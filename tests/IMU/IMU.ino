@@ -1,17 +1,16 @@
 #include <Arduino_LSM6DS3.h>  // Bibliothèque pour la gestion de l'IMU (Inertial Measurement Unit)
-#include <avr/dtostrf.h>      // Fonction pour la conversion des nombres décimaux en chaînes de caractères
 
 /*
  * Système
  */
-static const char MODULE_SYSTEM[] = "SYSTEM";
+static const String MODULE_SYSTEM = "SYSTEM";
 unsigned long time = 0;  //Durée en millisecondes depuis le démarrage de l'Arduino
 
 /*
  * IMU
  */
-static const char MODULE_IMU[] = "IMU";
-static const char MODULE_IMU_HEADER[] = "accX, accY, accZ, alphaX, alphaY, alphaZ ";
+static const String MODULE_IMU = "IMU";
+static const String MODULE_IMU_HEADER = "accX, accY, accZ, alphaX, alphaY, alphaZ ";
 float accX = 0.0f;
 float accY = 0.0f;
 float accZ = 0.0f;
@@ -21,26 +20,24 @@ float alphaZ = 0.0f;
 
 
 void setup() {
-  log((char *)MODULE_SYSTEM, (char *)"Initialisation générale", (char *)"");
+  log(MODULE_SYSTEM, "Initialisation générale", "");
   
-  Serial.begin(9600);
+  Serial.begin(250000);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
-  log((char *)MODULE_SYSTEM, (char *)"Liaison série initialisée", (char *)"");
+  log(MODULE_SYSTEM, "Liaison série initialisée", "");
   
   if (!IMU.begin()) {
-    log((char *)MODULE_IMU, (char *)"Erreur d'initialisation", (char *)"");
-    //Serial.println("Erreur d'initialisation de l'IMU !");
+    log(MODULE_IMU, "Erreur d'initialisation", "");
     while (true); // Blocage du programme
   }
   
-  log((char *)MODULE_IMU, (char *)"IMU initialisée", (char *)"");
-  char temp[10];
-  log((char *)MODULE_IMU, (char *)"Fréquence d'échantillonnage des accéléromètres (Hz)", dtostrf(IMU.accelerationSampleRate(), 4, 2, temp));
-  log((char *)MODULE_IMU, (char *)"Fréquence d'échantillonnage des gyroscopes (Hz)", dtostrf(IMU.gyroscopeSampleRate(), 4, 2, temp));
+  log(MODULE_IMU, "IMU initialisée", "");
+  log(MODULE_IMU, "Fréquence d'échantillonnage des accéléromètres (Hz)", String(IMU.accelerationSampleRate(), 2));
+  log(MODULE_IMU, "Fréquence d'échantillonnage des gyroscopes (Hz)", String(IMU.gyroscopeSampleRate(), 2));
 
-  delay(1000);
+  delay(2000);
 }
 
 void loop() {
@@ -48,54 +45,36 @@ void loop() {
 }
 
 void lireImu() {
-  const char * separateur = ", ";
-  char temp[10];
-  char str[70];
+  const String SEPARATEUR = ", ";
+  const int DECIMALES = 3;
  
   if (IMU.accelerationAvailable()
     && IMU.gyroscopeAvailable()) {
     IMU.readAcceleration(accX, accY, accZ);
     IMU.readGyroscope(alphaX, alphaY, alphaZ);
-    
-    strcpy(str, dtostrf(accX, 4, 2, temp));
-    strcat(str, separateur);
-    strcat(str, dtostrf(accY, 4, 2, temp));
-    strcat(str, separateur);
-    strcat(str, dtostrf(accZ, 4, 2, temp));
-    strcat(str, separateur);
-    strcat(str, dtostrf(alphaX, 4, 2, temp));
-    strcat(str, separateur);
-    strcat(str, dtostrf(alphaX, 4, 2, temp));    
-    strcat(str, separateur);
-    strcat(str, dtostrf(alphaX, 4, 2, temp));
 
-    log((char *)MODULE_IMU, (char *)MODULE_IMU_HEADER, str);
+    String data = String(String(accX, DECIMALES) + SEPARATEUR
+      + String(accY, DECIMALES) + SEPARATEUR
+      + String(accZ, DECIMALES) + SEPARATEUR
+      + String(alphaX, DECIMALES) + SEPARATEUR
+      + String(alphaY, DECIMALES) + SEPARATEUR
+      + String(alphaZ, DECIMALES));
+
+    log(MODULE_IMU, MODULE_IMU_HEADER, data);
   }
 }
 
 // Fonction d'écriture des logs (vers le port série)
-void log(char* module, char* message, char* details) {
-  char str[256];
-  char temp[10];
-  const char * separateur = ", ";
-  const char * guillemets = "\"";
+void log(String module, String message, String details) {
+  const String SEPARATEUR = ", ";
+  const String GUILLEMETS = "\"";
 
   time = millis();
-  snprintf(temp, 10, "%lu", time);
-  strcpy(str, temp);
 
-  strcat(str, separateur);
-  strcat(str, module);
+  String log = String(String(time) + SEPARATEUR
+    + module + SEPARATEUR
+    + GUILLEMETS + message + GUILLEMETS + SEPARATEUR
+    + GUILLEMETS + details + GUILLEMETS);
 
-  strcat(str, separateur);
-  strcat(str, guillemets);
-  strcat(str, message);
-  strcat(str, guillemets);
-
-  strcat(str, separateur);
-  strcat(str, guillemets);
-  strcat(str, details);
-  strcat(str, guillemets);
-
-  Serial.println(str);  
+  Serial.println(log);  
 }
