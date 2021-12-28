@@ -34,13 +34,13 @@ void CentraleInertielle::lire(DonneesInertielles &data) {
     IMU.readGyroscope(data.alphaX, data.alphaY, data.alphaZ);
 
     if (logging) {
-      String str = String(String(millis()) + SEPARATEUR
+      String str = String(millis()) + SEPARATEUR
         + String(data.accX, decimales) + SEPARATEUR
         + String(data.accY, decimales) + SEPARATEUR
         + String(data.accZ, decimales) + SEPARATEUR
         + String(data.alphaX, decimales) + SEPARATEUR
         + String(data.alphaY, decimales) + SEPARATEUR
-        + String(data.alphaZ, decimales));
+        + String(data.alphaZ, decimales);
       logger.log(SUB_MODULE_IMU_DATA, MODULE_IMU_HEADER, str);
     }
   }

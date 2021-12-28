@@ -7,7 +7,7 @@
 #include "Wifi.h"
 #include "secrets.h"
 
-static const String MODULE_SYSTEME = "SYSTÈME";
+static const String MODULE_SYSTEME = "SYSTEM";
 
 /* Variable globales */
 // Instanciation d'un loggeur
@@ -22,17 +22,22 @@ CentraleInertielle centrale(logger);
 void setup() {
   logger.log(MODULE_SYSTEME, "Initialisation générale", "");
   initSerial();
+  
   wifi.listerReseaux();
   wifi.init(SECRET_SSID, SECRET_PASS);
   wifi.logStatut();
+
   centrale.logging = false;
   centrale.init();
 
   delay(2000);
+  //centrale.logging = true;
 }
 
 void loop() {
+  wifi.lireUdp();
   centrale.lire(donneesInertiellesCourantes);
+  wifi.ecrireUdp(String(donneesInertiellesCourantes.t));
 }
 
 

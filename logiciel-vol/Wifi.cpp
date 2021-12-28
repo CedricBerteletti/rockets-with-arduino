@@ -5,6 +5,9 @@
 #include "Wifi.h"
 
 const String Wifi::MODULE_WIFI = "WIFI";
+const String Wifi::MODULE_WIFI_UDP_REC = "WIFI_UDP_REC";
+const String Wifi::MODULE_WIFI_UDP_SEND = "WIFI_UDP_SEND";
+const unsigned int Wifi::LOCAL_PORT = 23900;
 
 Wifi::Wifi(Logger &logger):logger(logger) {
 
@@ -21,9 +24,9 @@ void Wifi::listerReseaux()
     logger.log(MODULE_WIFI, "Nombre de réseaux trouvés : ", String(numSsid));
 
     for (int net = 0; net < numSsid; net++) {
-      logger.log(MODULE_WIFI, "Réseau Wifi trouvé : ", String(String(net)
+      logger.log(MODULE_WIFI, "Réseau Wifi trouvé : ", String(net)
         + " | " + String(WiFi.SSID(net))
-        + " | Signal : " + String(WiFi.RSSI(net)) + " dBm")
+        + " | Signal : " + String(WiFi.RSSI(net)) + " dBm"
         + " | " + typeChiffrement(WiFi.encryptionType(net)) );
     }
   }
@@ -46,6 +49,7 @@ void Wifi::init(char ssid[], char pwd[])
 
   if (statut == WL_CONNECTED) {
     actif = true;
+    udp.begin(LOCAL_PORT);
     logger.log(MODULE_WIFI, "Connecté au réseau : ", String(ssid));
   }
   else {    
@@ -56,9 +60,41 @@ void Wifi::init(char ssid[], char pwd[])
 
 void Wifi::logStatut()
 {
-  logger.log(MODULE_WIFI, "Statut", String(WiFi.localIP())
+  logger.log(MODULE_WIFI, "Statut", ipAddress(WiFi.localIP())
     + " | " + String(WiFi.SSID())
-    + " | " + String(WiFi.RSSI()));  
+    + " | " + String(WiFi.RSSI()) );  
+}
+
+void Wifi::lireUdp() {
+  if (actif) {
+    // Paquet disponible ?
+    int taillePaquet = udp.parsePacket();
+    if (taillePaquet) {
+      remoteIp = udp.remoteIP();
+      remotePort = udp.remotePort();
+
+      // read the packet into packetBufffer
+      int len = udp.read(bufferReception, 255);
+      if (len > 0) {
+        bufferReception[len] = 0;
+      }
+      logger.log(MODULE_WIFI_UDP_REC, "Commande", ipAddress(udp.remoteIP())
+        + " | " + String(udp.remotePort())
+        + " | " + String(bufferReception));
+    }
+  }
+}
+
+void Wifi::ecrireUdp(String msg) {
+  if (actif && udp.remoteIP()) {
+    msg.toCharArray(bufferEnvoi, 255);
+    udp.beginPacket(udp.remoteIP(), LOCAL_PORT);
+    udp.write(bufferEnvoi);
+    logger.log(MODULE_WIFI_UDP_SEND, "Envoi", ipAddress(udp.remoteIP())
+      + " | " + String(udp.remotePort())
+      + " | " + String(bufferEnvoi));
+    udp.endPacket();
+  }
 }
 
 String Wifi::typeChiffrement(int type) {
@@ -83,4 +119,12 @@ String Wifi::typeChiffrement(int type) {
       return String("Unknown");
       break;
   }
+}
+
+String Wifi::ipAddress(IPAddress ip) {
+  uint8_t byte3 = (uint8_t)(ip >> 24);  // 0xde
+  uint8_t byte2 = (uint8_t)(ip >> 16);  // 0xad
+  uint8_t byte1 = (uint8_t)(ip >> 8);   // 0xbe
+  uint8_t byte0 = (uint8_t)ip;
+  return String(byte0) + "." + String(byte1) + "." + String(byte2) + "." + String(byte3);
 }
