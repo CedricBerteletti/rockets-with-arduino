@@ -13,7 +13,7 @@ void Logger::log(String module, String message, String details) {
 
   String log;
   if (toSerial || toSdcard || toUdp) {
-    log = String(String(millis()) + SEPARATEUR
+    log = String(millis() + SEPARATEUR
       + module + SEPARATEUR
       + GUILLEMETS + message + GUILLEMETS + SEPARATEUR
       + GUILLEMETS + details + GUILLEMETS);
