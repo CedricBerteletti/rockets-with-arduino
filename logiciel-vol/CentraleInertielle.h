@@ -24,11 +24,11 @@ class CentraleInertielle
 {
   public:
     CentraleInertielle(Logger &logger);
-    void init();
-    void lire(DonneesInertielles &data);
     bool actif = true;
     bool logging = true;
     int decimales = 2;
+    void init();
+    void lire(DonneesInertielles &data);
   private:
     static const String MODULE_IMU;
     static const String SUB_MODULE_IMU_DATA;
