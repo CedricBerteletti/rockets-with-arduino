@@ -1,7 +1,8 @@
-# rocket-with-arduino
-Some programs for our arduino powered rocket !
+# Fusée avec Arduino embarqué
 
-## Arduino program
+Quelques programmes pour notre fusée avec Arduino embarqué !
+
+## Logiciel de vol pour l'Arduino embarqué
 
 Needed libraries:
-- Arduino_LSM6DS3 : IMU
+- Arduino_LSM6DS3 : centrale inertielle (CI)
