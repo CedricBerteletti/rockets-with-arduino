@@ -6,6 +6,8 @@
 #define Logger_h
 
 #include "Arduino.h"
+#include "aides.h"
+#include "Wifi.h"
 
 class Logger
 {
@@ -15,6 +17,7 @@ class Logger
     bool toSerial = true;
     bool toSdcard = false;
     bool toUdp = false;
+    Wifi *wifi;
 };
 
 #endif

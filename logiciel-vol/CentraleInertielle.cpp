@@ -18,7 +18,7 @@ void CentraleInertielle::init()
     while (true); // Blocage du programme
   }
   
-  logger.log(MODULE_IMU, "IMU initialisée", "");
+  logger.log(MODULE_IMU, "Centrale inertielle initialisée", "");
   logger.log(MODULE_IMU, "Fréquence d'échantillonnage des accéléromètres (Hz)", String(IMU.accelerationSampleRate(), 2));
   logger.log(MODULE_IMU, "Fréquence d'échantillonnage des gyroscopes (Hz)", String(IMU.gyroscopeSampleRate(), 2));
 }
@@ -33,7 +33,7 @@ void CentraleInertielle::lire(DonneesInertielles &data) {
     IMU.readAcceleration(data.accX, data.accY, data.accZ);
     IMU.readGyroscope(data.alphaX, data.alphaY, data.alphaZ);
 
-    if (logging) {
+    if (loggingData) {
       String str = String(millis()) + SEPARATEUR
         + String(data.accX, decimales) + SEPARATEUR
         + String(data.accY, decimales) + SEPARATEUR
