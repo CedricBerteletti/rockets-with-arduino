@@ -8,8 +8,8 @@ from tkinter import Tk
 from ecran_principal import EcranPrincipal
 
 # Constantes
-LARGEUR_ECRAN = 900
-HAUTEUR_ECRAN = 600
+LARGEUR_ECRAN = 1280
+HAUTEUR_ECRAN = 1024
 
 
 
