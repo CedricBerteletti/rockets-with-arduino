@@ -13,7 +13,7 @@ static const String MODULE_SYSTEME = "SYSTEM";
 // Instanciation d'un loggeur
 Logger logger;
 // Instanciation d'un objet gérant la connexion et les communications wifi
-Wifi wifi(logger);
+Wifi wifi;
 // Instanciation d'un objet pour stocker les valeurs courantes des accéléromètres et gyroscopes
 DonneesInertielles donneesInertiellesCourantes;
 // Instanciation de l'objet gérant la centrale inertielle (constructeur nécessitant un logger en paramètre)
@@ -26,18 +26,20 @@ void setup() {
   wifi.listerReseaux();
   wifi.init(SECRET_SSID, SECRET_PASS);
   wifi.logStatut();
+  logger.wifi = &wifi;
+  logger.toUdp = true;
 
-  centrale.logging = false;
+  centrale.loggingData = false;
   centrale.init();
 
   delay(2000);
-  //centrale.logging = true;
+  centrale.loggingData = true;
 }
 
 void loop() {
   wifi.lireUdp();
+
   centrale.lire(donneesInertiellesCourantes);
-  wifi.ecrireUdp(String(donneesInertiellesCourantes.t));
 }
 
 

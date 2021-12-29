@@ -25,7 +25,7 @@ class CentraleInertielle
   public:
     CentraleInertielle(Logger &logger);
     bool actif = true;
-    bool logging = true;
+    bool loggingData = true;
     int decimales = 2;
     void init();
     void lire(DonneesInertielles &data);
