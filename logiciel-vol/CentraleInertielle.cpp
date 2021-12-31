@@ -14,13 +14,13 @@ CentraleInertielle::CentraleInertielle(Logger &logger):logger(logger) {
 void CentraleInertielle::init()
 {
   if (!IMU.begin()) {
-    logger.log(MODULE_IMU, "Erreur d'initialisation", "");
+    logger.log(MODULE_IMU, "ERROR_INIT", "Erreur d'initialisation");
     while (true); // Blocage du programme
   }
   
-  logger.log(MODULE_IMU, "Centrale inertielle initialisée", "");
-  logger.log(MODULE_IMU, "Fréquence d'échantillonnage des accéléromètres (Hz)", String(IMU.accelerationSampleRate(), 2));
-  logger.log(MODULE_IMU, "Fréquence d'échantillonnage des gyroscopes (Hz)", String(IMU.gyroscopeSampleRate(), 2));
+  logger.log(MODULE_IMU, "INITIALIZED", "Centrale inertielle initialisée");
+  logger.log(MODULE_IMU, "ACCELEROMETER_FREQUENCY", String(IMU.accelerationSampleRate(), 2));
+  logger.log(MODULE_IMU, "GYRO_FREQUENCY", String(IMU.gyroscopeSampleRate(), 2));
 }
 
 void CentraleInertielle::lire(DonneesInertielles &data) {

@@ -6,6 +6,10 @@ Point d'entrée pour le programme du poste de contrôle de la fusée
 
 from tkinter import Tk
 from ecran_principal import EcranPrincipal
+from connexion import Connexion
+from controleur import Controleur
+from telemetrie import Telemetrie
+from time import sleep
 
 # Constantes
 LARGEUR_ECRAN = 1280
@@ -14,12 +18,25 @@ HAUTEUR_ECRAN = 1024
 
 
 def main(args):
+    connexion = Connexion()
+    connexion.init("192.168.0.50", 23900) # TODO dans EcranPrincipal
+    controleur = Controleur(connexion)
+    telemetrie = Telemetrie(connexion)
+    telemetrie.start()
+    
     fenetre = Tk("")
     fenetre.title("Centre de Contrôle et de Télémétrie")
     fenetre.geometry(str(LARGEUR_ECRAN) + "x" + str(HAUTEUR_ECRAN))
-    principal = EcranPrincipal()
+    principal = EcranPrincipal(controleur, telemetrie)
+
+    # Boucle principale de l'application
     fenetre.mainloop()
 
+    # Arrêt de l'application
+    # Fin du thread d'aquisition des données
+    telemetrie.actif = False
+    sleep(1)
+    connexion.fermer()
 
 
 print("Programme principal")

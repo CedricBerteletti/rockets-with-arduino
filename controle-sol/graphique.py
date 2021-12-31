@@ -6,6 +6,7 @@ from tkinter.constants import VERTICAL
 
 
 class Graphique(LabelFrame):
+    "Classe pour gérer un graphique"
 
     def __init__(self, root, text):
         super().__init__(root, text=text)

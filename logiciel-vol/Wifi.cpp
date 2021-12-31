@@ -5,8 +5,6 @@
 #include "Wifi.h"
 
 const String Wifi::MODULE_WIFI = "WIFI";
-const String Wifi::MODULE_WIFI_UDP_REC = "WIFI_UDP_REC";
-const String Wifi::MODULE_WIFI_UDP_SEND = "WIFI_UDP_SEND";
 const unsigned int Wifi::LOCAL_PORT = 23900;
 
 Wifi::Wifi() {
@@ -14,16 +12,16 @@ Wifi::Wifi() {
 
 void Wifi::listerReseaux()
 {
-  log(MODULE_WIFI, "Recherche ...", "");
+  log(MODULE_WIFI, "SEARCHING", "");
   int numSsid = WiFi.scanNetworks();
   if (numSsid == -1) {
-    log(MODULE_WIFI, "Aucun réseau trouvé", "");
+    log(MODULE_WIFI, "NO_NETWORK", "");
   }
   else {
-    log(MODULE_WIFI, "Nombre de réseaux trouvés : ", String(numSsid));
+    log(MODULE_WIFI, "NETWORKS_FOUND", String(numSsid));
 
     for (int net = 0; net < numSsid; net++) {
-      log(MODULE_WIFI, "Réseau Wifi trouvé : ", String(net)
+      log(MODULE_WIFI, "NETWORK", String(net)
         + " | " + String(WiFi.SSID(net))
         + " | Signal : " + String(WiFi.RSSI(net)) + " dBm"
         + " | " + typeChiffrement(WiFi.encryptionType(net)) );
@@ -38,7 +36,7 @@ void Wifi::init(char ssid[], char pwd[])
 
   while (statut != WL_CONNECTED
     &&  millis() - tempsDebut < 10000) { // Tentative de connexion pendant 10s
-    log(MODULE_WIFI, "Tentative de connexion au réseau : ", String(ssid));
+    log(MODULE_WIFI, "CONNECTING", String(ssid));
 
     // Connexion à un réseau to WPA/WPA2
     statut = WiFi.begin(ssid, pwd);
@@ -49,22 +47,22 @@ void Wifi::init(char ssid[], char pwd[])
   if (statut == WL_CONNECTED) {
     actif = true;
     udp.begin(LOCAL_PORT);
-    log(MODULE_WIFI, "Connecté au réseau : ", String(ssid));
+    log(MODULE_WIFI, "CONNECTED", String(ssid));
   }
   else {    
     actif = false;
-    log(MODULE_WIFI, "Erreur de connexion au réseau : ", String(ssid));
+    log(MODULE_WIFI, "ERROR_CONNECTION", String(ssid));
   }
 }
 
 void Wifi::logStatut()
 {
-  log(MODULE_WIFI, "Statut", ipAddress(WiFi.localIP())
+  log(MODULE_WIFI, "STATUS", ipAddress(WiFi.localIP())
     + " | " + String(WiFi.SSID())
     + " | " + String(WiFi.RSSI()) );  
 }
 
-void Wifi::lireUdp() {
+String Wifi::lireUdp() {
   if (actif) {
     // Paquet disponible ?
     int taillePaquet = udp.parsePacket();
@@ -78,11 +76,16 @@ void Wifi::lireUdp() {
         bufferReception[len] = 0;
       }
 
-      if (loggingIo) log(MODULE_WIFI_UDP_REC, "Commande", ipAddress(udp.remoteIP())
+      if (loggingIo) log(MODULE_WIFI, "RECEPTION", ipAddress(udp.remoteIP())
         + " | " + String(udp.remotePort())
         + " | " + String(bufferReception));
     }
+    else {
+      // On indique une chaîne vide
+      bufferReception[0] = 0;
+    }
   }
+  return String(bufferReception);
 }
 
 void Wifi::ecrireUdp(String msg) {
@@ -92,7 +95,7 @@ void Wifi::ecrireUdp(String msg) {
     udp.write(bufferEnvoi);
     udp.endPacket();
 
-    if (loggingIo) log(MODULE_WIFI_UDP_SEND, "Envoi", ipAddress(udp.remoteIP())
+    if (loggingIo) log(MODULE_WIFI, "SENDING", ipAddress(udp.remoteIP())
       + " | " + String(udp.remotePort())
       + " | " + String(bufferEnvoi));
   }
