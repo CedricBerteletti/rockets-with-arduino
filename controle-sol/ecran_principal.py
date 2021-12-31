@@ -117,7 +117,6 @@ class EcranPrincipal(Frame):
         # self.commandeText.set("")
         commande = self.commandeText.get()
         if commande[0:8] == "connect ":
-            print("connect")
             connect, ip, port = commande.split()
             self.controleur.connecter(ip, int(port))
         else:
