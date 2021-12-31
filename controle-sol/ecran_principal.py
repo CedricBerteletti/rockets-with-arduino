@@ -30,10 +30,10 @@ class EcranPrincipal(Frame):
         panneaux.add(panneauGauche)        
 
         # 2 panneaux horizontaux de gauche
-        visualisation = LabelFrame(panneaux, text="Vue")
+        visualisation = LabelFrame(panneauGauche, text="Vue")
         panneauGauche.add(visualisation, height=self.winfo_height()*2/3)
 
-        controle = LabelFrame(panneaux, text="Contrôle")
+        controle = LabelFrame(panneauGauche, text="Contrôle")
         panneauGauche.add(controle, height=self.winfo_height()/3)
         boutons = Frame(controle)
         boutons.pack(side=TOP)
@@ -115,6 +115,11 @@ class EcranPrincipal(Frame):
         # self.logs.see("end")
         # self.logs.config(state=DISABLED)
         # self.commandeText.set("")
-
-        self.controleur.envoyerCommandeBrute(self.commandeText.get())
+        commande = self.commandeText.get()
+        if commande[0:8] == "connect ":
+            print("connect")
+            connect, ip, port = commande.split()
+            self.controleur.connecter(ip, int(port))
+        else:
+            self.controleur.envoyerCommandeBrute(self.commandeText.get())
         self.commandeText.set("")
