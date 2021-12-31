@@ -18,7 +18,7 @@ class Wifi
     void listerReseaux();
     void init(char ssid[], char pwd[]);
     void logStatut();
-    void lireUdp();
+    String lireUdp();
     void ecrireUdp(String msg);
   private:
     static const String MODULE_WIFI;
