@@ -12,19 +12,20 @@ Wifi::Wifi() {
 
 void Wifi::listerReseaux()
 {
-  log(MODULE_WIFI, "SEARCHING", "");
+  log(MODULE_WIFI, "SEARCHING", "", true);
   int numSsid = WiFi.scanNetworks();
   if (numSsid == -1) {
-    log(MODULE_WIFI, "NO_NETWORK", "");
+    log(MODULE_WIFI, "NO_NETWORK", "", true);
   }
   else {
-    log(MODULE_WIFI, "NETWORKS_FOUND", String(numSsid));
+    log(MODULE_WIFI, "NETWORKS_FOUND", String(numSsid), true);
 
     for (int net = 0; net < numSsid; net++) {
       log(MODULE_WIFI, "NETWORK", String(net)
         + " | " + String(WiFi.SSID(net))
         + " | Signal : " + String(WiFi.RSSI(net)) + " dBm"
-        + " | " + typeChiffrement(WiFi.encryptionType(net)) );
+        + " | " + typeChiffrement(WiFi.encryptionType(net)),
+        true);
     }
   }
 }
@@ -36,7 +37,7 @@ void Wifi::init(char ssid[], char pwd[])
 
   while (statut != WL_CONNECTED
     &&  millis() - tempsDebut < 10000) { // Tentative de connexion pendant 10s
-    log(MODULE_WIFI, "CONNECTING", String(ssid));
+    log(MODULE_WIFI, "CONNECTING", String(ssid), true);
 
     // Connexion à un réseau to WPA/WPA2
     statut = WiFi.begin(ssid, pwd);
@@ -47,11 +48,11 @@ void Wifi::init(char ssid[], char pwd[])
   if (statut == WL_CONNECTED) {
     actif = true;
     udp.begin(LOCAL_PORT);
-    log(MODULE_WIFI, "CONNECTED", String(ssid));
+    log(MODULE_WIFI, "CONNECTED", String(ssid), true);
   }
   else {    
     actif = false;
-    log(MODULE_WIFI, "ERROR_CONNECTION", String(ssid));
+    log(MODULE_WIFI, "ERROR_CONNECTION", String(ssid), true);
   }
 }
 
@@ -59,7 +60,8 @@ void Wifi::logStatut()
 {
   log(MODULE_WIFI, "STATUS", ipAddress(WiFi.localIP())
     + " | " + String(WiFi.SSID())
-    + " | " + String(WiFi.RSSI()) );  
+    + " | " + String(WiFi.RSSI()),
+    true);  
 }
 
 String Wifi::lireUdp() {
@@ -78,7 +80,8 @@ String Wifi::lireUdp() {
 
       if (loggingIo) log(MODULE_WIFI, "RECEPTION", ipAddress(udp.remoteIP())
         + " | " + String(udp.remotePort())
-        + " | " + String(bufferReception));
+        + " | " + String(bufferReception),
+        false);
     }
     else {
       // On indique une chaîne vide
@@ -97,7 +100,8 @@ void Wifi::ecrireUdp(String msg) {
 
     if (loggingIo) log(MODULE_WIFI, "SENDING", ipAddress(udp.remoteIP())
       + " | " + String(udp.remotePort())
-      + " | " + String(bufferEnvoi));
+      + " | " + String(bufferEnvoi),
+      false);
   }
 }
 
@@ -133,6 +137,10 @@ String Wifi::ipAddress(IPAddress ip) {
   return String(byte0) + "." + String(byte1) + "." + String(byte2) + "." + String(byte3);
 }
 
-void Wifi::log(String module, String message, String details) {
-  Serial.println(formatLog(module, message, details));
+void Wifi::log(String module, String message, String details, bool toWifi) {
+  String str = formatLog(module, message, details);
+  Serial.println(str);
+  if(actif && toWifi) {
+    ecrireUdp(str);
+  }
 }

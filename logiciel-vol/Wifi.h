@@ -32,7 +32,7 @@ class Wifi
     unsigned int remotePort;
     String typeChiffrement(int type);
     String ipAddress(IPAddress ip);
-    void log(String module, String message, String details);
+    void log(String module, String message, String details, bool toWifi);
 };
 
 #endif
