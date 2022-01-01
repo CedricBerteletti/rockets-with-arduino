@@ -21,12 +21,10 @@ class Wifi
     String lireUdp();
     void ecrireUdp(String msg);
   private:
-    static const String MODULE_WIFI;
-    static const String MODULE_WIFI_UDP_REC;
-    static const String MODULE_WIFI_UDP_SEND;
+    static const char MODULE_WIFI[];
     static const unsigned int LOCAL_PORT;
-    char bufferReception[256];
-    char bufferEnvoi[256];
+    char bufferReception[STRING_MAX_LENGTH];
+    char bufferEnvoi[STRING_MAX_LENGTH];
     WiFiUDP udp;
     IPAddress remoteIp;
     unsigned int remotePort;
