@@ -4,7 +4,7 @@
 
 #include "Wifi.h"
 
-const String Wifi::MODULE_WIFI = "WIFI";
+const char Wifi::MODULE_WIFI[] = "WIFI";
 const unsigned int Wifi::LOCAL_PORT = 23900;
 
 Wifi::Wifi() {
@@ -138,7 +138,9 @@ String Wifi::ipAddress(IPAddress ip) {
 }
 
 void Wifi::log(String module, String message, String details, bool toWifi) {
-  String str = formatLog(module, message, details);
+  //String str = formatLog(module, message, details);
+  char str[STRING_MAX_LENGTH];
+  formatLog(module, message, details, str)
   Serial.println(str);
   if(actif && toWifi) {
     ecrireUdp(str);
