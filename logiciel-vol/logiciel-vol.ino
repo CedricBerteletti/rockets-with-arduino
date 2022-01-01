@@ -3,12 +3,17 @@
  * embarquant un Arduino Nano 33 IoT
  */
 
+#include "Logger.h"
 #include "CentraleInertielle.h"
 #include "Wifi.h"
 #include "secrets.h"
 
+// Nombre d'étapes du vol
+#define NB_ETAPES 10
+
 static const String MODULE_SYSTEME = "SYSTEM";
 static const String MODULE_COMMANDE = "COMMAND";
+static const long DELAI_FLUSH = 1000; // Flush des logs sur la carte SD toutes les secondes
 
 /* Variable globales */
 // Instanciation d'un loggeur
@@ -17,6 +22,9 @@ Logger logger;
 Wifi wifi;
 // Instanciation de l'objet gérant la centrale inertielle (constructeur nécessitant un logger en paramètre)
 CentraleInertielle centrale(logger);
+// Date à laquelle réaliser un nouveau flush des données de logs
+// pas à chaque écriture car prendre trop de temps
+long flushSuivant = 0;
 
 /* Etat de la fusée */
 static const int INITIAL = -1;
@@ -36,10 +44,15 @@ int fuseeStatut = INITIAL;
 // Instanciation d'un objet pour stocker les valeurs courantes des accéléromètres et gyroscopes
 DonneesInertielles donneesInertiellesCourantes;
 long dateLancement = 0;
+int dureeEtape[NB_ETAPES];
+String commandeEtape[NB_ETAPES];
+long dateEtapeSuivante = -1;
 
 void setup() {
   logger.log(MODULE_SYSTEME, "SYSTEM_INIT", "Initialisation générale");
   initSerial();
+  delay(1000);
+  logger.initSdcard();
   
   wifi.listerReseaux();
   wifi.init(SECRET_SSID, SECRET_PASS);
@@ -51,12 +64,21 @@ void setup() {
   centrale.loggingData = false;
   centrale.init();
 
-  delay(2000);
+  delay(1000);
+  flushSuivant = millis();
 }
 
 void loop() {
   lireCommande();
   centrale.lire(donneesInertiellesCourantes);
+  long date = millis();
+  if(date > flushSuivant) {
+    logger.flush();
+    flushSuivant = flushSuivant + DELAI_FLUSH;
+  }
+  if(dateEtapeSuivante != -1 && date > dateEtapeSuivante) {
+    etapeSuivante();
+  }
 }
 
 
@@ -77,6 +99,12 @@ void executerCommande(String commande) {
     if(commande.startsWith("connect ")) {
       // Ne rien faire : on a déjà récupéré l'IP de l'émetteur dans le module Wifi
     }
+    else if (commande.startsWith("initSdcard")) {
+      logger.initSdcard();
+    }
+    else if (commande.startsWith("flushLogs")) {
+      logger.flush();
+    }
     else if (commande.startsWith("rocketStatus")) {
       logger.log(MODULE_SYSTEME, "ROCKET_STATUS", String(fuseeStatut));
     }
@@ -86,7 +114,7 @@ void executerCommande(String commande) {
     else if (commande.startsWith("toggleLogImuData")) {
       centrale.loggingData = !centrale.loggingData;
     }
-    // Perte de la connexion en cours
+    // Perte de la connexion en cours de commande
     // else if (commande.startsWith("wifiNetworks")) {
     //   wifi.listerReseaux();
     // }
@@ -94,12 +122,15 @@ void executerCommande(String commande) {
       // TODO
     }
     else if (commande.startsWith("launch ")) {
+      // TODO code
       etapeSuivante();
     }
     else if (commande.startsWith("stage ")) {
+      // TODO code
       etapeSuivante();
     }
     else if (commande.startsWith("stop ")) {
+      // TODO code
       fuseeStatut = -1;
     }
     else if (commande.startsWith("digitalWrite ")) {
@@ -111,9 +142,14 @@ void executerCommande(String commande) {
 void etapeSuivante() {
   fuseeStatut = fuseeStatut + 1;
   if(fuseeStatut >= 0) {
-    if(fuseeStatut == 0) dateLancement = millis();
-    // TODO
-  }
+    if(fuseeStatut == 0) {
+      dateLancement = millis();
+      dateEtapeSuivante = dateLancement;
+    }
+    logger.log(MODULE_SYSTEME, "STAGGING", String(fuseeStatut));
+    dateEtapeSuivante = dateEtapeSuivante + dureeEtape[fuseeStatut];
+    executerCommande(commandeEtape[fuseeStatut]);
+  }  
 }
 
 

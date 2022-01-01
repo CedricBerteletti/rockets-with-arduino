@@ -21,11 +21,15 @@ Permet de recevoir via Wifi les commandes :
 - rocketStatus : état de la fusée
 - wifiStatus : état de la connexion Wifi
 - toggleLogImuData : active/désactive les logs (via serial, SD-Card et Wifi) des données de la centrale inertielle
-- configureStep no_step commande : précise la temporisation d'une étape donnée et la commande à exécuter au début de l'étape
+- configureStep no_step delai commande : précise la temporisation (en ms) d'une étape donnée et la commande à exécuter au **début** de l'étape
 - launch code : passe à l'étape suivante (idem "stage"). Protégé par un code.
 - stage code : passe à l'étape suivante (idem "stage"). Protégé par un code.
 - stop code : interromp le programme de la fusée et revient à l'étape initiale. Protégé par un code. Attention aux conséquences !
 - digitalWrite pin niveau : envoi un signal ou l'arrête sur la sortie numérique désignée.
+
+Remarque sur la carte SD :
+- à alimenter en 5V ;
+- nom de fichier de 8 caractères maximum (retour à l'époque du DOS !!)
 
 
 ## controle-sol - Centre de Contrôle et de Télémétrie
