@@ -6,8 +6,12 @@
 #define secrets_h
 
 // Wifi
-char SECRET_SSID[] = "Livebox-40A0";
-char SECRET_PASS[] = "ShShgbkvwPchYki7KP";
+char WIFI1_SSID[] = "";
+char WIFI1_PASS[] = "";
+char WIFI2_SSID[] = "";
+char WIFI2_PASS[] = "";
+
+// Code de lancement
 char SECRET_COMMAND_CODE[] = "";
 
 #endif
