@@ -2,11 +2,11 @@
 * Gestion de la centrale inertielle de l'Arduino Nano 33 IoT
 */
 
-#include "CentraleInertielle.h"
+#include "CentraleInertielle.hpp"
 
-const String CentraleInertielle::MODULE_IMU = "IMU";
-const String CentraleInertielle::SUB_MODULE_IMU_DATA = "IMU_DATA";
-const String CentraleInertielle::MODULE_IMU_HEADER = "t, accX, accY, accZ, alphaX, alphaY, alphaZ";
+const char CentraleInertielle::MODULE_IMU[] = "IMU";
+const char CentraleInertielle::SUB_MODULE_IMU_DATA[] = "IMU_DATA";
+const char CentraleInertielle::MODULE_IMU_HEADER[] = "t, accX, accY, accZ, alphaX, alphaY, alphaZ";
 
 CentraleInertielle::CentraleInertielle(Logger &logger):logger(logger) {
 }
