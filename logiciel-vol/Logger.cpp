@@ -37,16 +37,21 @@ void Logger::initSdcard() {
       log(MODULE_LOGGER, "ERROR_SDCARD_VOLUME", "Aucune partition FAT16/FAT32 trouvée.");
     }
     else {
-      log(MODULE_LOGGER, "SDCARD_VOLUME_CLUSTERS", String(volume.clusterCount()));
-      log(MODULE_LOGGER, "SDCARD_VOLUME_BLOCKS_PER_CLUSTER", String(volume.blocksPerCluster()));
-      log(MODULE_LOGGER, "SDCARD_VOLUME_BLOCKS", String(volume.blocksPerCluster() * volume.clusterCount()));
+      itoa(volume.clusterCount(), strLog, 10);
+      log(MODULE_LOGGER, "SDCARD_VOLUME_CLUSTERS", strLog);
+      itoa(volume.blocksPerCluster(), strLog, 10);
+      log(MODULE_LOGGER, "SDCARD_VOLUME_BLOCKS_PER_CLUSTER", strLog);
+      itoa(volume.blocksPerCluster() * volume.clusterCount(), strLog, 10);
+      log(MODULE_LOGGER, "SDCARD_VOLUME_BLOCKS", strLog);
+      itoa(volume.fatType(), strLog, 10);
+      log(MODULE_LOGGER, "SDCARD_VOLUME_FAT_TYPE", strLog);
       uint32_t volumesize;
-      log(MODULE_LOGGER, "SDCARD_VOLUME_FAT_TYPE", String(volume.fatType()));
       volumesize = volume.blocksPerCluster(); // clusters are collections of blocks
       volumesize *= volume.clusterCount(); // we'll have a lot of clusters
       volumesize /= 2; // SD card blocks are always 512 bytes (2 blocks are 1KB)
       volumesize /= 1024;
-      log(MODULE_LOGGER, "SDCARD_VOLUME_SIZE_MB", String(volumesize));
+      itoa(volumesize, strLog, 10);
+      log(MODULE_LOGGER, "SDCARD_VOLUME_SIZE_MB", strLog);
 
       // log(MODULE_LOGGER, "SDCARD_VOLUME_ALL_FILES", "");
       // root.openRoot(volume);

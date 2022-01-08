@@ -7,6 +7,7 @@
 
 #include <Arduino.h>
 #include <Arduino_LSM6DS3.h>  // Bibliothèque pour la gestion de l'IMU (Inertial Measurement Unit)
+#include <avr/dtostrf.h>
 #include "Logger.hpp"
 
 
@@ -33,6 +34,10 @@ class CentraleInertielle
     static const char MODULE_IMU[];
     static const char SOUS_MODULE_IMU_DATA[];
     static const char ENTETE_DATA[];
+    static const char SEPARATEUR_DATA[];
+    // Une seule allocation des buffers/strings au chargement de l'instance
+    char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
+    char strNumber[10];
     Logger &logger;
 };
 
