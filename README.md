@@ -15,6 +15,8 @@ Bibliothèques nécessaires :
 Bibliothèques nécessaires :
 - Arduino_LSM6DS3 : centrale inertielle (CI)
 - WiFiNINA : connexion et communication via Wifi
+- SD : gestion de la carte SD
+- avr/dtostrf : pour convertir les floats en chaîne de caractères
 
 Permet de recevoir via Wifi les commandes :
 - connect ip port: permet de connaître le client distant et de lui retourner les mesures et le statut de la fusée

@@ -2,11 +2,11 @@
 * Logger
 */
 
-#include "Logger.h"
+#include "Logger.hpp"
 
 const int chipSelect = 10;
-const String Logger::MODULE_LOGGER = "LOGGER";
-const String Logger::NOM_FICHIER_LOGS = "rlogs.csv";
+const char Logger::MODULE_LOGGER[] = "LOGGER";
+const char Logger::NOM_FICHIER_LOGS[] = "rlogs.csv";
 
 
 Logger::Logger() {}
@@ -37,16 +37,21 @@ void Logger::initSdcard() {
       log(MODULE_LOGGER, "ERROR_SDCARD_VOLUME", "Aucune partition FAT16/FAT32 trouvée.");
     }
     else {
-      log(MODULE_LOGGER, "SDCARD_VOLUME_CLUSTERS", String(volume.clusterCount()));
-      log(MODULE_LOGGER, "SDCARD_VOLUME_BLOCKS_PER_CLUSTER", String(volume.blocksPerCluster()));
-      log(MODULE_LOGGER, "SDCARD_VOLUME_BLOCKS", String(volume.blocksPerCluster() * volume.clusterCount()));
+      itoa(volume.clusterCount(), strLog, 10);
+      log(MODULE_LOGGER, "SDCARD_VOLUME_CLUSTERS", strLog);
+      itoa(volume.blocksPerCluster(), strLog, 10);
+      log(MODULE_LOGGER, "SDCARD_VOLUME_BLOCKS_PER_CLUSTER", strLog);
+      itoa(volume.blocksPerCluster() * volume.clusterCount(), strLog, 10);
+      log(MODULE_LOGGER, "SDCARD_VOLUME_BLOCKS", strLog);
+      itoa(volume.fatType(), strLog, 10);
+      log(MODULE_LOGGER, "SDCARD_VOLUME_FAT_TYPE", strLog);
       uint32_t volumesize;
-      log(MODULE_LOGGER, "SDCARD_VOLUME_FAT_TYPE", String(volume.fatType()));
       volumesize = volume.blocksPerCluster(); // clusters are collections of blocks
       volumesize *= volume.clusterCount(); // we'll have a lot of clusters
       volumesize /= 2; // SD card blocks are always 512 bytes (2 blocks are 1KB)
       volumesize /= 1024;
-      log(MODULE_LOGGER, "SDCARD_VOLUME_SIZE_MB", String(volumesize));
+      itoa(volumesize, strLog, 10);
+      log(MODULE_LOGGER, "SDCARD_VOLUME_SIZE_MB", strLog);
 
       // log(MODULE_LOGGER, "SDCARD_VOLUME_ALL_FILES", "");
       // root.openRoot(volume);
@@ -81,19 +86,21 @@ void Logger::flush() {
   }
 }
 
-// Fonction d'écriture des logs
-void Logger::log(String module, String message, String details) {
-  String log;
+// Fonctions d'écriture des logs
+void Logger::log(const char module[], const char message[], const char details[]) {
   if (toSerial || toSdcard || toUdp) {
-    log = formatLog(module, message, details);
+    formatLog(strLog, module, message, details);
   }
 
-  if(toSerial) Serial.println(log);
-  if(toUdp) wifi->ecrireUdp(log);
-  if(toSdcard) {
-    fichier.println(log);
-    //fichier.flush();
-  }
+  if(toSerial) Serial.println(strLog);
+  if(toUdp) wifi->ecrireUdp(strLog);
+  if(toSdcard) fichier.println(strLog);
+}
+
+void Logger::log(const char module[], const char message[], String details) {
+  char str[LONGUEUR_MAX_CHAINE_CARACTERES];
+  details.toCharArray(str, LONGUEUR_MAX_CHAINE_CARACTERES);
+  log(module, message, str);
 }
 
 
