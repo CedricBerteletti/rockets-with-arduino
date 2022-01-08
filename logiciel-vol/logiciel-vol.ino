@@ -3,16 +3,16 @@
  * embarquant un Arduino Nano 33 IoT
  */
 
-#include "Logger.h"
-#include "CentraleInertielle.h"
-#include "Wifi.h"
-#include "secrets.h"
+#include "aides.hpp"
+#include "Logger.hpp"
+#include "Wifi.hpp"
+#include "CentraleInertielle.hpp"
 
 // Nombre d'étapes du vol
 #define NB_ETAPES 10
 
-static const String MODULE_SYSTEME = "SYSTEM";
-static const String MODULE_COMMANDE = "COMMAND";
+static const char MODULE_SYSTEME[] = "SYSTEM";
+static const char MODULE_COMMANDE[] = "COMMAND";
 static const long DELAI_FLUSH = 1000; // Flush des logs sur la carte SD toutes les secondes
 
 /* Variable globales */
@@ -25,6 +25,9 @@ CentraleInertielle centrale(logger);
 // Date à laquelle réaliser un nouveau flush des données de logs
 // pas à chaque écriture car prendre trop de temps
 long flushSuivant = 0;
+// Dernière commande reçue (déclaration globale pour éviter la réallocation dans la pile à chaque appel de lireCommande)
+char commande[LONGUEUR_MAX_CHAINE_CARACTERES];
+
 
 /* Etat de la fusée */
 static const int INITIAL = -1;
@@ -52,10 +55,10 @@ void setup() {
   logger.log(MODULE_SYSTEME, "SYSTEM_INIT", "Initialisation générale");
   initSerial();
   delay(1000);
-  logger.initSdcard();
+  //logger.initSdcard();
   
   wifi.listerReseaux();
-  wifi.init(SECRET_SSID, SECRET_PASS);
+  wifi.init();
   wifi.logStatut();
 
   logger.wifi = &wifi;
@@ -89,8 +92,8 @@ void initSerial() {
 }
 
 void lireCommande() {
-  String commande = wifi.lireUdp();
-  executerCommande(commande);
+  wifi.lireUdp(commande);
+  executerCommande(String(commande));
 }
 
 void executerCommande(String commande) {

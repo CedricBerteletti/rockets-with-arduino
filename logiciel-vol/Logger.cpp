@@ -2,11 +2,11 @@
 * Logger
 */
 
-#include "Logger.h"
+#include "Logger.hpp"
 
 const int chipSelect = 10;
-const String Logger::MODULE_LOGGER = "LOGGER";
-const String Logger::NOM_FICHIER_LOGS = "rlogs.csv";
+const char Logger::MODULE_LOGGER[] = "LOGGER";
+const char Logger::NOM_FICHIER_LOGS[] = "rlogs.csv";
 
 
 Logger::Logger() {}
@@ -81,19 +81,21 @@ void Logger::flush() {
   }
 }
 
-// Fonction d'écriture des logs
-void Logger::log(String module, String message, String details) {
-  String log;
+// Fonctions d'écriture des logs
+void Logger::log(const char module[], const char message[], const char details[]) {
   if (toSerial || toSdcard || toUdp) {
-    log = formatLog(module, message, details);
+    formatLog(strLog, module, message, details);
   }
 
-  if(toSerial) Serial.println(log);
-  if(toUdp) wifi->ecrireUdp(log);
-  if(toSdcard) {
-    fichier.println(log);
-    //fichier.flush();
-  }
+  if(toSerial) Serial.println(strLog);
+  if(toUdp) wifi->ecrireUdp(strLog);
+  if(toSdcard) fichier.println(strLog);
+}
+
+void Logger::log(const char module[], const char message[], String details) {
+  char str[LONGUEUR_MAX_CHAINE_CARACTERES];
+  details.toCharArray(str, LONGUEUR_MAX_CHAINE_CARACTERES);
+  log(module, message, str);
 }
 
 

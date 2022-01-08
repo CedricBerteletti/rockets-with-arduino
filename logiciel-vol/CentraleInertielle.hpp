@@ -5,9 +5,9 @@
 #ifndef CentraleInertielle_h
 #define CentraleInertielle_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <Arduino_LSM6DS3.h>  // Bibliothèque pour la gestion de l'IMU (Inertial Measurement Unit)
-#include "Logger.h"
+#include "Logger.hpp"
 
 
 struct DonneesInertielles {
@@ -30,9 +30,9 @@ class CentraleInertielle
     void init();
     void lire(DonneesInertielles &data);
   private:
-    static const String MODULE_IMU;
-    static const String SUB_MODULE_IMU_DATA;
-    static const String MODULE_IMU_HEADER;
+    static const char MODULE_IMU[];
+    static const char SUB_MODULE_IMU_DATA[];
+    static const char MODULE_IMU_HEADER[];
     Logger &logger;
 };
 
