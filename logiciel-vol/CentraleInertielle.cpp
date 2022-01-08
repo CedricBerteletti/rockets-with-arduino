@@ -7,6 +7,7 @@
 const char CentraleInertielle::MODULE_IMU[] = "IMU";
 const char CentraleInertielle::SOUS_MODULE_IMU_DATA[] = "IMU_DATA";
 const char CentraleInertielle::ENTETE_DATA[] = "t, accX, accY, accZ, alphaX, alphaY, alphaZ";
+const char CentraleInertielle::SEPARATEUR_DATA[] = ", ";
 
 CentraleInertielle::CentraleInertielle(Logger &logger):logger(logger) {
 }
@@ -19,13 +20,13 @@ void CentraleInertielle::init()
   }
   
   logger.log(MODULE_IMU, "INITIALIZED", "Centrale inertielle initialisée");
-  logger.log(MODULE_IMU, "ACCELEROMETER_FREQUENCY", String(IMU.accelerationSampleRate(), 2));
-  logger.log(MODULE_IMU, "GYRO_FREQUENCY", String(IMU.gyroscopeSampleRate(), 2));
+  itoa(IMU.accelerationSampleRate(), strLog, 10);
+  logger.log(MODULE_IMU, "ACCELEROMETER_FREQUENCY", strLog);
+  itoa(IMU.gyroscopeSampleRate(), strLog, 10);
+  logger.log(MODULE_IMU, "GYRO_FREQUENCY", strLog);
 }
 
 void CentraleInertielle::lire(DonneesInertielles &data) {
-  const String SEPARATEUR = ", ";
- 
   if (actif
     && IMU.accelerationAvailable()
     && IMU.gyroscopeAvailable()) {
@@ -34,14 +35,34 @@ void CentraleInertielle::lire(DonneesInertielles &data) {
     IMU.readGyroscope(data.alphaX, data.alphaY, data.alphaZ);
 
     if (loggingData) {
-      String str = String(millis()) + SEPARATEUR
-        + String(data.accX, decimales) + SEPARATEUR
-        + String(data.accY, decimales) + SEPARATEUR
-        + String(data.accZ, decimales) + SEPARATEUR
-        + String(data.alphaX, decimales) + SEPARATEUR
-        + String(data.alphaY, decimales) + SEPARATEUR
-        + String(data.alphaZ, decimales);
-      logger.log(SOUS_MODULE_IMU_DATA, ENTETE_DATA, str);
+      int longueur = 5 + decimales;
+      itoa(millis(), strLog, 10);
+      strcat(strLog, SEPARATEUR_DATA);
+
+      dtostrf(data.accX, longueur, decimales, strNumber);
+      strcat(strLog, strNumber);
+      strcat(strLog, SEPARATEUR_DATA);
+      
+      dtostrf(data.accY, longueur, decimales, strNumber);
+      strcat(strLog, strNumber);
+      strcat(strLog, SEPARATEUR_DATA);
+      
+      dtostrf(data.accZ, longueur, decimales, strNumber);
+      strcat(strLog, strNumber);
+      strcat(strLog, SEPARATEUR_DATA);
+      
+      dtostrf(data.alphaX, longueur, decimales, strNumber);
+      strcat(strLog, strNumber);
+      strcat(strLog, SEPARATEUR_DATA);
+      
+      dtostrf(data.alphaY, longueur, decimales, strNumber);
+      strcat(strLog, strNumber);
+      strcat(strLog, SEPARATEUR_DATA);
+      
+      dtostrf(data.alphaZ, longueur, decimales, strNumber);
+      strcat(strLog, strNumber);
+
+      logger.log(SOUS_MODULE_IMU_DATA, ENTETE_DATA, strLog);
     }
   }
 }

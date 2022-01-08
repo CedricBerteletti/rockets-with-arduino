@@ -154,6 +154,7 @@ void etapeSuivante() {
     logger.log(MODULE_SYSTEME, "STAGGING", strLog);
 
     if(dureeEtape[fuseeStatut] != -1) {
+      // La condition de passage à l'étape suivante est une durée
       dateEtapeSuivante = dateEtapeSuivante + dureeEtape[fuseeStatut];
     }
     else {
