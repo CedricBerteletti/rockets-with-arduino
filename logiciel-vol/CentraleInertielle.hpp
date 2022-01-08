@@ -31,8 +31,8 @@ class CentraleInertielle
     void lire(DonneesInertielles &data);
   private:
     static const char MODULE_IMU[];
-    static const char SUB_MODULE_IMU_DATA[];
-    static const char MODULE_IMU_HEADER[];
+    static const char SOUS_MODULE_IMU_DATA[];
+    static const char ENTETE_DATA[];
     Logger &logger;
 };
 

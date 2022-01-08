@@ -27,6 +27,8 @@ CentraleInertielle centrale(logger);
 long flushSuivant = 0;
 // Dernière commande reçue (déclaration globale pour éviter la réallocation dans la pile à chaque appel de lireCommande)
 char commande[LONGUEUR_MAX_CHAINE_CARACTERES];
+// Chaîne de caractère pour les logs
+char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
 
 
 /* Etat de la fusée */
@@ -47,15 +49,15 @@ int fuseeStatut = INITIAL;
 // Instanciation d'un objet pour stocker les valeurs courantes des accéléromètres et gyroscopes
 DonneesInertielles donneesInertiellesCourantes;
 long dateLancement = 0;
-int dureeEtape[NB_ETAPES];
-String commandeEtape[NB_ETAPES];
+int dureeEtape[NB_ETAPES] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+char commandeEtape[NB_ETAPES][LONGUEUR_MAX_CHAINE_CARACTERES];
 long dateEtapeSuivante = -1;
 
 void setup() {
   logger.log(MODULE_SYSTEME, "SYSTEM_INIT", "Initialisation générale");
   initSerial();
   delay(1000);
-  //logger.initSdcard();
+  logger.initSdcard();
   
   wifi.listerReseaux();
   wifi.init();
@@ -93,50 +95,48 @@ void initSerial() {
 
 void lireCommande() {
   wifi.lireUdp(commande);
-  executerCommande(String(commande));
+  executerCommande(commande);
 }
 
-void executerCommande(String commande) {
-  if(commande.length() > 0) {
+void executerCommande(const char commande[]) {
+  String cmd = String(commande);
+  if(cmd.length() > 0) {
     logger.log(MODULE_COMMANDE, "COMMAND_RECEPTION", commande);
-    if(commande.startsWith("connect ")) {
+    if(cmd.startsWith("connect ")) {
       // Ne rien faire : on a déjà récupéré l'IP de l'émetteur dans le module Wifi
     }
-    else if (commande.startsWith("initSdcard")) {
+    else if (cmd.startsWith("initSdcard")) {
       logger.initSdcard();
     }
-    else if (commande.startsWith("flushLogs")) {
+    else if (cmd.startsWith("flushLogs")) {
       logger.flush();
     }
-    else if (commande.startsWith("rocketStatus")) {
-      logger.log(MODULE_SYSTEME, "ROCKET_STATUS", String(fuseeStatut));
+    else if (cmd.startsWith("rocketStatus")) {
+      itoa(fuseeStatut, strLog, 10);
+      logger.log(MODULE_SYSTEME, "ROCKET_STATUS", strLog);
     }
-    else if (commande.startsWith("wifiStatus")) {
+    else if (cmd.startsWith("wifiStatus")) {
       wifi.logStatut();
     }
-    else if (commande.startsWith("toggleLogImuData")) {
+    else if (cmd.startsWith("toggleLogImuData")) {
       centrale.loggingData = !centrale.loggingData;
     }
-    // Perte de la connexion en cours de commande
-    // else if (commande.startsWith("wifiNetworks")) {
-    //   wifi.listerReseaux();
-    // }
-    else if (commande.startsWith("configureStep ")) {
+    else if (cmd.startsWith("configureStep ")) {
       // TODO
     }
-    else if (commande.startsWith("launch ")) {
+    else if (cmd.startsWith("launch ")) {
       // TODO code
       etapeSuivante();
     }
-    else if (commande.startsWith("stage ")) {
+    else if (cmd.startsWith("stage ")) {
       // TODO code
       etapeSuivante();
     }
-    else if (commande.startsWith("stop ")) {
+    else if (cmd.startsWith("stop ")) {
       // TODO code
       fuseeStatut = -1;
     }
-    else if (commande.startsWith("digitalWrite ")) {
+    else if (cmd.startsWith("digitalWrite ")) {
       // TODO
     }
   }
@@ -149,8 +149,17 @@ void etapeSuivante() {
       dateLancement = millis();
       dateEtapeSuivante = dateLancement;
     }
-    logger.log(MODULE_SYSTEME, "STAGGING", String(fuseeStatut));
-    dateEtapeSuivante = dateEtapeSuivante + dureeEtape[fuseeStatut];
+
+    itoa(fuseeStatut, strLog, 10);
+    logger.log(MODULE_SYSTEME, "STAGGING", strLog);
+
+    if(dureeEtape[fuseeStatut] != -1) {
+      dateEtapeSuivante = dateEtapeSuivante + dureeEtape[fuseeStatut];
+    }
+    else {
+      // La condition de passage à l'étape suivante n'est pas une durée
+      dateEtapeSuivante = -1;
+    }
     executerCommande(commandeEtape[fuseeStatut]);
   }  
 }

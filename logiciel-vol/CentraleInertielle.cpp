@@ -5,8 +5,8 @@
 #include "CentraleInertielle.hpp"
 
 const char CentraleInertielle::MODULE_IMU[] = "IMU";
-const char CentraleInertielle::SUB_MODULE_IMU_DATA[] = "IMU_DATA";
-const char CentraleInertielle::MODULE_IMU_HEADER[] = "t, accX, accY, accZ, alphaX, alphaY, alphaZ";
+const char CentraleInertielle::SOUS_MODULE_IMU_DATA[] = "IMU_DATA";
+const char CentraleInertielle::ENTETE_DATA[] = "t, accX, accY, accZ, alphaX, alphaY, alphaZ";
 
 CentraleInertielle::CentraleInertielle(Logger &logger):logger(logger) {
 }
@@ -41,7 +41,7 @@ void CentraleInertielle::lire(DonneesInertielles &data) {
         + String(data.alphaX, decimales) + SEPARATEUR
         + String(data.alphaY, decimales) + SEPARATEUR
         + String(data.alphaZ, decimales);
-      logger.log(SUB_MODULE_IMU_DATA, MODULE_IMU_HEADER, str);
+      logger.log(SOUS_MODULE_IMU_DATA, ENTETE_DATA, str);
     }
   }
 }
