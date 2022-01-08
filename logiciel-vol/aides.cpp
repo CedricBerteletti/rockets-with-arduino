@@ -2,15 +2,9 @@
 * Quelques fonctions d'aide
 */
 
-#include "aides.h"
+#include "aides.hpp"
 
 // Formatage des log
-String formatLog(String module, String message, String details) {
-  const String SEPARATEUR = ", ";
-  const String GUILLEMETS = "\"";
-
-  return String(millis() + SEPARATEUR
-      + module + SEPARATEUR
-      + GUILLEMETS + message + GUILLEMETS + SEPARATEUR
-      + GUILLEMETS + details + GUILLEMETS);
+void formatLog(char destination[], const char module[], const char message[], const char details[]) {
+  sprintf(destination, "%i, %s, \"%s\", \"%s\"", millis(), module, message, details);
 }
