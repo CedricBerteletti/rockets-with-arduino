@@ -1,6 +1,6 @@
 /*
  * --------------------------------------------------------------------------------------------------------------------
- * Simple countdown for a rocket ignition, locked with a RFID key.
+ * Compte à rebours pour l'allumage d'une fusée. Verrouillé par une clé RFID.
  * --------------------------------------------------------------------------------------------------------------------
  * @author Cédric Berteletti
  */
@@ -11,72 +11,68 @@
 #define RST_PIN     9     // Configurable, see typical pin layout above
 #define SS_PIN      10    // Configurable, see typical pin layout above
 
-#define BUTTON_PIN  4
-#define COMMAND_PIN 8
+#define BOUTON_PIN  4     // Broche à laquelle est relié le bouton de lancement
+#define COMMANDE_PIN 8    // Broche de commande du relai de mise à feu
 
-#define BLUE 7
-#define GREEN 6
-#define RED 5
+// Broches pour la LED RVB
+#define ROUGE_PIN 5
+#define VERT_PIN 6
+#define BLEU_PIN 7
 
-//#define delayTime 1000
+
+MFRC522 mfrc522(SS_PIN, RST_PIN);   // Création de l'instance pour la gestion de la clé RFID
 
 
-MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance
-
-/* Set your new UID here! */
-#define NEW_UID {0xDE, 0xAD, 0xBE, 0xEF}
-
-MFRC522::MIFARE_Key key;
+MFRC522::MIFARE_Key cleRfid;
 
 void setup() {
-  Serial.begin(9600);  // Initialize serial communications with the PC
-  while (!Serial);     // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
-  SPI.begin();         // Init SPI bus
-  mfrc522.PCD_Init();  // Init MFRC522 card
+  Serial.begin(9600);  // Initialisation du port série pour la communication avec le PC
+  while (!Serial);     // Ne rien faire si le port série n'est pas ouvert (pour Arduinos basé ATMEGA32U4)
+  SPI.begin();         // Initialisation du bus SPI (auquel est relié la carte de lecture RFID)
+  mfrc522.PCD_Init();  // Initialisation de la carte de lecture RFID MFRC522
   
   // Prepare key - all keys are set to FFFFFFFFFFFFh at chip delivery from the factory.
   for (byte i = 0; i < 6; i++) {
-    key.keyByte[i] = 0xFF;
+    cleRfid.keyByte[i] = 0xFF;
   }
 
-  //pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT_PULLUP); 
+  pinMode(BOUTON_PIN, INPUT_PULLUP); 
 
-  pinMode(RED, OUTPUT);
-  pinMode(GREEN, OUTPUT);
-  pinMode(BLUE, OUTPUT);
-  digitalWrite(RED, LOW);
-  digitalWrite(GREEN, LOW);
-  digitalWrite(BLUE, LOW);
+  pinMode(ROUGE_PIN, OUTPUT);
+  pinMode(VERT_PIN, OUTPUT);
+  pinMode(BLEU_PIN, OUTPUT);
+  digitalWrite(ROUGE_PIN, LOW);
+  digitalWrite(VERT_PIN, LOW);
+  digitalWrite(BLEU_PIN, LOW);
 
-  pinMode(COMMAND_PIN, OUTPUT);
+  pinMode(COMMANDE_PIN, OUTPUT);
 
   Serial.println(F("Console de lancement en attente ..."));
 }
 
-const int STATUS_LOCKED = 0;
-const int STATUS_UNLOCKED = 1;
-const int STATUS_COUNTDOWN = 2;
-const int STATUS_IGNITION = 3;
-int status = STATUS_LOCKED;
+const int STATUT_VERROUILLE = 0;
+const int STATUT_DEVERROUILLE = 1;
+const int STATUT_COMPTE_A_REBOURS = 2;
+const int STATUT_ALLUMAGE = 3;
+int statut = STATUT_VERROUILLE;
 
-int redValue;
-int greenValue;
-int blueValue;
+int intensiteRouge;
+int intensiteVert;
+int intensiteBleu;
 
-int delayTime = 1000;
+int delai = 1000;
 
 
-static const char AUTHORIZED_KEY[] = "FE 4A 43 73";
+static const char CLE_AUTORISEE[] = "FE 4A 43 73";
 
 // But of course this is a more proper approach
 void loop() {
-  greenValue = 0;
-  redValue = 0;
-  blueValue = 0;
+  intensiteRouge = 0;
+  intensiteVert = 0;
+  intensiteBleu = 0;
 
   
-  if(status == STATUS_LOCKED) {
+  if(statut == STATUT_VERROUILLE) {
     // VERIFICATION DE LA CLE RFID
     // Look for new cards, and select one if present
     if ( ! mfrc522.PICC_IsNewCardPresent() || ! mfrc522.PICC_ReadCardSerial() ) {
@@ -85,112 +81,100 @@ void loop() {
     }  
     // Now a card is selected. The UID and SAK is in mfrc522.uid.
     
-    if(checkKey()) {
+    if(verificationCle()) {
       Serial.println("Déverrouillage de la séquence de lancement.");
-      status = STATUS_UNLOCKED;
+      statut = STATUT_DEVERROUILLE;
 
-      greenValue = 255;
-      analogWrite(GREEN, greenValue);
-      delayTime = 100;
+      intensiteVert = 255;
+      analogWrite(VERT_PIN, intensiteVert);
+      delai = 100;
     }
     else {    
       Serial.println("ALERTE ! Accès non autorisé !");
       
-      redValue = 255;
-      analogWrite(RED, redValue);
+      intensiteRouge = 255;
+      analogWrite(ROUGE_PIN, intensiteRouge);
       delay(200);
-      analogWrite(RED, 0);
+      analogWrite(ROUGE_PIN, 0);
       delay(200);
-      analogWrite(RED, redValue);
+      analogWrite(ROUGE_PIN, intensiteRouge);
       delay(200);
-      analogWrite(RED, 0);
+      analogWrite(ROUGE_PIN, 0);
       delay(200);
-      analogWrite(RED, redValue);
+      analogWrite(ROUGE_PIN, intensiteRouge);
       delay(200);
-      analogWrite(RED, 0);
+      analogWrite(ROUGE_PIN, 0);
     }
   }
-  else if(status == STATUS_UNLOCKED && digitalRead(BUTTON_PIN) == LOW) {
+  else if(statut == STATUT_DEVERROUILLE && digitalRead(BOUTON_PIN) == LOW) {
     Serial.println("Séquence finale.");
-    status = STATUS_COUNTDOWN;
+    statut = STATUT_COMPTE_A_REBOURS;
   }
-  else if (status == STATUS_COUNTDOWN) {
+  else if (statut == STATUT_COMPTE_A_REBOURS) {
 
-    greenValue = 40;
-    redValue = 225;
+    intensiteVert = 40;
+    intensiteRouge = 225;
     for(int i = 10; i > 1; i -= 1)
     {
       Serial.println(i);
-      analogWrite(RED, redValue);
-      analogWrite(GREEN, greenValue);
+      analogWrite(ROUGE_PIN, intensiteRouge);
+      analogWrite(VERT_PIN, intensiteVert);
       delay(500);
-      analogWrite(RED, 0);
-      analogWrite(GREEN, 0);
+      analogWrite(ROUGE_PIN, 0);
+      analogWrite(VERT_PIN, 0);
       delay(500);
     }
     
-    greenValue = 0;
-    redValue = 255;
+    intensiteVert = 0;
+    intensiteRouge = 255;
     Serial.println(1);
-    analogWrite(RED, redValue);
-    analogWrite(GREEN, greenValue);
+    analogWrite(ROUGE_PIN, intensiteRouge);
+    analogWrite(VERT_PIN, intensiteVert);
     delay(800);
-    analogWrite(RED, 0);
-    analogWrite(GREEN, 0);
+    analogWrite(ROUGE_PIN, 0);
+    analogWrite(VERT_PIN, 0);
     delay(200);
-    status = STATUS_IGNITION;
+    statut = STATUT_ALLUMAGE;
   }
-  else if (status == STATUS_IGNITION) {    
+  else if (statut == STATUT_ALLUMAGE) {    
     Serial.println("Décollage !");
-    // TODO mise à feu
-    greenValue = 0;
-    redValue = 255;
-    analogWrite(RED, redValue);
-    analogWrite(GREEN, greenValue);
-    digitalWrite(COMMAND_PIN, HIGH);
+    // Mise à feu
+    intensiteVert = 0;
+    intensiteRouge = 255;
+    analogWrite(ROUGE_PIN, intensiteRouge);
+    analogWrite(VERT_PIN, intensiteVert);
+    digitalWrite(COMMANDE_PIN, HIGH);
     
     delay(2000);
     
-    digitalWrite(COMMAND_PIN, LOW);
-    analogWrite(RED, 0);
-    analogWrite(GREEN, 0);    
-    status = STATUS_LOCKED;  
+    digitalWrite(COMMANDE_PIN, LOW);
+    analogWrite(ROUGE_PIN, 0);
+    analogWrite(VERT_PIN, 0);    
+    statut = STATUT_VERROUILLE;  
   }
-
   
-  
-  delay(delayTime);
+  delay(delai);
 }
 
-boolean checkKey() {
-  // Dump UID
-  char key[20] = "";
-  char* keyPointer = key;
-  char* endOfBuf = key + sizeof(key);
+boolean verificationCle() {
+  char cleRfid[20] = "";
+  char* pointeurCle = cleRfid;
+  char* finBuffer = cleRfid + sizeof(cleRfid);
   for (byte i = 0; i < mfrc522.uid.size; i++) {
-      if (keyPointer + 3 < endOfBuf)
+      if (pointeurCle + 3 < finBuffer)
       {
           if (i > 0)
           {
-              keyPointer += sprintf(keyPointer, " ");
+              pointeurCle += sprintf(pointeurCle, " ");
           }
-          keyPointer += sprintf(keyPointer, "%02X", mfrc522.uid.uidByte[i]);
+          pointeurCle += sprintf(pointeurCle, "%02X", mfrc522.uid.uidByte[i]);
       }
   }
-  //buf2 += sprintf(buf2, "\n");
-  //strcat(dest, src);
   Serial.print(F("Clé UID:"));
-  //for (byte i = 0; i < mfrc522.uid.size; i++) {
-  //  strcat(key, mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-  //  strcat(key, mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-    
-  //  Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-  //  Serial.print(mfrc522.uid.uidByte[i], HEX);
-  //} 
-  Serial.print(key);
+  Serial.print(cleRfid);
   Serial.println();
 
-  if(strcmp(key, AUTHORIZED_KEY) == 0) {
+  if(strcmp(cleRfid, CLE_AUTORISEE) == 0) {
     return true;
   }
   else {    
