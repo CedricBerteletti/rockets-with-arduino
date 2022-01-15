@@ -46,8 +46,9 @@ class EcranPrincipal(Frame):
         self.logs.pack(padx=5, pady=5, fill=BOTH, expand=1)
         self.commandeText = StringVar()
         commande = Entry(controle, textvariable=self.commandeText)
+        #commande = Text(controle, textvariable=self.commandeText, height=3)
         commande.pack(padx=5, pady=5, side=BOTTOM, fill=X)
-        commande.bind('<Return>', self.nouvelleCommande)
+        commande.bind('<Return>', self.nouvellesCommandes)
       
 
         # Panneau de droite contenant les informations de trajectoire
@@ -109,16 +110,26 @@ class EcranPrincipal(Frame):
         self.after(100, self.maj_loggers)
 
 
-    def nouvelleCommande(self, event):
+    def nouvellesCommandes(self, event):
         # self.logs.config(state=NORMAL)
         # self.logs.insert("end", self.commandeText.get()+"\n")
         # self.logs.see("end")
         # self.logs.config(state=DISABLED)
         # self.commandeText.set("")
-        commande = self.commandeText.get()
+        commandes = self.commandeText.get().splitlines()
+        self.executerCommandes(commandes)
+        self.commandeText.set("")
+
+    def executerCommandes(self, commandes):
+        for commande in commandes:
+            self.executerCommande(commande)
+            # Attente d'envoi de la commance (risque de perte sinon : UDP et non TCP)
+            time.sleep(0.1)
+
+    def executerCommande(self, commande):
+        print(commande[0:8])
         if commande[0:8] == "connect ":
             connect, ip, port = commande.split()
             self.controleur.connecter(ip, int(port))
         else:
-            self.controleur.envoyerCommandeBrute(self.commandeText.get())
-        self.commandeText.set("")
+            self.controleur.envoyerCommandeBrute(commande)
