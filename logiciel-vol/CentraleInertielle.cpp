@@ -1,6 +1,9 @@
 /*
-* Gestion de la centrale inertielle de l'Arduino Nano 33 IoT
-*/
+ * --------------------------------------------------------------------------
+ * Gestion de la centrale inertielle de l'Arduino Nano 33 IoT
+ * --------------------------------------------------------------------------
+ * @author Cédric Berteletti
+ */
 
 #include "CentraleInertielle.hpp"
 

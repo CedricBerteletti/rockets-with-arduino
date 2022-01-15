@@ -1,6 +1,9 @@
 /*
-* Gestion de la centrale inertielle de l'Arduino Nano 33 IoT
-*/
+ * --------------------------------------------------------------------------
+ * Gestion de la centrale inertielle de l'Arduino Nano 33 IoT
+ * --------------------------------------------------------------------------
+ * @author Cédric Berteletti
+ */
 
 #ifndef CentraleInertielle_h
 #define CentraleInertielle_h
@@ -13,12 +16,12 @@
 
 struct DonneesInertielles {
   unsigned long t = 0;
-  float accX = 0.0f;
-  float accY = 0.0f;
-  float accZ = 0.0f;
-  float alphaX = 0.0f;
-  float alphaY = 0.0f;
-  float alphaZ = 0.0f;
+  float accX = 0.0f; // Unité : g
+  float accY = 0.0f; // Unité : g
+  float accZ = 0.0f; // Unité : g
+  float alphaX = 0.0f; // Unité : °/s
+  float alphaY = 0.0f; // Unité : °/s
+  float alphaZ = 0.0f; // Unité : °/s
 };
 
 class CentraleInertielle
