@@ -1,6 +1,9 @@
 /*
-* Module gérant les connexions wifi
-*/
+ * --------------------------------------------------------------------------
+ * Module gérant les connexions wifi
+ * --------------------------------------------------------------------------
+ * @author Cédric Berteletti
+ */
 
 #ifndef Wifi_h
 #define Wifi_h

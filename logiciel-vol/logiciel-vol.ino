@@ -1,6 +1,9 @@
-/*
+/* 
+ * --------------------------------------------------------------------------
  * Module principal du programme de vol d'une fusée
  * embarquant un Arduino Nano 33 IoT
+ * --------------------------------------------------------------------------
+ * @author Cédric Berteletti
  */
 
 #include "aides.hpp"
@@ -47,16 +50,18 @@ int fuseeStatut = INITIAL;
 
 /* Données de navigation */
 // Instanciation d'un objet pour stocker les valeurs courantes des accéléromètres et gyroscopes
-DonneesInertielles donneesInertiellesCourantes;
-long dateLancement = 0;
 int dureeEtape[NB_ETAPES] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 char commandeEtape[NB_ETAPES][LONGUEUR_MAX_CHAINE_CARACTERES];
+long dateLancement = 0;
 long dateEtapeSuivante = -1;
+long dateCourante = 0;
+DonneesInertielles donneesInertiellesCourantes;
 
 void setup() {
   logger.log(MODULE_SYSTEME, "SYSTEM_INIT", "Initialisation générale");
   initSerial();
   delay(1000);
+
   logger.initSdcard();
   
   wifi.listerReseaux();
@@ -76,68 +81,119 @@ void setup() {
 void loop() {
   lireCommande();
   centrale.lire(donneesInertiellesCourantes);
-  long date = millis();
-  if(date > flushSuivant) {
+  
+  long dateCourante = millis();
+
+  if(dateCourante > flushSuivant) {
     logger.flush();
     flushSuivant = flushSuivant + DELAI_FLUSH;
   }
-  if(dateEtapeSuivante != -1 && date > dateEtapeSuivante) {
+  if(dateEtapeSuivante != -1 && dateCourante > dateEtapeSuivante) {
     etapeSuivante();
   }
 }
 
 
 void initSerial() {
-  Serial.begin(115200);  
-  delay(3000);
+  Serial.begin(115200);
   logger.log(MODULE_SYSTEME, "SERIAL_INIT", "Liaison série initialisée");
 }
 
 void lireCommande() {
   wifi.lireUdp(commande);
+  trim(commande);
   executerCommande(commande);
 }
 
 void executerCommande(const char commande[]) {
-  String cmd = String(commande);
-  if(cmd.length() > 0) {
+  if(strlen(commande) > 0) {
     logger.log(MODULE_COMMANDE, "COMMAND_RECEPTION", commande);
-    if(cmd.startsWith("connect ")) {
+    if(chaineCommencePar(commande, "#")) {
+      // Ne rien faire : ligne de commentaire
+    }
+    else if(chaineCommencePar(commande, "connect ")) {
       // Ne rien faire : on a déjà récupéré l'IP de l'émetteur dans le module Wifi
     }
-    else if (cmd.startsWith("initSdcard")) {
+    else if (chaineCommencePar(commande, "initSdcard")) {
       logger.initSdcard();
     }
-    else if (cmd.startsWith("flushLogs")) {
+    else if (chaineCommencePar(commande, "flushLogs")) {
       logger.flush();
     }
-    else if (cmd.startsWith("rocketStatus")) {
+    else if (chaineCommencePar(commande, "rocketStatus")) {
       itoa(fuseeStatut, strLog, 10);
       logger.log(MODULE_SYSTEME, "ROCKET_STATUS", strLog);
     }
-    else if (cmd.startsWith("wifiStatus")) {
+    else if (chaineCommencePar(commande, "rocketSteps")) {
+      // TODO
+    }
+    else if (chaineCommencePar(commande, "wifiStatus")) {
       wifi.logStatut();
     }
-    else if (cmd.startsWith("toggleLogImuData")) {
+    else if (chaineCommencePar(commande, "loggerStatus")) {
+      logger.logStatut();
+    }
+    else if (chaineCommencePar(commande, "toggleLogImuData")) {
       centrale.loggingData = !centrale.loggingData;
     }
-    else if (cmd.startsWith("configureStep ")) {
-      // TODO
+    else if (chaineCommencePar(commande, "configureStep ")) { 
+      char chEtape[LONGUEUR_NOMBRE];
+      char chDelai[LONGUEUR_NOMBRE];
+      copierToken(commande, " ", 1, chEtape);
+      copierToken(commande, " ", 2, chDelai);
+      int etape = atoi(chEtape);
+      int delai = atoi(chDelai);
+      dureeEtape[etape] = delai;
+      copierToken(commande, " ", 3, commandeEtape[etape], true);
     }
-    else if (cmd.startsWith("launch ")) {
-      // TODO code
-      etapeSuivante();
+    else if (chaineCommencePar(commande, "launch ") || chaineCommencePar(commande, "stage ")) { // Vérification du code
+      if(chaineContient(commande, SECRET_COMMAND_CODE)) {
+        etapeSuivante();
+      }
+      else {
+        logger.log(MODULE_COMMANDE, "COMMAND_ERROR_CODE", "Code de derrouillage de la commande incorrect");
+      }
     }
-    else if (cmd.startsWith("stage ")) {
-      // TODO code
-      etapeSuivante();
+    else if (chaineCommencePar(commande, "stop ")) {
+      if(chaineContient(commande, SECRET_COMMAND_CODE)) {
+        fuseeStatut = -1;
+      }
+      else {
+        logger.log(MODULE_COMMANDE, "COMMAND_ERROR_CODE", "Code de derrouillage de la commande incorrect");
+      }
     }
-    else if (cmd.startsWith("stop ")) {
-      // TODO code
-      fuseeStatut = -1;
+    else if (chaineCommencePar(commande, "delay ")) {
+      char chDelai[LONGUEUR_NOMBRE];
+      copierToken(commande, " ", 1, chDelai);
+      int delai = atoi(chDelai);
+      delay(delai);
     }
-    else if (cmd.startsWith("digitalWrite ")) {
-      // TODO
+    else if (chaineCommencePar(commande, "pinMode ")) {
+      char chPin[LONGUEUR_NOMBRE];
+      char chMode[LONGUEUR_NOMBRE];
+      copierToken(commande, " ", 1, chPin);
+      copierToken(commande, " ", 2, chMode);
+      int pin = atoi(chPin);
+      int mode;
+      if(chaineCommencePar(chMode, "OUTPUT")) {
+        mode = OUTPUT;
+      }
+      else {
+        mode = INPUT;
+      }
+      pinMode(pin, mode);
+    }
+    else if (chaineCommencePar(commande, "digitalWrite ")) {
+      char chPin[LONGUEUR_NOMBRE];
+      char chNiveau[LONGUEUR_NOMBRE];
+      copierToken(commande, " ", 1, chPin);
+      copierToken(commande, " ", 2, chNiveau);
+      int pin = atoi(chPin);
+      int niveau = atoi(chNiveau);
+      digitalWrite(pin, niveau);
+    }
+    else {
+      logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
     }
   }
 }

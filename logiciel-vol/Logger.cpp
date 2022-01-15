@@ -1,6 +1,9 @@
 /*
-* Logger
-*/
+ * --------------------------------------------------------------------------
+ * Logger
+ * --------------------------------------------------------------------------
+ * @author Cédric Berteletti
+ */
 
 #include "Logger.hpp"
 
@@ -76,6 +79,12 @@ void Logger::initSdcard() {
       log(MODULE_LOGGER, "ERROR_LOG_FILE", "Impossible d'ouvrir le fichier de logs");
     }
   }
+}
+
+void Logger::logStatut()
+{
+  sprintf(strTmp, "Logger série %i | Logger SD %i | Logger wifi %i", toSerial, toSdcard, toUdp);
+  log(MODULE_LOGGER, "STATUS", strTmp);  
 }
 
 // Force l'écriture du cache sur la carte SD

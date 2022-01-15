@@ -8,6 +8,7 @@ Un compte à rebours simple de 10 secondes, verrouillé par une clé RFID et dé
 Basé sur un Arduino Nano.
 
 Bibliothèques nécessaires :
+- SPI
 - MFRC522 V1.4 : contrôle de la clé RFID
 
 
@@ -22,14 +23,19 @@ Bibliothèques nécessaires :
 - avr/dtostrf : pour convertir les floats en chaîne de caractères
 
 Permet de recevoir via Wifi les commandes :
-- *connect ip port*: permet de connaître le client distant et de lui retourner les mesures et le statut de la fusée
-- *rocketStatus* : état de la fusée
-- *wifiStatus* : état de la connexion Wifi
-- *toggleLogImuData* : active/désactive les logs (via serial, SD-Card et Wifi) des données de la centrale inertielle
-- *configureStep no_step delai commande* : précise la temporisation (en ms) d'une étape donnée et la commande à exécuter au **début** de l'étape
+- *connect ip port*: permet de connaître le client distant et de lui retourner les mesures et le statut de la fusée.
+- *rocketStatus* : état de la fusée.
+- *rocketSteps* : log toutes les étapes de vol de la fusée.
+- *initSdcard* : initialise et lance les logs sur la carte SD.
+- *flushLogs* : force le vidage du cache des logs sur la carte SD.
+- *wifiStatus* : état de la connexion Wifi.
+- *loggerStatus* : indique les différents loggers actifs.
+- *toggleLogImuData* : active/désactive les logs (via serial, SD-Card et Wifi) des données de la centrale inertielle.
+- *configureStep no_step delai commande* : précise la temporisation (en ms) d'une étape donnée et la commande à exécuter au **début** de l'étape.
 - *launch code* : passe à l'étape suivante (idem "stage"). Protégé par un code.
 - *stage code* : passe à l'étape suivante (idem "stage"). Protégé par un code.
 - *stop code* : interrompt le programme de la fusée et revient à l'étape initiale. Protégé par un code. Attention aux conséquences !
+- *pinMode pin mode* : configure la broche n°*pin* (OUTPUT/INPUT). 
 - *digitalWrite pin niveau* : envoie un signal ou l'arrête sur la sortie numérique désignée.
 
 Remarques sur l'Arduino Nano 33 IoT :
