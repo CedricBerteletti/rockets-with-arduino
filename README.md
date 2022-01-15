@@ -24,6 +24,7 @@ Bibliothèques nécessaires :
 
 Permet de recevoir via Wifi les commandes :
 - *connect ip port*: permet de connaître le client distant et de lui retourner les mesures et le statut de la fusée.
+- *delay duree* : bloque l'exactution de la boucle principale de l'Arduino pendant *duree* ms.
 - *rocketStatus* : état de la fusée.
 - *rocketSteps* : log toutes les étapes de vol de la fusée.
 - *initSdcard* : initialise et lance les logs sur la carte SD.
