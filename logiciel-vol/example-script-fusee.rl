@@ -5,15 +5,22 @@ connect 192.168.0.50 23900
 wifiStatus
 loggerStatus
 rocketStatus
-delay 2000
+rocketSteps
 
 # Vérifier le contrôle des entrées-sorties
 pinMode 13 OUTPUT
-delay 2000
+pinMode 14 OUTPUT
+pinMode 15 OUTPUT
+pinMode 16 OUTPUT
+pinMode 17 OUTPUT
 digitalWrite 13 1
 
 # Configuration des étapes de vol (stagging)
-configureStep 0 10000 digitalWrite 13 1
+configureStep 0 10000
+configureStep 1 5000 digitalWrite 14 1
+configureStep 2 2000 digitalWrite 15 1
+configureStep 3 10000 digitalWrite 16 1
+rocketSteps
 
 # Logs des données de la centrale inertielle
 toggleLogImuData

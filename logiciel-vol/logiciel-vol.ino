@@ -50,7 +50,7 @@ int fuseeStatut = INITIAL;
 
 /* Données de navigation */
 // Instanciation d'un objet pour stocker les valeurs courantes des accéléromètres et gyroscopes
-int dureeEtape[NB_ETAPES] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+int dureeEtape[NB_ETAPES];
 char commandeEtape[NB_ETAPES][LONGUEUR_MAX_CHAINE_CARACTERES];
 long dateLancement = 0;
 long dateEtapeSuivante = -1;
@@ -74,6 +74,11 @@ void setup() {
   centrale.loggingData = false;
   centrale.init();
 
+  // Blocage des transitions automatiques
+  for (int i = 0; i < NB_ETAPES; i++ ) {
+    dureeEtape[i] = -1;
+  }
+
   delay(1000);
   flushSuivant = millis();
 }
@@ -82,11 +87,14 @@ void loop() {
   lireCommande();
   centrale.lire(donneesInertiellesCourantes);
   
-  long dateCourante = millis();
+  dateCourante = millis();
 
   if(dateCourante > flushSuivant) {
     logger.flush();
     flushSuivant = flushSuivant + DELAI_FLUSH;
+    if(fuseeStatut > INITIAL) {
+      rocketStatus();
+    }
   }
   if(dateEtapeSuivante != -1 && dateCourante > dateEtapeSuivante) {
     etapeSuivante();
@@ -121,11 +129,13 @@ void executerCommande(const char commande[]) {
       logger.flush();
     }
     else if (chaineCommencePar(commande, "rocketStatus")) {
-      itoa(fuseeStatut, strLog, 10);
-      logger.log(MODULE_SYSTEME, "ROCKET_STATUS", strLog);
+      rocketStatus();
     }
     else if (chaineCommencePar(commande, "rocketSteps")) {
-      // TODO
+      for (int i = 0; i < NB_ETAPES; i++ ) {
+        sprintf(strLog, "%i | %ims | %s", i, dureeEtape[i], commandeEtape[i]);
+        logger.log(MODULE_SYSTEME, "ROCKET_STEP", strLog);
+      }
     }
     else if (chaineCommencePar(commande, "wifiStatus")) {
       wifi.logStatut();
@@ -198,10 +208,21 @@ void executerCommande(const char commande[]) {
   }
 }
 
+void rocketStatus() {
+  if(fuseeStatut > INITIAL) {
+    int dateEnSeconde = (dateCourante - dateLancement - dureeEtape[0])/1000;
+    sprintf(strLog, "t=%is | Etape %i", dateEnSeconde, fuseeStatut);
+  }
+  else {
+    sprintf(strLog, "En attente | Etape %i", fuseeStatut);
+  }
+  logger.log(MODULE_SYSTEME, "ROCKET_STATUS", strLog);
+}
+
 void etapeSuivante() {
   fuseeStatut = fuseeStatut + 1;
-  if(fuseeStatut >= 0) {
-    if(fuseeStatut == 0) {
+  if(fuseeStatut > INITIAL) {
+    if(fuseeStatut == DECOMPTE_FINAL) {
       dateLancement = millis();
       dateEtapeSuivante = dateLancement;
     }
