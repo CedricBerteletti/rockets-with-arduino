@@ -21,6 +21,7 @@ static const long DELAI_FLUSH = 1000; // Flush des logs sur la carte SD toutes l
 /* Variable globales */
 // Instanciation d'un loggeur
 Logger logger;
+bool loggingRocketStatus = false;
 // Instanciation d'un objet gérant la connexion et les communications wifi
 Wifi wifi;
 // Instanciation de l'objet gérant la centrale inertielle (constructeur nécessitant un logger en paramètre)
@@ -92,8 +93,8 @@ void loop() {
   if(dateCourante > flushSuivant) {
     logger.flush();
     flushSuivant = flushSuivant + DELAI_FLUSH;
-    if(fuseeStatut > INITIAL) {
-      rocketStatus();
+    if(loggingRocketStatus) {
+      logRocketStatus();
     }
   }
   if(dateEtapeSuivante != -1 && dateCourante > dateEtapeSuivante) {
@@ -129,7 +130,7 @@ void executerCommande(const char commande[]) {
       logger.flush();
     }
     else if (chaineCommencePar(commande, "rocketStatus")) {
-      rocketStatus();
+      logRocketStatus();
     }
     else if (chaineCommencePar(commande, "rocketSteps")) {
       for (int i = 0; i < NB_ETAPES; i++ ) {
@@ -145,6 +146,12 @@ void executerCommande(const char commande[]) {
     }
     else if (chaineCommencePar(commande, "toggleLogImuData")) {
       centrale.loggingData = !centrale.loggingData;
+    }
+    else if (chaineCommencePar(commande, "toggleLogFlush")) {
+      logger.loggingFlush = !logger.loggingFlush;
+    }
+    else if (chaineCommencePar(commande, "toggleLogRocketStatus")) {
+      loggingRocketStatus = !loggingRocketStatus;
     }
     else if (chaineCommencePar(commande, "configureStep ")) { 
       char chEtape[LONGUEUR_NOMBRE];
@@ -208,7 +215,7 @@ void executerCommande(const char commande[]) {
   }
 }
 
-void rocketStatus() {
+void logRocketStatus() {
   if(fuseeStatut > INITIAL) {
     int dateEnSeconde = (dateCourante - dateLancement - dureeEtape[0])/1000;
     sprintf(strLog, "t=%is | Etape %i", dateEnSeconde, fuseeStatut);
@@ -224,6 +231,7 @@ void etapeSuivante() {
   if(fuseeStatut > INITIAL) {
     if(fuseeStatut == DECOMPTE_FINAL) {
       dateLancement = millis();
+      loggingRocketStatus = true;
       dateEtapeSuivante = dateLancement;
     }
 

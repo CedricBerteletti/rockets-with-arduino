@@ -91,7 +91,7 @@ void Logger::logStatut()
 void Logger::flush() {
   if(fichier) {
     fichier.flush();
-    log(MODULE_LOGGER, "SDCARD_FLUSH", "Ecriture des données du cache sur la carte SD");
+    if(loggingFlush) log(MODULE_LOGGER, "SDCARD_FLUSH", "Ecriture des données du cache sur la carte SD");
   }
 }
 

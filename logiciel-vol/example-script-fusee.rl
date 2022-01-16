@@ -16,10 +16,11 @@ pinMode 17 OUTPUT
 digitalWrite 13 1
 
 # Configuration des étapes de vol (stagging)
-configureStep 0 10000
+configureStep 0 10000 toggleLogFlush
 configureStep 1 5000 digitalWrite 14 1
 configureStep 2 2000 digitalWrite 15 1
 configureStep 3 10000 digitalWrite 16 1
+configureStep 4 -1 toggleLogFlush
 rocketSteps
 
 # Logs des données de la centrale inertielle
