@@ -19,7 +19,7 @@ HAUTEUR_ECRAN = 1024
 
 def main(args):
     connexion = Connexion()
-    connexion.init("192.168.0.50", 23900) # TODO dans EcranPrincipal
+    connexion.init("192.168.0.50", 23900)
     controleur = Controleur(connexion)
     telemetrie = Telemetrie(connexion)
     telemetrie.start()
