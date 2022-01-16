@@ -8,10 +8,10 @@ class Controleur():
     def __init__(self, connexion):
         self.connexion = connexion
 
-    def envoyerCommandeBrute(self, commande):
+    def envoyer_commande_brute(self, commande):
         self.connexion.envoyer(commande)
 
     def connecter(self, ip, port):
         self.connexion.init(ip, port)
-        self.envoyerCommandeBrute("connect " + ip + " " + str(port))
+        self.envoyer_commande_brute("connect " + ip + " " + str(port))
         

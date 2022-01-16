@@ -38,17 +38,20 @@ class EcranPrincipal(Frame):
         boutons = Frame(controle)
         boutons.pack(side=TOP)
         btnConnect = Button(boutons, text="Connexion")
-        btnConnect.pack(padx=5, pady=5,side=LEFT)
+        btnConnect.pack(padx=5, pady=5, side=LEFT)
         btnEtages = Button(boutons, text="Etages")
-        btnEtages.pack(padx=5, pady=5,side=LEFT)        
+        btnEtages.pack(padx=5, pady=5, side=LEFT)
+        btnLancer = Button(boutons, text="Lancement !")
+        btnLancer.pack(padx=5, pady=5, side=LEFT)
+        btnViderLogs = Button(boutons, text="Vider logs", command=self.vider_logs)
+        btnViderLogs.pack(padx=5, pady=5, side=LEFT)
         self.logs = Text(controle, height=1, bg="#000000", fg="#FFFFFF")
         self.logs.config(state=DISABLED)
         self.logs.pack(padx=5, pady=5, fill=BOTH, expand=1)
         self.commandeText = StringVar()
         commande = Entry(controle, textvariable=self.commandeText)
-        #commande = Text(controle, textvariable=self.commandeText, height=3)
         commande.pack(padx=5, pady=5, side=BOTTOM, fill=X)
-        commande.bind('<Return>', self.nouvellesCommandes)
+        commande.bind('<Return>', self.nouvelles_commandes)
       
 
         # Panneau de droite contenant les informations de trajectoire
@@ -110,26 +113,25 @@ class EcranPrincipal(Frame):
         self.after(100, self.maj_loggers)
 
 
-    def nouvellesCommandes(self, event):
-        # self.logs.config(state=NORMAL)
-        # self.logs.insert("end", self.commandeText.get()+"\n")
-        # self.logs.see("end")
-        # self.logs.config(state=DISABLED)
-        # self.commandeText.set("")
+    def vider_logs(self):
+        self.logs.config(state=NORMAL)
+        self.logs.delete(1.0,"end")
+        self.logs.config(state=DISABLED)
+
+    def nouvelles_commandes(self, event):
         commandes = self.commandeText.get().splitlines()
-        self.executerCommandes(commandes)
+        self.executer_commandes(commandes)
         self.commandeText.set("")
 
-    def executerCommandes(self, commandes):
+    def executer_commandes(self, commandes):
         for commande in commandes:
-            self.executerCommande(commande)
+            self.executer_commande(commande)
             # Attente d'envoi de la commance (risque de perte sinon : UDP et non TCP)
             time.sleep(0.1)
 
-    def executerCommande(self, commande):
-        print(commande[0:8])
+    def executer_commande(self, commande):
         if commande[0:8] == "connect ":
             connect, ip, port = commande.split()
             self.controleur.connecter(ip, int(port))
         else:
-            self.controleur.envoyerCommandeBrute(commande)
+            self.controleur.envoyer_commande_brute(commande)
