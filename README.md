@@ -20,6 +20,7 @@ Bibliothèques nécessaires :
 - Arduino_LSM6DS3 : centrale inertielle (CI)
 - WiFiNINA : connexion et communication via Wifi
 - SD : gestion de la carte SD
+- Servo : gestion des servomoteurs
 - avr/dtostrf : pour convertir les floats en chaîne de caractères
 
 Permet de recevoir via Wifi les commandes :
@@ -36,17 +37,19 @@ Permet de recevoir via Wifi les commandes :
 	- *toggleLogFlush*: active/désactive les logs de vidage du cache sur la carte SD.
 	- *toggleLogRocketStatus* : active/désactive les logs d'état général de la fusée.
 - Plan/script de vol de la fusée
-	- *configureStep no_step delai commande* : précise la temporisation (en ms) d'une étape donnée et la commande à exécuter au **début** de l'étape.
+	- *configureStep no_step delai commande* : précise la temporisation (en ms) de l'étape *no_step* et la commande à exécuter au **début** de l'étape.
 	- *rocketSteps* : renvoie toutes les étapes de vol de la fusée.
 	- *pinMode pin mode* : configure la broche n°*pin* (OUTPUT/INPUT). 
 - Lancement et actions
-	- *digitalWrite pin niveau* : envoie un signal ou l'arrête sur la sortie numérique désignée.
+	- *digitalWrite pin niveau* : envoie un signal (0 ou 1) ou l'arrête sur la sortie numérique *pin* désignée.
+	- *servoPosition servo angle* : positionne sur un *angle* précis le servo moteur n°*servo*.
 	- *launch code* : passe à l'étape suivante (idem "stage"). Protégé par un code.
 	- *stage code* : passe à l'étape suivante (idem "stage"). Protégé par un code.
 	- *stop code* : interrompt le programme de la fusée et revient à l'étape initiale. Protégé par un code. Attention aux conséquences !
 
 Remarques sur l'Arduino Nano 33 IoT :
-- La gestion de l'USB est basé sur un programme chargé par le bootloader. Mais si le programme personnalisé est bogué, il peut empêcher la routine de gestion de l'USB de fonctionner. L'Arduino apparaît alors "briqué". Il faut appuyer rapidement 2 fois sur le boutons reset pour forcer le rechargement du bootloader (et la gestion 
+- La gestion de l'USB est basé sur un programme chargé par le bootloader. Mais si le programme personnalisé est bogué, il peut empêcher la routine de gestion de l'USB de fonctionner. L'Arduino apparaît alors "briqué". Il faut appuyer rapidement 2 fois sur le boutons reset pour forcer le rechargement du bootloader (et la gestion du port USB).
+- **Attention** : I/O en 3,3 V.
 
 Remarques sur la carte SD :
 - à alimenter en 5V ;

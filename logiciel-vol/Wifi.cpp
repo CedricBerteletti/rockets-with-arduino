@@ -51,13 +51,14 @@ void Wifi::init(const char ssid[], const char pwd[])
   actif = false;
 
   while (statut != WL_CONNECTED
-    &&  millis() - tempsDebut < 10000) { // Tentative de connexion pendant 10s
+    &&  millis() - tempsDebut < 30000) { // Tentative de connexion pendant 30s
     log(MODULE_WIFI, "CONNECTING", ssid, true);
 
     // Connexion à un réseau WPA/WPA2
     statut = WiFi.begin(ssid, pwd);
 
-    delay(1000);
+    // Attente de la connexion (peut être supérieur à 1s !)
+    delay(5000);
   }
 
   if (statut == WL_CONNECTED) {
