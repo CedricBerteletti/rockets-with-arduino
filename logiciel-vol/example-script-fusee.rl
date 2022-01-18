@@ -1,7 +1,7 @@
 # Script d'example pour configurer le vol d'une fusée
 
 # Connexion à la fusée et vérification des différents statuts
-connect 192.168.0.50 23900
+connect 192.168.0.8 23900
 wifiStatus
 loggerStatus
 rocketStatus
