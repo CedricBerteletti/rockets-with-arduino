@@ -34,8 +34,10 @@ long flushSuivant = 0;
 char commande[LONGUEUR_MAX_CHAINE_CARACTERES];
 // Chaîne de caractère pour les logs
 char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
-// Servomoteurs des ailerons
+// Servomoteurs des ailerons sur les broches 20 et 21
 Servo servo[2];
+static const int SERVO0_PIN = 20;
+static const int SERVO1_PIN = 21;
 
 /* Etat de la fusée */
 static const int INITIAL = -1;
@@ -85,8 +87,8 @@ void setup() {
   }
 
   // 2 servomoteurs sur les broches 20 et 21
-  servo[0].attach(20);
-  servo[1].attach(21);
+  servo[0].attach(SERVO0_PIN);
+  servo[1].attach(SERVO1_PIN);
 
   delay(1000);
   flushSuivant = millis();
@@ -227,6 +229,21 @@ void executerCommande(const char commande[]) {
       int serv = atoi(chServo);
       int pos = atoi(chPosition);
       servo[serv].write(pos);
+    }
+    else if (chaineCommencePar(commande, "tone ")) {
+      char chPin[LONGUEUR_NOMBRE];
+      char chFreq[LONGUEUR_NOMBRE];
+      copierToken(commande, " ", 1, chPin);
+      copierToken(commande, " ", 2, chFreq);
+      int pin = atoi(chPin);
+      int freq = atoi(chFreq);
+      tone(pin, freq);
+    }
+    else if (chaineCommencePar(commande, "toneStop ")) {
+      char chPin[LONGUEUR_NOMBRE];
+      copierToken(commande, " ", 1, chPin);
+      int pin = atoi(chPin);
+      noTone(pin);
     }
     else {
       logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
