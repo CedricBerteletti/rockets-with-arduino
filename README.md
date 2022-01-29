@@ -42,10 +42,12 @@ Permet de recevoir via Wifi les commandes :
 	- *pinMode pin mode* : configure la broche n°*pin* (OUTPUT/INPUT). 
 - Lancement et actions
 	- *digitalWrite pin niveau* : envoie un signal (0 ou 1) ou l'arrête sur la sortie numérique *pin* désignée.
-	- *servoPosition servo angle* : positionne sur un *angle* précis le servo moteur n°*servo*.
+	- *servoPosition servo angle* : positionne sur un *angle* précis (de 0 à 180°) le servo moteur n°*servo*.
 	- *launch code* : passe à l'étape suivante (idem "stage"). Protégé par un code.
 	- *stage code* : passe à l'étape suivante (idem "stage"). Protégé par un code.
 	- *stop code* : interrompt le programme de la fusée et revient à l'étape initiale. Protégé par un code. Attention aux conséquences !
+	- *tone pin freq* : joue un son de fréquence *freq* hz sur la sortie *pin*.
+	- *toneStop pin* : coupe le son sur la sortie *pin*.
 
 Remarques sur l'Arduino Nano 33 IoT :
 - La gestion de l'USB est basé sur un programme chargé par le bootloader. Mais si le programme personnalisé est bogué, il peut empêcher la routine de gestion de l'USB de fonctionner. L'Arduino apparaît alors "briqué". Il faut appuyer rapidement 2 fois sur le boutons reset pour forcer le rechargement du bootloader (et la gestion du port USB).
