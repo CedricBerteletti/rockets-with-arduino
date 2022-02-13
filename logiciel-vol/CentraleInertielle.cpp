@@ -9,7 +9,7 @@
 
 const char CentraleInertielle::MODULE_IMU[] = "IMU";
 const char CentraleInertielle::SOUS_MODULE_IMU_DATA[] = "IMU_DATA";
-const char CentraleInertielle::ENTETE_DATA[] = "t, accX, accY, accZ, alphaX, alphaY, alphaZ";
+const char CentraleInertielle::ENTETE_DATA[] = "t, accX, accY, accZ, vAlpha, vBeta, vGamma";
 const char CentraleInertielle::SEPARATEUR_DATA[] = ", ";
 
 CentraleInertielle::CentraleInertielle(Logger &logger):logger(logger) {

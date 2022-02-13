@@ -36,29 +36,51 @@ void Wifi::listerReseaux()
 
 
 
-void Wifi::init()
+void Wifi::connecter()
 {
-  init(WIFI1_SSID, WIFI1_PASS);
+  connecter(WIFI1_SSID, WIFI1_PASS);
   if (!actif) {
-    init(WIFI2_SSID, WIFI2_PASS);
+    connecter(WIFI2_SSID, WIFI2_PASS);
   }
 }
 
-void Wifi::init(const char ssid[], const char pwd[])
+/* Tente de se connecter à un réseau WiFi
+   En cas d'échec, tente de se connecter à l'un des deux réseaux par défaut */
+void Wifi::connecterAvecFallback(const char ssid[], const char pwd[])
 {
+  connecter(ssid, pwd);
+  if (!actif) {
+    connecter();
+  }
+  logStatut();
+}
+
+void Wifi::connecter(const char ssid[], const char pwd[])
+{
+  // Déconnexion d'un précédent réseau
+  if(strlen(WiFi.SSID()) > 0) {
+    log(MODULE_WIFI, "DISCONNECTING", WiFi.SSID(), true);
+    WiFi.disconnect();
+    delay(5000);
+  }
+
   int statut = WL_IDLE_STATUS;
   long tempsDebut = millis();
+  int tempsAttente = 2000; // Attendre l'initialisation de la connexion Wifi pendant 2s
   actif = false;
 
   while (statut != WL_CONNECTED
-    &&  millis() - tempsDebut < 30000) { // Tentative de connexion pendant 30s
+      &&  millis() - tempsDebut < 30000) { // Tentative de connexion pendant 30s
+
     log(MODULE_WIFI, "CONNECTING", ssid, true);
 
     // Connexion à un réseau WPA/WPA2
     statut = WiFi.begin(ssid, pwd);
 
     // Attente de la connexion (peut être supérieur à 1s !)
-    delay(5000);
+    delay(tempsAttente);
+    // Si connexion KO, on attend un peu plus longtemps au prochain essai
+    tempsAttente = tempsAttente + 1000;
   }
 
   if (statut == WL_CONNECTED) {
@@ -67,8 +89,7 @@ void Wifi::init(const char ssid[], const char pwd[])
     udp.begin(PORT_LOCAL);
     log(MODULE_WIFI, "CONNECTED", ssid, true);
   }
-  else {    
-    actif = false;
+  else {
     log(MODULE_WIFI, "ERROR_CONNECTION", ssid, true);
   }
 }
