@@ -5,6 +5,7 @@ Point d'entrée pour le programme du poste de contrôle de la fusée
 """
 
 from tkinter import Tk
+from centrale_inertielle import CentraleInertielle
 from ecran_principal import EcranPrincipal
 from connexion import Connexion
 from controleur import Controleur
@@ -23,11 +24,12 @@ def main(args):
     controleur = Controleur(connexion)
     telemetrie = Telemetrie(connexion)
     telemetrie.start()
+    centrale = CentraleInertielle()
     
     fenetre = Tk("")
     fenetre.title("Centre de Contrôle et de Télémétrie")
     fenetre.geometry(str(LARGEUR_ECRAN) + "x" + str(HAUTEUR_ECRAN))
-    principal = EcranPrincipal(controleur, telemetrie)
+    principal = EcranPrincipal(controleur, telemetrie, centrale)
 
     # Boucle principale de l'application
     fenetre.mainloop()

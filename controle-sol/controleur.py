@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+@author: Cédric Berteletti
+Envoi des commandes à la fusée
+"""
 
 from connexion import Connexion
 
@@ -13,5 +17,5 @@ class Controleur():
 
     def connecter(self, ip, port):
         self.connexion.init(ip, port)
-        self.envoyer_commande_brute("connect " + ip + " " + str(port))
+        self.envoyer_commande_brute("wifi.initUdp " + ip + " " + str(port))
         
