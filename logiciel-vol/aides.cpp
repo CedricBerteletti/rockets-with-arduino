@@ -12,7 +12,7 @@ void formatLog(char destination[], const char module[], const char message[], co
   sprintf(destination, "%i, %s, \"%s\", \"%s\"", millis(), module, message, details);
 }
 
-// Teste si une chaîne de caractères commence par un prefix donné
+// Teste si une chaîne de caractères commence par un prefixe donné
 bool chaineCommencePar(const char chaine[], const char prefix[])
 {
     return strncmp(prefix, chaine, strlen(prefix)) == 0;
@@ -65,7 +65,8 @@ char *trim(char *str)
     return str;
 }
 
-// Copie une sous-chaîne donnée de la chaîne principale, comprise entre des séparateurs.
+// Copie une sous-chaîne à l'index donné de la chaîne principale, comprise entre des séparateurs (si dernierToken false),
+// ou comprise entre un séparateur et la fin (si dernierToken vrai)
 void copierToken(const char *chaine, const char separateur[], int index, char *token, bool dernierToken) {
   char *debut = (char*)chaine;
   char *fin;
@@ -100,6 +101,7 @@ void copierToken(const char *chaine, const char separateur[], int index, char *t
   }
 }
 
+// Copie une sous-chaîne à l'index donné de la chaîne principale, comprise entre des séparateurs
 void copierToken(const char *chaine, const char separateur[], int index, char *token) {
   copierToken(chaine, separateur, index, token, false);
 }
