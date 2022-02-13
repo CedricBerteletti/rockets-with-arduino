@@ -1,4 +1,8 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
+"""
+@author: Cédric Berteletti
+Gestion de la connexion WiFi à la fusée
+"""
 
 import socket
 import errno
@@ -8,7 +12,7 @@ class Connexion():
     "Classe pour gérer la connexion wifi à la fusée"
 
     def __init__(self):
-        self.ip = "192.168.0.50"
+        self.ip = "192.168.0.8"
         self.port = 23900
         
     def init(self, ip, port):

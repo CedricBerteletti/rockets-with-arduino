@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+@author: Cédric Berteletti
+Gestion du thread d'acquisition des données télémétriques de la fusée
+"""
 
 from connexion import Connexion
 import threading
