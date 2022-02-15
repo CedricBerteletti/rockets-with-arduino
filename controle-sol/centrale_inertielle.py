@@ -39,13 +39,22 @@ class CentraleInertielle():
                 data.vbeta = float(values[5]) + self.delta_vbeta
                 data.vgamma = float(values[6]) + self.delta_vgamma
 
-                # Pour éviter la dérive des gyroscopes, on filtre les trop petites vitesses angulaires
+                # Pour éviter la dérive des gyroscopes,
+                # on filtre les trop petites vitesses angulaires
                 if (abs(data.valpha) < FILTRE_VITESSE_ANGULAIRE_MIN):
                     data.valpha = 0.0
                 if (abs(data.vbeta) < FILTRE_VITESSE_ANGULAIRE_MIN):
                     data.vbeta = 0.0
                 if (abs(data.vgamma) < FILTRE_VITESSE_ANGULAIRE_MIN):
                     data.vgamma = 0.0
+                
+                #de même pour les accélération
+                if (abs(data.ax) < FILTRE_ACCELERATION_MIN):
+                    data.ax = 0.0
+                if (abs(data.ay) < FILTRE_ACCELERATION_MIN):
+                    data.ay = 0.0
+                if (abs(data.az) < FILTRE_ACCELERATION_MIN):
+                    data.az = 0.0
 
                 if (self.courant.t > 0):
                     # Il ne s'agit pas de la première donnée reçue, on peut donc calculer
