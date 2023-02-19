@@ -4,16 +4,18 @@
 Gestion de la connexion WiFi à la fusée
 """
 
-import socket
+
 import errno
+import logging
+import socket
 from time import sleep
 
 class Connexion():
     "Classe pour gérer la connexion wifi à la fusée"
 
     def __init__(self):
-        self.ip = "192.168.0.8"
-        self.port = 23900
+        self.ip = ""
+        self.port = 0
         
     def init(self, ip, port):
         self.ip = ip
@@ -40,7 +42,7 @@ class Connexion():
                 sleep(0.01)
             else:
                 # Erreur réelle
-                print(e)
+                logging.error("Erreur lors de la tentative de lecture de l'Arduino", e)
         else:
             str = data.decode()
         return str

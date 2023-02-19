@@ -4,11 +4,12 @@
 Gestion du thread d'acquisition des données télémétriques de la fusée
 """
 
-from connexion import Connexion
+import functools
+import logging
 import threading
 
+from connexion import Connexion
 
-import functools
 
 def synchronized(lock):
     "Synchronization decorator"
@@ -52,7 +53,7 @@ class Telemetrie(threading.Thread):
 
     def run(self):
         self.actif = True
-        print("Lancement du thread d'aquisition des données")
+        logging.info("Lancement du thread d'aquisition des données")
         while self.actif:
             str = self.connexion.recevoir()
             if str:
@@ -62,7 +63,7 @@ class Telemetrie(threading.Thread):
                 else:
                     self.logs.append(str)
                     self.tempLogs.append(str)
-        print("Fin du thread d'aquisition des données")
+        logging.info("Fin du thread d'aquisition des données")
 
 
     

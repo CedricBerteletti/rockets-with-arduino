@@ -23,7 +23,7 @@ Bibliothèques nécessaires :
 - Servo : gestion des servomoteurs
 - avr/dtostrf : pour convertir les floats en chaîne de caractères
 
-Permet de recevoir via Wifi les commandes :
+Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
 - Commandes générales
 	- *wifi.connect ssid pwd*: permet de se connecter au réseau wifi *ssid* avec le mot de passe *pwd*.
 	- *wifi.initUdp ip port*: permet de connaître le client distant et de lui retourner les mesures et le statut de la fusée.
