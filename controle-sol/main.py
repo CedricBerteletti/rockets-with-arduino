@@ -4,6 +4,8 @@
 Point d'entrée pour le programme du poste de contrôle de la fusée
 """
 
+import logging
+
 from tkinter import Tk
 from centrale_inertielle import CentraleInertielle
 from ecran_principal import EcranPrincipal
@@ -15,12 +17,14 @@ from time import sleep
 # Constantes
 LARGEUR_ECRAN = 1280
 HAUTEUR_ECRAN = 1024
+ARDUINO_IP = "192.168.0.8"
+ARDUINO_PORT = 23900
 
 
 
 def main(args):
     connexion = Connexion()
-    connexion.init("192.168.0.50", 23900)
+    connexion.init(ARDUINO_IP, ARDUINO_PORT)
     controleur = Controleur(connexion)
     telemetrie = Telemetrie(connexion)
     telemetrie.start()
@@ -41,7 +45,8 @@ def main(args):
     connexion.fermer()
 
 
-print("Programme principal")
+logging.basicConfig(format="%(asctime)s %(levelname)s - %(filename)s:%(lineno)d - %(message)s", datefmt="%Y-%m-%d %H:%M:%S", level=logging.DEBUG)
+logging.info("Programme principal")
 if __name__ == "__main__":
     from sys import argv
     try:

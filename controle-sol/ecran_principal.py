@@ -4,11 +4,12 @@
 Ecran principal
 """
 
+import time
+
 from tkinter import Tk, StringVar, Text
 from tkinter import Button, Entry, Frame, LabelFrame, PanedWindow
 from tkinter.constants import VERTICAL, TOP, LEFT, BOTTOM, X, BOTH, VERTICAL, HORIZONTAL, RAISED, DISABLED, NORMAL, W, N, E, S
 from graphique import Graphique
-import time
 
 
 class EcranPrincipal(Frame):
