@@ -51,7 +51,7 @@ class CentraleInertielle():
                 if (abs(data.vgamma) < FILTRE_VITESSE_ANGULAIRE_MIN):
                     data.vgamma = 0.0
                 
-                # De même pour les accélération
+                # De même pour les accélérations
                 if (abs(data.ax) < FILTRE_ACCELERATION_MIN):
                     data.ax = 0.0
                 if (abs(data.ay) < FILTRE_ACCELERATION_MIN):
@@ -77,12 +77,6 @@ class CentraleInertielle():
         "Efface toutes les données stockées, mais ne modifie pas la calibration"
         self.data_liste = []
         self.courant = DonneesInertielles()
-        self.offset_ax = 0.0
-        self.offset_ay = 0.0
-        self.offset_az = 0.0
-        self.offset_valpha = 0.0
-        self.deltavabeta = 0.0
-        self.deltavagamma = 0.0
 
     def calibrer(self):
         sum_ax = 0.0
@@ -104,14 +98,23 @@ class CentraleInertielle():
             n = n + 1
         
         # Déviation moyenne en fonction du nombre n d'échantillons
-        self.offset_ax = - sum_ax / n
-        self.offset_ay = - sum_ay / n
-        self.offset_az = - sum_az / n
-        self.offset_valpha = - sum_valpha / n
-        self.offset_vbeta = - sum_vbeta / n
-        self.offset_vgamma = - sum_vgamma / n
+        if(n>0):
+            self.offset_ax = - sum_ax / n
+            self.offset_ay = - sum_ay / n
+            self.offset_az = - sum_az / n
+            self.offset_valpha = - sum_valpha / n
+            self.offset_vbeta = - sum_vbeta / n
+            self.offset_vgamma = - sum_vgamma / n
+        else:
+            # Pas de donnée : on efface la calibration
+            self.offset_ax = 0.0
+            self.offset_ay = 0.0
+            self.offset_az = 0.0
+            self.offset_valpha = 0.0
+            self.offset_vbeta = 0.0
+            self.offset_vgamma = 0.0
 
-        logging.info("CALIBRATION ", self.offset_ax, self.offset_ay, self.offset_az, self.offset_valpha, self.deltavabeta, self.deltavagamma)
+        logging.info("CALIBRATION (%s, %s, %s, %s, %s, %s)", self.offset_ax, self.offset_ay, self.offset_az, self.offset_valpha, self.offset_vbeta, self.offset_vgamma)
 
 
 
