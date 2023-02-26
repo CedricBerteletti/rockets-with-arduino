@@ -10,7 +10,7 @@ import time
 from tkinter import Tk, StringVar, Text
 from tkinter import Button, Entry, Frame, LabelFrame, PanedWindow
 from tkinter.constants import VERTICAL, TOP, LEFT, BOTTOM, X, BOTH, VERTICAL, HORIZONTAL, RAISED, DISABLED, NORMAL, W, N, E, S
-from graphique import Graphique
+from graphiques import Graphiques
 
 
 class EcranPrincipal(Frame):
@@ -36,7 +36,7 @@ class EcranPrincipal(Frame):
         panneauGauche = PanedWindow(panneaux, orient=VERTICAL, sashrelief = RAISED, sashpad=2, width=self.winfo_width()/2)
         panneaux.add(panneauGauche)        
 
-        # 2 panneaux horizontaux de gauche
+        # 2 sous-panneaux horizontaux de gauche
         visualisation = LabelFrame(panneauGauche, text="Vue")
         panneauGauche.add(visualisation, height=self.winfo_height()*2/3)
 
@@ -56,6 +56,7 @@ class EcranPrincipal(Frame):
         btnViderLogsImu.pack(padx=5, pady=5, side=LEFT)
         btnCalibrerImu = Button(boutons, text="Calibrer CI", command=self.calibrer)
         btnCalibrerImu.pack(padx=5, pady=5, side=LEFT)
+
         self.logs = Text(controle, height=1, bg="#000000", fg="#FFFFFF")
         self.logs.config(state=DISABLED)
         self.logs.pack(padx=5, pady=5, fill=BOTH, expand=1)
@@ -64,35 +65,21 @@ class EcranPrincipal(Frame):
         commande.pack(padx=5, pady=5, side=BOTTOM, fill=X)
         commande.bind('<Return>', self.nouvelles_commandes)
       
+        # Panneau de droite
+        frameDroite = LabelFrame(panneaux, text="Centrale inertielle", height=self.winfo_height()*4/5)        
+        frameDroite.pack(side=TOP)
+        panneaux.add(frameDroite)
+        panneauDroit = PanedWindow(frameDroite, orient=VERTICAL, sashrelief = RAISED, sashpad=2, width=self.winfo_width()/2)
+        panneauDroit.pack(fill=BOTH, expand=1)
 
-        # Panneau de droite contenant les informations de trajectoire
-        panneauDroit = LabelFrame(panneaux, text="Centrale inertielle", width=self.winfo_width()/2)
-        panneaux.add(panneauDroit)
-        panneauDroit.columnconfigure(0, weight=1)
-        panneauDroit.rowconfigure(0, weight=1)
-        panneauDroit.rowconfigure(1, weight=1)
-        panneauDroit.rowconfigure(2, weight=1)
-        panneauDroit.rowconfigure(3, weight=1)
-        panneauDroit.rowconfigure(4, weight=1)
-        panneauDroit.rowconfigure(5, weight=1)
-        panneauDroit.rowconfigure(6, weight=1)
-
-        self.graph1 = Graphique(panneauDroit, text="x")
-        self.graph1.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.graph2 = Graphique(panneauDroit, text="y")
-        self.graph2.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.graph3 = Graphique(panneauDroit, text="z")
-        self.graph3.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.graph4 = Graphique(panneauDroit, text="alpha")
-        self.graph4.grid(column=0, row=3, sticky=(N, S, E, W))
-        self.graph5 = Graphique(panneauDroit, text="beta")
-        self.graph5.grid(column=0, row=4, sticky=(N, S, E, W))
-        self.graph6 = Graphique(panneauDroit, text="gamma")
-        self.graph6.grid(column=0, row=5, sticky=(N, S, E, W))
+        # 2 sous-panneaux de droite contenant les informations de trajectoire
+        self.graphiques = Graphiques(panneauDroit, height=self.winfo_height()*4/5)
+        panneauDroit.add(self.graphiques)        
         self.imuLogs = Text(panneauDroit, bg="#000000", fg="#FFFFFF")
         self.imuLogs.config(state=DISABLED)
-        self.imuLogs.grid(column=0, row=6, sticky=(N, S, E, W))
+        panneauDroit.add(self.imuLogs, height=self.winfo_height()/5)
 
+        # MAJ régulière
         self.maj_loggers()
         self.maj_graph()
 
@@ -100,6 +87,7 @@ class EcranPrincipal(Frame):
     def maj_loggers(self):
         "Mise à jour des loggers toutes les 100 ms"
 
+        # Logs courants
         self.logs.config(state=NORMAL)
         s = self.telemetrie.logSuivant()
         nouveauLog = False
@@ -111,6 +99,7 @@ class EcranPrincipal(Frame):
             self.logs.see("end")
         self.logs.config(state=DISABLED)
 
+        # Logs de la centrale inertielle
         self.imuLogs.config(state=NORMAL)
         s = self.telemetrie.logImuSuivant()
         nouveauLog = False
@@ -123,57 +112,15 @@ class EcranPrincipal(Frame):
             self.imuLogs.see("end")
         self.imuLogs.config(state=DISABLED)
 
-        # MAJ graphique ssur un échantillon des données toutes les 100 ms
-        t = (self.centrale.courant.t - self.centrale.data_liste[0].t) / 1000
-        self.graph1.x1.append(t)
-        self.graph1.y1.append(self.centrale.courant.ax)
-        self.graph1.x2.append(t)
-        self.graph1.y2.append(self.centrale.courant.vx)
-        self.graph1.x3.append(t)
-        self.graph1.y3.append(self.centrale.courant.x)
-
-        self.graph2.x1.append(t)
-        self.graph2.y1.append(self.centrale.courant.ay)
-        self.graph2.x2.append(t)
-        self.graph2.y2.append(self.centrale.courant.vy)
-        self.graph2.x3.append(t)
-        self.graph2.y3.append(self.centrale.courant.y)
-
-        self.graph3.x1.append(t)
-        self.graph3.y1.append(self.centrale.courant.az)
-        self.graph3.x2.append(t)
-        self.graph3.y2.append(self.centrale.courant.vz)
-        self.graph3.x3.append(t)
-        self.graph3.y3.append(self.centrale.courant.z)
-
-        self.graph4.x2.append(t)
-        self.graph4.y2.append(self.centrale.courant.valpha)
-        self.graph4.x3.append(t)
-        self.graph4.y3.append(self.centrale.courant.alpha)
-
-        self.graph5.x2.append(t)
-        self.graph5.y2.append(self.centrale.courant.vbeta)
-        self.graph5.x3.append(t)
-        self.graph5.y3.append(self.centrale.courant.beta)
-
-        self.graph6.x2.append(t)
-        self.graph6.y2.append(self.centrale.courant.vgamma)
-        self.graph6.x3.append(t)
-        self.graph6.y3.append(self.centrale.courant.gamma)
-
-
+        # MAJ graphique sur un échantillon des données toutes les 100 ms
+        if nouveauLog:
+            self.graphiques.ajouter_telemetrie(self.centrale.data_liste[0].t, self.centrale.courant)
 
         self.after(100, self.maj_loggers)
 
     def maj_graph(self):
-        self.graph1.maj()
-        self.graph2.maj()
-        self.graph3.maj()
-        self.graph4.maj()
-        self.graph5.maj()
-        self.graph6.maj()
-        self.after(200, self.maj_graph)
-
+        self.graphiques.maj()
+        self.after(100, self.maj_graph)
 
     def vider_logs(self):
         self.logs.config(state=NORMAL)
@@ -185,12 +132,7 @@ class EcranPrincipal(Frame):
         self.imuLogs.delete(1.0, "end")
         self.imuLogs.config(state=DISABLED)
         self.centrale.effacer_donnees()
-        self.graph1.effacer()
-        self.graph2.effacer()
-        self.graph3.effacer()
-        self.graph4.effacer()
-        self.graph5.effacer()
-        self.graph6.effacer()
+        self.graphiques.effacer()
 
     def calibrer(self):
         self.centrale.calibrer()

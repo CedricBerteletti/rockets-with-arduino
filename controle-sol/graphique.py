@@ -22,10 +22,12 @@ class Graphique(LabelFrame):
 
     def __init__(self, root, text):
         super().__init__(root, text=text)
-        self.init_ui()
 
-    def init_ui(self):        
-        self.fig = Figure(figsize=(20,2), dpi=100)
+    def init_ui(self):
+        width = self.winfo_width()/100
+        logging.info(width)
+        height = self.winfo_height()/100
+        self.fig = Figure(figsize=(75, 5), dpi=75)
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.get_tk_widget().pack()
         self.effacer()
