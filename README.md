@@ -27,7 +27,7 @@ Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
 - Commandes générales
 	- *wifi.connect ssid pwd*: permet de se connecter au réseau wifi *ssid* avec le mot de passe *pwd*.
 	- *wifi.initUdp ip port*: permet de connaître le client distant et de lui retourner les mesures et le statut de la fusée.
-	- *delay duree* : bloque l'exactution de la boucle principale de l'Arduino pendant *duree* ms.
+	- *delay duree* : bloque l'exécution de la boucle principale de l'Arduino pendant *duree* ms.
 - Loggers et différents états 
 	- *status.rocket* : état de la fusée.
 	- *status.wifi* : état de la connexion Wifi.
@@ -38,12 +38,12 @@ Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
 	- *logger.toggleLogFlush*: active/désactive les logs de vidage du cache sur la carte SD.
 	- *logger.toggleLogRocketStatus* : active/désactive les logs d'état général de la fusée.
 - Plan/script de vol de la fusée
-	- *rocket.configureStep no_step delai commande* : précise la temporisation (en ms) de l'étape *no_step* et la commande à exécuter au **début** de l'étape.
+	- *rocket.configureStep no_step delai commande* : précise la temporisation (durée en ms) de l'étape *no_step* et la commande à exécuter au **début** de l'étape.
 	- *rocket.getSteps* : renvoie toutes les étapes de vol de la fusée.
 	- *pin.setMode pin mode* : configure la broche n°*pin* (OUTPUT/INPUT). 
 - Lancement et actions
 	- *rocket.launch code* : passe à l'étape suivante (idem "stage"). Protégé par un code.
-	- *rocket.stage code* : passe à l'étape suivante (idem "stage"). Protégé par un code.
+	- *rocket.stage code* : passe à l'étape suivante. Protégé par un code.
 	- *rocket.stop code* : interrompt le programme de la fusée et revient à l'étape initiale. Protégé par un code. Attention aux conséquences !
 	- *rocket.goStep step* : permet de passer directement à l'étape *step* (et éventuellement de faire des boucles).
 	- *pin.digitalWrite pin niveau* : envoie un signal (0 ou 1) ou l'arrête sur la sortie numérique *pin* désignée.

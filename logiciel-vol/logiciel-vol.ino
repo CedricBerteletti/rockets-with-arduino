@@ -17,8 +17,8 @@
 
 static const char MODULE_SYSTEME[] = "SYSTEM";
 static const char MODULE_COMMANDE[] = "COMMAND";
-static const long DELAI_FLUSH = 1000; // Flush des logs sur la carte SD toutes les secondes
-static const long DELAI_COMMANDE = 100; // Tentative de lecture d'une nouvelle commande toutes les secondes 100 ms
+static const long DELAI_FLUSH = 1000; // (en ms) Flush des logs sur la carte SD toutes les secondes
+static const long DELAI_COMMANDE = 100; // (en ms) Tentative de lecture d'une nouvelle commande toutes les 100 ms
 
 /* Variable globales */
 // Instanciation d'un loggeur
@@ -81,7 +81,7 @@ void setup() {
   logger.wifi = &wifi;
   logger.toUdp = true;
 
-  // Pour éviter de poluer les logs, on désactive les logs des données inertielles avant le lanement
+  // Pour éviter de polLuer les logs, on désactive les logs des données inertielles avant le lanCement
   centrale.loggingData = false;
   centrale.init();
 
@@ -144,7 +144,7 @@ void logRocketStatus() {
 }
 
 /* Stagging : la fusée passe à une nouvelle séquence du vol (par exemple, du 1° au 2° étage)
-  - on écrémente le statut/étage de la fusée (initalement à -1)
+  - on incrémente le statut/étage de la fusée (initalement à -1)
   - on exécute la commande correspondant à cette nouvelle étape
   - on indique la date de la prochaine transition d'étage
 */
