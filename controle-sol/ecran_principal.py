@@ -4,6 +4,7 @@
 Ecran principal
 """
 
+import logging
 import time
 
 from tkinter import Tk, StringVar, Text
@@ -93,6 +94,7 @@ class EcranPrincipal(Frame):
         self.imuLogs.grid(column=0, row=6, sticky=(N, S, E, W))
 
         self.maj_loggers()
+        self.maj_graph()
 
 
     def maj_loggers(self):
@@ -121,30 +123,56 @@ class EcranPrincipal(Frame):
             self.imuLogs.see("end")
         self.imuLogs.config(state=DISABLED)
 
-        # TODO MAJ graphiques
-        self.graph1.area.delete(1.0, "end")
-        self.graph1.area.insert("end", str(self.centrale.courant.ax) + "\n")
-        self.graph1.area.insert("end", str(self.centrale.courant.vx) + "\n")
-        self.graph1.area.insert("end", str(self.centrale.courant.x) + "\n")
-        self.graph2.area.delete(1.0, "end")
-        self.graph2.area.insert("end", str(self.centrale.courant.ay) + "\n")
-        self.graph2.area.insert("end", str(self.centrale.courant.vy) + "\n")
-        self.graph2.area.insert("end", str(self.centrale.courant.y) + "\n")
-        self.graph3.area.delete(1.0, "end")
-        self.graph3.area.insert("end", str(self.centrale.courant.az) + "\n")
-        self.graph3.area.insert("end", str(self.centrale.courant.vz) + "\n")
-        self.graph3.area.insert("end", str(self.centrale.courant.z) + "\n")
-        self.graph4.area.delete(1.0, "end")
-        self.graph4.area.insert("end", str(self.centrale.courant.valpha) + "\n")
-        self.graph4.area.insert("end", str(self.centrale.courant.alpha) + "\n")
-        self.graph5.area.delete(1.0, "end")
-        self.graph5.area.insert("end", str(self.centrale.courant.vbeta) + "\n")
-        self.graph5.area.insert("end", str(self.centrale.courant.beta) + "\n")
-        self.graph6.area.delete(1.0, "end")
-        self.graph6.area.insert("end", str(self.centrale.courant.vgamma) + "\n")
-        self.graph6.area.insert("end", str(self.centrale.courant.gamma) + "\n")
+        # MAJ graphique ssur un échantillon des données toutes les 100 ms
+        t = (self.centrale.courant.t - self.centrale.data_liste[0].t) / 1000
+        self.graph1.x1.append(t)
+        self.graph1.y1.append(self.centrale.courant.ax)
+        self.graph1.x2.append(t)
+        self.graph1.y2.append(self.centrale.courant.vx)
+        self.graph1.x3.append(t)
+        self.graph1.y3.append(self.centrale.courant.x)
+
+        self.graph2.x1.append(t)
+        self.graph2.y1.append(self.centrale.courant.ay)
+        self.graph2.x2.append(t)
+        self.graph2.y2.append(self.centrale.courant.vy)
+        self.graph2.x3.append(t)
+        self.graph2.y3.append(self.centrale.courant.y)
+
+        self.graph3.x1.append(t)
+        self.graph3.y1.append(self.centrale.courant.az)
+        self.graph3.x2.append(t)
+        self.graph3.y2.append(self.centrale.courant.vz)
+        self.graph3.x3.append(t)
+        self.graph3.y3.append(self.centrale.courant.z)
+
+        self.graph4.x2.append(t)
+        self.graph4.y2.append(self.centrale.courant.valpha)
+        self.graph4.x3.append(t)
+        self.graph4.y3.append(self.centrale.courant.alpha)
+
+        self.graph5.x2.append(t)
+        self.graph5.y2.append(self.centrale.courant.vbeta)
+        self.graph5.x3.append(t)
+        self.graph5.y3.append(self.centrale.courant.beta)
+
+        self.graph6.x2.append(t)
+        self.graph6.y2.append(self.centrale.courant.vgamma)
+        self.graph6.x3.append(t)
+        self.graph6.y3.append(self.centrale.courant.gamma)
+
+
 
         self.after(100, self.maj_loggers)
+
+    def maj_graph(self):
+        self.graph1.maj()
+        self.graph2.maj()
+        self.graph3.maj()
+        self.graph4.maj()
+        self.graph5.maj()
+        self.graph6.maj()
+        self.after(200, self.maj_graph)
 
 
     def vider_logs(self):
@@ -157,6 +185,12 @@ class EcranPrincipal(Frame):
         self.imuLogs.delete(1.0, "end")
         self.imuLogs.config(state=DISABLED)
         self.centrale.effacer_donnees()
+        self.graph1.effacer()
+        self.graph2.effacer()
+        self.graph3.effacer()
+        self.graph4.effacer()
+        self.graph5.effacer()
+        self.graph6.effacer()
 
     def calibrer(self):
         self.centrale.calibrer()
