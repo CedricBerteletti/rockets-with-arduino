@@ -10,7 +10,7 @@ import time
 from tkinter import Tk, StringVar, Text
 from tkinter import Button, Entry, Frame, LabelFrame, PanedWindow
 from tkinter.constants import VERTICAL, TOP, LEFT, BOTTOM, X, BOTH, VERTICAL, HORIZONTAL, RAISED, DISABLED, NORMAL, W, N, E, S
-from graphiques import Graphiques
+from graphiques import GraphiquesIndependants, GraphiquesIntegres
 
 
 class EcranPrincipal(Frame):
@@ -73,7 +73,8 @@ class EcranPrincipal(Frame):
         panneauDroit.pack(fill=BOTH, expand=1)
 
         # 2 sous-panneaux de droite contenant les informations de trajectoire
-        self.graphiques = Graphiques(panneauDroit, height=self.winfo_height()*4/5)
+        #self.graphiques = GraphiquesIndependants(panneauDroit, height=self.winfo_height()*4/5)
+        self.graphiques = GraphiquesIntegres(panneauDroit, height=self.winfo_height()*4/5)
         panneauDroit.add(self.graphiques)        
         self.imuLogs = Text(panneauDroit, bg="#000000", fg="#FFFFFF")
         self.imuLogs.config(state=DISABLED)
