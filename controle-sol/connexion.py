@@ -42,7 +42,7 @@ class Connexion():
                 sleep(0.01)
             else:
                 # Erreur réelle
-                logging.error("Erreur lors de la tentative de lecture de l'Arduino", e)
+                logging.error("Erreur lors de la tentative de lecture de l'Arduino : ", e)
         else:
             str = data.decode()
         return str

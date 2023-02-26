@@ -63,8 +63,8 @@ class CentraleInertielle():
                     # Il ne s'agit pas de la première donnée reçue, on peut donc calculer
                     # l'orientation et la position
                     temps_ecoule = (data.t - self.courant.t) / 1000
-                    logging.debug("Calcul du nouvel angle ", temps_ecoule, data.alpha, self.courant.alpha, data.valpha)
                     data.alpha = self.courant.alpha + data.valpha * temps_ecoule
+                    logging.debug(f"Calcul du nouvel angle à deltat={temps_ecoule} s : a'={data.alpha} ; a={self.courant.alpha} ; va={data.valpha}")
                     data.beta = self.courant.beta + data.vbeta * temps_ecoule
                     data.gamma = self.courant.gamma + data.vgamma * temps_ecoule
                     # TODO
@@ -114,7 +114,7 @@ class CentraleInertielle():
             self.offset_vbeta = 0.0
             self.offset_vgamma = 0.0
 
-        logging.info("CALIBRATION (%s, %s, %s, %s, %s, %s)", self.offset_ax, self.offset_ay, self.offset_az, self.offset_valpha, self.offset_vbeta, self.offset_vgamma)
+        logging.info(f"CALIBRATION {self.offset_ax} ; {self.offset_ay} ; {self.offset_az} ; {self.offset_valpha} ; {self.offset_vbeta} ; {self.offset_vgamma}")
 
 
 
