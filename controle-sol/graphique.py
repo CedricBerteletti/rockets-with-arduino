@@ -25,7 +25,6 @@ class Graphique(LabelFrame):
 
     def init_ui(self):
         width = self.winfo_width()/100
-        logging.info(width)
         height = self.winfo_height()/100
         self.fig = Figure(figsize=(75, 5), dpi=75)
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
