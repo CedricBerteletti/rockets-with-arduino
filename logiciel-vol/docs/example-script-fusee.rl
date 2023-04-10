@@ -49,3 +49,7 @@ logger.toggleLogImuData
 #pin.tone 3 495
 #pin.tone 2 528
 
+
+# servo.setPosition servo angle (de 0 à 180°)
+servo.setPosition 1 90
+
