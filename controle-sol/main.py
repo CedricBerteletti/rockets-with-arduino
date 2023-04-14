@@ -45,7 +45,7 @@ def main(args):
     connexion.fermer()
 
 
-logging.basicConfig(format="%(asctime)s %(levelname)s - %(filename)s:%(lineno)d - %(message)s", datefmt="%Y-%m-%d %H:%M:%S", level=logging.INFO)
+logging.basicConfig(format="%(asctime)s %(levelname)s - %(filename)s:%(lineno)d - %(message)s", datefmt="%Y-%m-%d %H:%M:%S", level=logging.DEBUG)
 logging.info("Programme principal")
 if __name__ == "__main__":
     from sys import argv

@@ -5,6 +5,7 @@ Graphiques pour représenter les données de la centrale inertielle
 """
 
 import logging
+import time
 
 from graphique import Graphique
 
@@ -39,7 +40,6 @@ class GraphiquesIntegres(Frame):
 
     def ajouter_telemetrie(self, t_origine, data):
         t = (data.t - t_origine) / 1000
-        logging.info(t)
         self.t.append(t)
 
         self.ax.append(data.ax)
@@ -65,6 +65,8 @@ class GraphiquesIntegres(Frame):
 
 
     def maj(self):
+        tstart = time.time()
+
         self.plots[0,0].plot(self.t, self.ax, color="red")
         self.plots[1,0].plot(self.t, self.vx, color="blue")
         self.plots[2,0].plot(self.t, self.x, color="green")
@@ -87,6 +89,8 @@ class GraphiquesIntegres(Frame):
         self.plots[2,5].plot(self.t, self.gamma, color="green")
         
         self.canvas.draw()
+
+        logging.debug(f"FPS = {1/(time.time()-tstart)}")
 
 
     def effacer(self):        
@@ -120,21 +124,32 @@ class GraphiquesIntegres(Frame):
         self.plots[0,0].set(xlabel='x', ylabel='a (g)')
         self.plots[1,0].set(xlabel='x', ylabel='v (m/s ou °/s)')
         self.plots[2,0].set(xlabel='x', ylabel='p (m ou °)')
+
         # self.plots[0,1].set(xlabel='y', ylabel='a (g)')
         # self.plots[1,1].set(xlabel='y', ylabel='v (m/s ou °/s)')
-        self.plots[2,1].set(xlabel='y', ylabel='p (m ou °)')
+        #self.plots[2,1].set(xlabel='y', ylabel='p (m ou °)')
+        self.plots[2,1].set(xlabel='y')
+
         # self.plots[0,2].set(xlabel='z', ylabel='a (g)')
         # self.plots[1,2].set(xlabel='z', ylabel='v (m/s ou °/s)')
-        self.plots[2,2].set(xlabel='z', ylabel='p (m ou °)')
+        #self.plots[2,2].set(xlabel='z', ylabel='p (m ou °)')
+        self.plots[2,2].set(xlabel='z')
+
         # self.plots[0,3].set(xlabel='α', ylabel='a (g)')
         # self.plots[1,3].set(xlabel='α', ylabel='v (m/s ou °/s)')
-        self.plots[2,3].set(xlabel='α', ylabel='p (m ou °)')
+        #self.plots[2,3].set(xlabel='α', ylabel='p (m ou °)')
+        self.plots[2,3].set(xlabel='α')
+
         # self.plots[0,4].set(xlabel='β', ylabel='a (g)')
         # self.plots[1,4].set(xlabel='β', ylabel='v (m/s ou °/s)')
-        self.plots[2,4].set(xlabel='β', ylabel='p (m ou °)')
+        #self.plots[2,4].set(xlabel='β', ylabel='p (m ou °)')
+        self.plots[2,4].set(xlabel='β')
+
         # self.plots[0,5].set(xlabel='γ', ylabel='a (g)')
         # self.plots[1,5].set(xlabel='γ', ylabel='v (m/s ou °/s)')
-        self.plots[2,5].set(xlabel='γ', ylabel='p (m ou °)')
+        #self.plots[2,5].set(xlabel='γ', ylabel='p (m ou °)')
+        self.plots[2,5].set(xlabel='γ')
+
         # for plot in self.plots:
         #     plot.label_outer()
 

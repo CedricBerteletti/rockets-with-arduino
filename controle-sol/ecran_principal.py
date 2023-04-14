@@ -34,15 +34,15 @@ class EcranPrincipal(Frame):
 
         # Panneau de gauche
         panneauGauche = PanedWindow(panneaux, orient=VERTICAL, sashrelief = RAISED, sashpad=2, width=self.winfo_width()/2)
-        panneaux.add(panneauGauche)        
+        panneaux.add(panneauGauche)
 
         # 2 sous-panneaux horizontaux de gauche
         visualisation = LabelFrame(panneauGauche, text="Vue")
         panneauGauche.add(visualisation, height=self.winfo_height()*2/3)
 
-        controle = LabelFrame(panneauGauche, text="Contrôle")
-        panneauGauche.add(controle, height=self.winfo_height()/3)
-        boutons = Frame(controle)
+        controles = LabelFrame(panneauGauche, text="Contrôle")
+        panneauGauche.add(controles, height=self.winfo_height()/3)
+        boutons = Frame(controles)
         boutons.pack(side=TOP)
         btnConnect = Button(boutons, text="Connexion")
         btnConnect.pack(padx=5, pady=5, side=LEFT)
@@ -52,33 +52,39 @@ class EcranPrincipal(Frame):
         btnLancer.pack(padx=5, pady=5, side=LEFT)
         btnViderLogs = Button(boutons, text="Vider logs", command=self.vider_logs)
         btnViderLogs.pack(padx=5, pady=5, side=LEFT)
-        btnViderLogsImu = Button(boutons, text="Vider logs CI", command=self.vider_logs_imu)
-        btnViderLogsImu.pack(padx=5, pady=5, side=LEFT)
-        btnCalibrerImu = Button(boutons, text="Calibrer CI", command=self.calibrer)
-        btnCalibrerImu.pack(padx=5, pady=5, side=LEFT)
 
-        self.logs = Text(controle, height=1, bg="#000000", fg="#FFFFFF")
+        self.logs = Text(controles, height=1, bg="#000000", fg="#FFFFFF")
         self.logs.config(state=DISABLED)
         self.logs.pack(padx=5, pady=5, fill=BOTH, expand=1)
         self.commandeText = StringVar()
-        commande = Entry(controle, textvariable=self.commandeText)
+        commande = Entry(controles, textvariable=self.commandeText)
         commande.pack(padx=5, pady=5, side=BOTTOM, fill=X)
         commande.bind('<Return>', self.nouvelles_commandes)
       
         # Panneau de droite
-        frameDroite = LabelFrame(panneaux, text="Centrale inertielle", height=self.winfo_height()*4/5)        
-        frameDroite.pack(side=TOP)
-        panneaux.add(frameDroite)
-        panneauDroit = PanedWindow(frameDroite, orient=VERTICAL, sashrelief = RAISED, sashpad=2, width=self.winfo_width()/2)
-        panneauDroit.pack(fill=BOTH, expand=1)
+        panneauDroit = PanedWindow(panneaux, orient=VERTICAL, sashrelief = RAISED, sashpad=2)
+        panneaux.add(panneauDroit)
+        frameImu = LabelFrame(panneauDroit, text="Centrale inertielle")
+        panneauDroit.add(frameImu, height=self.winfo_height()*4/5)
+        #panneauDroit.pack(fill=BOTH, expand=1)
+        #panneauDroit.pack(side=TOP)
 
         # 2 sous-panneaux de droite contenant les informations de trajectoire
         #self.graphiques = GraphiquesIndependants(panneauDroit, height=self.winfo_height()*4/5)
-        self.graphiques = GraphiquesIntegres(panneauDroit, height=self.winfo_height()*4/5)
-        panneauDroit.add(self.graphiques)        
-        self.imuLogs = Text(panneauDroit, bg="#000000", fg="#FFFFFF")
+        boutonsImu = Frame(frameImu)
+        boutonsImu.pack(side=TOP)
+        btnViderLogsImu = Button(boutonsImu, text="Vider logs CI", command=self.vider_logs_imu)
+        btnViderLogsImu.pack(padx=5, pady=5, side=LEFT)
+        btnCalibrerImu = Button(boutonsImu, text="Calibrer CI", command=self.calibrer)
+        btnCalibrerImu.pack(padx=5, pady=5, side=LEFT)
+        self.graphiques = GraphiquesIntegres(frameImu, height=self.winfo_height()*4/5)
+        self.graphiques.pack(side=TOP)
+        #panneauDroit.add(self.graphiques)
+
+        self.imuLogs = Text(panneauDroit, bg="#000000", fg="#FFFFFF", height=self.winfo_height()/5)
         self.imuLogs.config(state=DISABLED)
         panneauDroit.add(self.imuLogs, height=self.winfo_height()/5)
+        
 
         # MAJ régulière
         self.maj_loggers()
