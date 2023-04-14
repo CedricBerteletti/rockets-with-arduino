@@ -53,3 +53,13 @@ logger.toggleLogImuData
 # servo.setPosition servo angle (de 0 à 180°)
 servo.setPosition 1 90
 
+# Tests servo
+rocket.configureStep 0 500 servo.setPosition 0 90
+rocket.configureStep 1 500 servo.setPosition 1 90
+rocket.configureStep 2 500 servo.setPosition 0 110
+rocket.configureStep 3 500 servo.setPosition 1 110
+rocket.configureStep 4 500 servo.setPosition 1 90
+rocket.configureStep 5 500 servo.setPosition 1 70
+rocket.configureStep 6 500 servo.setPosition 0 90
+rocket.configureStep 7 500 servo.setPosition 0 70
+rocket.configureStep 8 0 rocket.goStep 0
