@@ -7,10 +7,13 @@ Ecran principal
 import logging
 import time
 
+import graphiques
+import settings
+
 from tkinter import Tk, StringVar, Text
 from tkinter import Button, Entry, Frame, LabelFrame, PanedWindow
 from tkinter.constants import VERTICAL, TOP, LEFT, BOTTOM, X, BOTH, VERTICAL, HORIZONTAL, RAISED, DISABLED, NORMAL, W, N, E, S
-from graphiques import GraphiquesIndependants, GraphiquesIntegres
+
 
 
 class EcranPrincipal(Frame):
@@ -19,9 +22,11 @@ class EcranPrincipal(Frame):
 
     def __init__(self, controleur, telemetrie, centrale):
         super().__init__()
+        self.actif = True
         self.controleur = controleur
         self.telemetrie = telemetrie
         self.centrale = centrale
+        self.graphs_refresh_delay_ms = settings.get("graphs.refresh_delay_ms")
         self.init_ui()
 
 
@@ -77,19 +82,27 @@ class EcranPrincipal(Frame):
         btnViderLogsImu.pack(padx=5, pady=5, side=LEFT)
         btnCalibrerImu = Button(boutonsImu, text="Calibrer CI", command=self.calibrer)
         btnCalibrerImu.pack(padx=5, pady=5, side=LEFT)
-        self.graphiques = GraphiquesIntegres(frameImu, height=self.winfo_height()*4/5)
+        if settings.get_bool("graphs.debug"):
+            self.graphiques = graphiques.DebugGraphiquesIntegres(frameImu, height=self.winfo_height()*4/5)
+        else:
+            self.graphiques = graphiques.GraphiquesIntegres(frameImu, height=self.winfo_height()*4/5)
         self.graphiques.pack(side=TOP)
         #panneauDroit.add(self.graphiques)
 
         self.imuLogs = Text(panneauDroit, bg="#000000", fg="#FFFFFF", height=self.winfo_height()/5)
         self.imuLogs.config(state=DISABLED)
-        panneauDroit.add(self.imuLogs, height=self.winfo_height()/5)
-        
+        panneauDroit.add(self.imuLogs, height=self.winfo_height()/5)        
 
         # MAJ régulière
-        self.maj_loggers()
-        self.maj_graph()
+        self.maj()
 
+
+    def maj(self):
+        if self.actif:
+            logging.debug(self)
+            self.maj_loggers()
+            self.maj_graph()
+            self.after(self.graphs_refresh_delay_ms, self.maj)
 
     def maj_loggers(self):
         "Mise à jour des loggers toutes les 100 ms"
@@ -119,15 +132,16 @@ class EcranPrincipal(Frame):
             self.imuLogs.see("end")
         self.imuLogs.config(state=DISABLED)
 
-        # MAJ graphique sur un échantillon des données toutes les 100 ms
+        # MAJ graphique sur un échantillon des données
         if nouveauLog:
             self.graphiques.ajouter_telemetrie(self.centrale.data_liste[0].t, self.centrale.courant)
 
-        self.after(100, self.maj_loggers)
-
     def maj_graph(self):
         self.graphiques.maj()
-        self.after(100, self.maj_graph)
+
+    def stop(self):
+        logging.debug("Fermeture de la fenêtre principale")
+        self.actif = False
 
     def vider_logs(self):
         self.logs.config(state=NORMAL)

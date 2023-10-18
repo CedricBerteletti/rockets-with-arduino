@@ -6,7 +6,9 @@ Gestion du thread d'acquisition des données télémétriques de la fusée
 
 import functools
 import logging
+import math
 import threading
+from time import sleep, time
 
 from connexion import Connexion
 
@@ -36,6 +38,16 @@ class Telemetrie(threading.Thread):
     def __init__(self, connexion):
         super().__init__()
         self.connexion = connexion
+        self.actif = False
+        self.debug = False
+
+    def stop(self):
+        self.actif = False
+
+    def startDebug(self):
+        self.debug = True
+        self.start()
+
     
     @synchronized(lock)
     def logSuivant(self):
@@ -54,15 +66,28 @@ class Telemetrie(threading.Thread):
     def run(self):
         self.actif = True
         logging.info("Lancement du thread d'aquisition des données")
-        while self.actif:
-            str = self.connexion.recevoir()
-            if str:
-                if str.find(", IMU_DATA,") != -1:
-                    self.logsImu.append(str)
-                    self.tempLogsImu.append(str)
-                else:
-                    self.logs.append(str)
-                    self.tempLogs.append(str)
+        if not self.debug:
+            while self.actif:
+                logging.debug("Essai lecture données Arduino")
+                str = self.connexion.recevoir()
+                if str:
+                    if str.find(", IMU_DATA,") != -1:
+                        self.logsImu.append(str)
+                        self.tempLogsImu.append(str)
+                    else:
+                        self.logs.append(str)
+                        self.tempLogs.append(str)
+        else:
+            start = time()
+            while self.actif:
+                t = time() - start
+                t_ms = int(1000*t)
+                value = math.sin(math.pi*t)
+                str = f"00000, IMU_DATA, \"t, accX, accY, accZ, vAlpha, vBeta, vGamma\", \"{t_ms}, {value}, {value}, {value}, {value}, {value}, {value}\""
+                self.logsImu.append(str)
+                self.tempLogsImu.append(str)
+                sleep(0.1)
+
         logging.info("Fin du thread d'aquisition des données")
 
 
