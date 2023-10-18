@@ -6,11 +6,11 @@ Calculs à partir des données de la centrale inertielle
 
 import logging
 
+import settings
+
 from dataclasses import dataclass
 
 
-FILTRE_VITESSE_ANGULAIRE_MIN = 0.2 # en ° par seconde
-FILTRE_ACCELERATION_MIN = 0.001 # en g (gravité terrestre 9.8 m/s²)
 
 class CentraleInertielle():
     "Classe gérant toutes les données inertielles"
@@ -25,6 +25,8 @@ class CentraleInertielle():
         self.offset_valpha = 0.0
         self.offset_vbeta = 0.0
         self.offset_vgamma = 0.0
+        self.filtre_vitesse_angulaire_min = float(settings.get("imu.filters.angular_velocity_min"))
+        self.filtre_acceleration_min = float(settings.get("imu.filters.angular_velocity_min"))
         
     def ajouter_telemetrie(self, log):
         if (log):
@@ -44,19 +46,19 @@ class CentraleInertielle():
 
                 # Pour éviter la dérive des gyroscopes,
                 # on filtre les trop petites vitesses angulaires
-                if (abs(data.valpha) < FILTRE_VITESSE_ANGULAIRE_MIN):
+                if (abs(data.valpha) < self.filtre_vitesse_angulaire_min):
                     data.valpha = 0.0
-                if (abs(data.vbeta) < FILTRE_VITESSE_ANGULAIRE_MIN):
+                if (abs(data.vbeta) < self.filtre_vitesse_angulaire_min):
                     data.vbeta = 0.0
-                if (abs(data.vgamma) < FILTRE_VITESSE_ANGULAIRE_MIN):
+                if (abs(data.vgamma) < self.filtre_vitesse_angulaire_min):
                     data.vgamma = 0.0
                 
                 # De même pour les accélérations
-                if (abs(data.ax) < FILTRE_ACCELERATION_MIN):
+                if (abs(data.ax) < self.filtre_acceleration_min):
                     data.ax = 0.0
-                if (abs(data.ay) < FILTRE_ACCELERATION_MIN):
+                if (abs(data.ay) < self.filtre_acceleration_min):
                     data.ay = 0.0
-                if (abs(data.az) < FILTRE_ACCELERATION_MIN):
+                if (abs(data.az) < self.filtre_acceleration_min):
                     data.az = 0.0
 
                 if (self.courant.t > 0):

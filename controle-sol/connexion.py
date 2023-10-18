@@ -7,11 +7,14 @@ Gestion de la connexion WiFi à la fusée
 
 import errno
 import logging
+import select
 import socket
 from time import sleep
 
 class Connexion():
     "Classe pour gérer la connexion wifi à la fusée"
+
+    timeout = 1 # en seconde
 
     def __init__(self):
         self.ip = ""
@@ -29,22 +32,26 @@ class Connexion():
         self.sock_rec.setblocking(0)
 
     def envoyer(self, message):
+        logging.debug(message)
         self.sock_send.sendto(message.encode(), (self.ip, self.port))
 
     def recevoir(self):
         str = ""
-        try:
-            data, addr = self.sock_rec.recvfrom(255) # taille du buffer
-        except socket.error as e:
-            err = e.args[0]
-            if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
-                # pas d'erreur, simplement pas de nouvelle donnée disponible
-                sleep(0.01)
+        ready = select.select([self.sock_rec], [], [], self.timeout)
+        if ready[0]:        
+            try:
+                data, addr = self.sock_rec.recv(255) # taille du buffer
+            except socket.error as e:
+                err = e.args[0]
+                if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
+                    # pas d'erreur, simplement pas de nouvelle donnée disponible
+                    sleep(0.01)
+                else:
+                    # Erreur réelle
+                    logging.error("Erreur lors de la tentative de lecture de l'Arduino : ", e)
             else:
-                # Erreur réelle
-                logging.error("Erreur lors de la tentative de lecture de l'Arduino : ", e)
-        else:
-            str = data.decode()
+                logging.debug(str)
+                str = data.decode()
         return str
 
     def fermer(self):
