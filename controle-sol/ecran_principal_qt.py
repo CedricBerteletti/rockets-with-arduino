@@ -51,8 +51,6 @@ class EcranPrincipal(QWidget):
         # Panneau de droite
         self.creer_groupe_graphiques()
         layout_panneau_droit.addWidget(self.grp_graphs)
-        self.creer_groupe_commandes_imu()
-        layout_panneau_droit.addWidget(self.grp_command_imu)
         self.creer_groupe_imu()
         layout_panneau_droit.addWidget(self.grp_imu)
 
@@ -91,7 +89,7 @@ class EcranPrincipal(QWidget):
 
 
     def creer_groupe_logs(self):
-        self.grp_logs = QGroupBox("Logs")
+        self.grp_logs = QGroupBox("Logs généraux")
         layout = QVBoxLayout()
         self.grp_logs.setLayout(layout)
 
@@ -105,32 +103,32 @@ class EcranPrincipal(QWidget):
 
 
     def creer_groupe_graphiques(self):
-        self.grp_graphs = QGroupBox("Graphiques")
+        self.grp_graphs = QGroupBox("Graphiques IMU")
+        layout = QVBoxLayout()
+        self.grp_graphs.setLayout(layout)
 
         if settings.get_bool("graphs.debug"):
             self.graphiques = graphiques.BaseGraphiquesIntegres(self.grp_graphs)
         else:
             self.graphiques = graphiques.GraphiquesIntegres(self.grp_graphs)
-
-
-    def creer_groupe_commandes_imu(self):
-        self.grp_command_imu = QGroupBox("Commandes IMU")
-        layout = QGridLayout()
-        self.grp_command_imu.setLayout(layout)
-
-        button = QPushButton("Vider logs")
-        layout.addWidget(button, 0, 0)
-        button.clicked.connect(self.vider_logs_imu)
-
-        button = QPushButton("Calibrer")
-        layout.addWidget(button, 0, 1)        
-        button.clicked.connect(self.calibrer)
+        layout.addWidget(self.graphiques)
 
 
     def creer_groupe_imu(self):
         self.grp_imu = QGroupBox("IMU")
         layout = QVBoxLayout()
         self.grp_imu.setLayout(layout)
+       
+        layout_command = QGridLayout()
+        layout.addLayout(layout_command)
+
+        button = QPushButton("Vider logs")
+        layout_command.addWidget(button, 0, 0)
+        button.clicked.connect(self.vider_logs_imu)
+
+        button = QPushButton("Calibrer")
+        layout_command.addWidget(button, 0, 1)        
+        button.clicked.connect(self.calibrer)
 
         self.tb_imu_logs = QTextEdit ()
         self.tb_imu_logs.setReadOnly(True)

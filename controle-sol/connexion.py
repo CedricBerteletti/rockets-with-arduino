@@ -20,7 +20,7 @@ class Connexion():
         self.ip = ""
         self.port = 0
         self.actif = False
-        
+
     def init(self, ip, port):
         self.ip = ip
         self.port = port
