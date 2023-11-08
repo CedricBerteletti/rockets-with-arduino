@@ -86,7 +86,7 @@ class Telemetrie(threading.Thread):
                 str = f"00000, IMU_DATA, \"t, accX, accY, accZ, vAlpha, vBeta, vGamma\", \"{t_ms}, {value}, {value}, {value}, {value}, {value}, {value}\""
                 self.logsImu.append(str)
                 self.tempLogsImu.append(str)
-                sleep(0.1)
+                sleep(0.01)
 
         logging.info("Fin du thread d'aquisition des données")
 

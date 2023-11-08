@@ -85,7 +85,7 @@ class EcranPrincipal(Frame):
         if settings.get_bool("graphs.debug"):
             self.graphiques = graphiques.DebugGraphiquesIntegres(frameImu, height=self.winfo_height()*4/5)
         else:
-            self.graphiques = graphiques.GraphiquesIntegres(frameImu, height=self.winfo_height()*4/5)
+            self.graphiques = graphiques.GraphiquesIntegres2(frameImu, height=self.winfo_height()*4/5)
         self.graphiques.pack(side=TOP)
         #panneauDroit.add(self.graphiques)
 

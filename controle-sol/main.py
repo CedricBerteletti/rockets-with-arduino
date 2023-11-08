@@ -7,30 +7,18 @@ Point d'entrée pour le programme du poste de contrôle de la fusée
 import logging
 import settings
 
-from tkinter import Tk
-from tkinter import messagebox
+from PyQt5.QtWidgets import QApplication
 
 from centrale_inertielle import CentraleInertielle
-from ecran_principal import EcranPrincipal
+from ecran_principal_qt import EcranPrincipal
 from connexion import Connexion
 from controleur import Controleur
 from telemetrie import Telemetrie
-from time import sleep
 
 
-
-def on_closing():
-    global fenetre
-    global ecran_principal
-    if messagebox.askokcancel("Quitter", "Voulez-vous vraiment quitter ?"):
-        ecran_principal.stop()
-        fenetre.quit()
-        #Tk.tk.quit()
-        fenetre.destroy()
 
 
 def main(args):
-    global fenetre
     global ecran_principal
 
     connexion = Connexion()
@@ -41,24 +29,19 @@ def main(args):
         telemetrie.start()
     else:
         telemetrie.startDebug()
-    centrale = CentraleInertielle()    
- 
-    fenetre = Tk("")
-    fenetre.title("Centre de Contrôle et de Télémétrie")
-    fenetre.geometry(str(settings.get("screen.width")) + "x" + str(settings.get("screen.height")))
-    ecran_principal = EcranPrincipal(controleur, telemetrie, centrale)
+    centrale = CentraleInertielle()
 
-    # Boucle principale de l'application
-    fenetre.protocol("WM_DELETE_WINDOW", on_closing)
-    fenetre.mainloop()
+    # QT - Interface graphique
+    app = QApplication([])
+    ecran_principal = EcranPrincipal(controleur, telemetrie, centrale)
+    ecran_principal.showMaximized()
+    app.exec()
 
     # Arrêt de l'application
     logging.debug("On quitte")
     # Fin du thread d'aquisition des données
     telemetrie.stop()
     telemetrie.join()
-    connexion.fermer()
-    sleep(1)
 
 
 settings.init()

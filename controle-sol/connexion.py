@@ -19,6 +19,7 @@ class Connexion():
     def __init__(self):
         self.ip = ""
         self.port = 0
+        self.actif = False
         
     def init(self, ip, port):
         self.ip = ip
@@ -30,28 +31,31 @@ class Connexion():
             socket.SOCK_DGRAM) # UDP
         self.sock_rec.bind((local_ip, self.port))
         self.sock_rec.setblocking(0)
+        self.actif = True
 
     def envoyer(self, message):
-        logging.debug(message)
-        self.sock_send.sendto(message.encode(), (self.ip, self.port))
+        if self.actif:
+            logging.debug(message)        
+            self.sock_send.sendto(message.encode(), (self.ip, self.port))
 
     def recevoir(self):
         str = ""
-        ready = select.select([self.sock_rec], [], [], self.timeout)
-        if ready[0]:        
-            try:
-                data, addr = self.sock_rec.recv(255) # taille du buffer
-            except socket.error as e:
-                err = e.args[0]
-                if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
-                    # pas d'erreur, simplement pas de nouvelle donnée disponible
-                    sleep(0.01)
+        if self.actif:
+            ready = select.select([self.sock_rec], [], [], self.timeout)
+            if ready[0]:        
+                try:
+                    data, addr = self.sock_rec.recv(255) # taille du buffer
+                except socket.error as e:
+                    err = e.args[0]
+                    if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
+                        # pas d'erreur, simplement pas de nouvelle donnée disponible
+                        sleep(0.01)
+                    else:
+                        # Erreur réelle
+                        logging.error("Erreur lors de la tentative de lecture de l'Arduino : ", e)
                 else:
-                    # Erreur réelle
-                    logging.error("Erreur lors de la tentative de lecture de l'Arduino : ", e)
-            else:
-                logging.debug(str)
-                str = data.decode()
+                    logging.debug(str)
+                    str = data.decode()
         return str
 
     def fermer(self):
