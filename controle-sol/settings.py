@@ -18,3 +18,7 @@ def get(str):
 def get_bool(str):
     global config
     return config.getboolean("DEFAULT", str)
+
+def get_int(str):
+    global config
+    return config.getint("DEFAULT", str)

@@ -83,7 +83,7 @@ class Telemetrie(threading.Thread):
                 t = time() - start
                 t_ms = int(1000*t)
                 value = math.sin(math.pi*t)
-                str = f"00000, IMU_DATA, \"t, accX, accY, accZ, vAlpha, vBeta, vGamma\", \"{t_ms}, {value}, {value}, {value}, {value}, {value}, {value}\""
+                str = f"00000, IMU_DATA, \"t, accX, accY, accZ, vAlpha, vBeta, vGamma\", \"{t_ms}, {value}, {value}, {value}, {100*value}, {100*value}, {100*value}\""
                 self.logsImu.append(str)
                 self.tempLogsImu.append(str)
                 sleep(0.1)
