@@ -25,28 +25,29 @@ Bibliothèques nécessaires :
 
 Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
 - Commandes générales
-	- *wifi.connect ssid pwd*: permet de se connecter au réseau wifi *ssid* avec le mot de passe *pwd*.
-	- *wifi.initUdp ip port*: permet de connaître le client distant et de lui retourner les mesures et le statut de la fusée.
-	- *delay duree* : bloque l'exécution de la boucle principale de l'Arduino pendant *duree* ms.
+	- *wifi.connectNetwork ssid pwd*: permet de se connecter au réseau wifi *ssid* avec le mot de passe *pwd*.
+	- *wifi.broadcastUdpClient n ip port*: permet de connaître le client distant numéro n (de 0à 4) et de lui retourner les mesures et le statut de la fusée.
+	- *system.delay duree* : bloque l'exécution de la boucle principale de l'Arduino pendant *duree* ms.
 - Loggers et différents états 
-	- *status.rocket* : état de la fusée.
-	- *status.wifi* : état de la connexion Wifi.
-	- *status.logger* : indique les différents loggers actifs.
+	- *rocket.status* : état de la fusée.
+	- *wifi.status* : état de la connexion Wifi.
+	- *logger.status* : indique les différents loggers actifs.
 	- *logger.initSdcard* : initialise et lance les logs sur la carte SD.
 	- *logger.flushToSdcard* : force le vidage du cache des logs sur la carte SD.
-	- *logger.toggleLogImuData* : active/désactive les logs (via serial, SD-Card et Wifi) des données de la centrale inertielle.
-	- *logger.toggleLogFlush*: active/désactive les logs de vidage du cache sur la carte SD.
-	- *logger.toggleLogRocketStatus* : active/désactive les logs d'état général de la fusée.
+	- *logger.activateLogImuData* et *logger.deactivateLogImuData* : active/désactive les logs (via serial, SD-Card et Wifi) des données de la centrale inertielle.
+	- *logger.activateLogFlush* et *logger.deactivateLogFlush*: active/désactive les logs de vidage du cache sur la carte SD.
+	- *logger.activateLogRocketStatus* et *logger.deactivateLogRocketStatus* : active/désactive les logs d'état général de la fusée.
 - Plan/script de vol de la fusée
-	- *rocket.configureStep no_step delai commande* : précise la temporisation (durée en ms) de l'étape *no_step* et la commande à exécuter au **début** de l'étape.
-	- *rocket.getSteps* : renvoie toutes les étapes de vol de la fusée.
+	- *flightplan.configureStep no_step delai commande* : précise la temporisation (durée en ms) de l'étape *no_step* et la commande à exécuter au **début** de l'étape.
+	- *flightplan.getSteps* : renvoie toutes les étapes de vol de la fusée.
 	- *pin.setMode pin mode* : configure la broche n°*pin* (OUTPUT/INPUT). 
 - Lancement et actions
-	- *rocket.launch code* : passe à l'étape suivante (idem "stage"). Protégé par un code.
-	- *rocket.stage code* : passe à l'étape suivante. Protégé par un code.
-	- *rocket.stop code* : interrompt le programme de la fusée et revient à l'étape initiale. Protégé par un code. Attention aux conséquences !
-	- *rocket.goStep step* : permet de passer directement à l'étape *step* (et éventuellement de faire des boucles).
+	- *rocket.launch code* ou *flightplan.start code* : Lance l'exécution du plan de vol avec le lancement de l'étape 0. Protégé par un code.
+	- *rocket.stage n* : Sans effet. Permet de générer un log indiquant que l'on est passé à l'étage n de la fusée.
+	- *flightplan.stop code* : interrompt le programme de la fusée et revient à l'étape initiale. Protégé par un code. Attention aux conséquences !
+	- *flightplan.goStep step* : permet de passer directement à l'étape *step* (et éventuellement de faire des boucles).
 	- *pin.digitalWrite pin niveau* : envoie un signal (0 ou 1) ou l'arrête sur la sortie numérique *pin* désignée.
+	- *pin.fire pin* : idem *pin.digitalWrite pin 1*.
 	- *pin.tone pin freq* : joue un son de fréquence *freq* hz sur la sortie *pin*.
 	- *pin.toneStop pin* : coupe le son sur la sortie *pin*.
 	- *servo.setPosition servo angle* : positionne sur un *angle* précis (de 0 à 180°) le servo moteur n°*servo*.
