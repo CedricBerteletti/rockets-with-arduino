@@ -8,10 +8,9 @@ import logging
 import settings
 
 from PyQt5.QtWidgets import QApplication
-from PyQt5 import Qt
 
 from centrale_inertielle import CentraleInertielle
-from ecran_principal_qt import EcranPrincipal
+from ecran_principal import EcranPrincipal
 from connexion import Connexion
 from controleur import Controleur
 from telemetrie import Telemetrie

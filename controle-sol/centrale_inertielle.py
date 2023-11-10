@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @author: Cédric Berteletti
-Calculs à partir des données de la centrale inertielle
+Calculs à partir des données inertielles (accéléromètres et gyroscopes)
 """
 
 import logging
@@ -27,7 +27,7 @@ class CentraleInertielle():
         self.offset_vgamma = 0.0
         self.filtre_vitesse_angulaire_min = float(settings.get("imu.filters.angular_velocity_min"))
         self.filtre_acceleration_min = float(settings.get("imu.filters.angular_velocity_min"))
-        
+
     def ajouter_telemetrie(self, log):
         if (log):
             data = DonneesInertielles()
@@ -36,7 +36,7 @@ class CentraleInertielle():
                 values = tokens[1][:-1].split(", ")
 
                 # Récupération des valeurs de la télémétrie, en tenant compte de la calibration
-                data.t = int(values[0])
+                data.t = int(values[0]) / 1000
                 data.ax = float(values[1])*g + self.offset_ax
                 data.ay = float(values[2])*g + self.offset_ay
                 data.az = float(values[3])*g + self.offset_az
@@ -68,22 +68,20 @@ class CentraleInertielle():
 
         logging.debug(f"Nouvelles données inertielles brutes = {data}")
 
-        # if (self.courant.t > 0):
-        #     # Il ne s'agit pas de la première donnée reçue, on peut donc calculer
-        #     # l'orientation et la position
-        temps_ecoule = (data.t - self.courant.t) / 1000
+        # Intégrations pour retrouver les vitesses, positions et angles à partir des données des accéléromètres et gyroscopes
+        temps_ecoule = data.t - self.courant.t
         data.alpha = self.integration(self.courant.alpha, self.courant.valpha, data.valpha, temps_ecoule)
         logging.debug(f"Calcul du nouvel angle à deltat={temps_ecoule} s : a'={data.alpha} ; a={self.courant.alpha} ; va={data.valpha}")
         data.beta = self.integration(self.courant.beta, self.courant.vbeta, data.vbeta, temps_ecoule)
         data.gamma = self.integration(self.courant.gamma, self.courant.vgamma, data.vgamma, temps_ecoule)
-        # TODO
+        # TODO vitesses et positions
 
         # Mise à jour de la liste
         self.courant = data
         self.data_liste.append(data)
 
     def integration(self, valeur_precedente, derivee_precedente, derivee_actuelle, duree_ecoulee):
-        return valeur_precedente + 10*(derivee_precedente + derivee_actuelle) / 2 * duree_ecoulee
+        return valeur_precedente + (derivee_precedente + derivee_actuelle) / 2 * duree_ecoulee
 
     def effacer_donnees(self):
         "Efface toutes les données stockées, mais ne modifie pas la calibration"
@@ -136,10 +134,10 @@ class CentraleInertielle():
 @dataclass
 class DonneesInertielles:
     "Classe représentant les données de la centrale inertielle et les valeurs calculées à un instant t donné"
-    t : int = 0             # en ms
-    ax : float = 0.0        # en g (gravité terrestre 9.8 m/s²)
-    ay : float = 0.0        # en g (gravité terrestre 9.8 m/s²)
-    az : float = 0.0        # en g (gravité terrestre 9.8 m/s²)
+    t : int = 0             # en s
+    ax : float = 0.0        # en m/s²
+    ay : float = 0.0        # en m/s²
+    az : float = 0.0        # en m/s²
     vx : float = 0.0        # en m/s
     vy : float = 0.0        # en m/s
     vz : float = 0.0        # en m/s
