@@ -230,10 +230,12 @@ class EcranPrincipal(QFrame):
     def executer_commande(self, commande):
         self.tb_logs.insertHtml(f"<h1 style=\"color:blue;\">> {commande}</h1>\n")
         self.tb_logs.insertPlainText("\n")
-        self.tb_logs.moveCursor(QTextCursor.End)
+        
         if commande[0:13] == "wifi.initUdp ":
             connect, ip, port = commande.split()
             self.controleur.connecter(ip, int(port))
         else:
             commande_envoyee = self.controleur.envoyer_commande_brute(commande)
             self.tb_logs.insertPlainText(f"Commande envoyée : {commande_envoyee}\n")
+
+        self.tb_logs.moveCursor(QTextCursor.End)

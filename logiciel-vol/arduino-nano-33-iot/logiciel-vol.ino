@@ -13,7 +13,7 @@
 #include <Servo.h>
 
 // Nombre d'étapes du vol
-#define NB_ETAPES 10
+#define NB_ETAPES 100
 
 static const char MODULE_SYSTEME[] = "SYSTEM";
 static const char MODULE_COMMANDE[] = "COMMAND";
@@ -34,7 +34,7 @@ long dateFlushSuivant = 0;
 // Date à laquelle vérifier la présence de nouvelles commandes
 long dateLectureCommandeSuivante = 0;
 // Dernière commande reçue (déclaration globale pour éviter la réallocation dans la pile à chaque appel de lireCommande)
-char commande[LONGUEUR_MAX_CHAINE_CARACTERES];
+char commande[LONGUEUR_MAX_COMMANDE];
 // Chaîne de caractère pour les logs
 char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
 // Servomoteurs des ailerons sur les broches 20 et 21
@@ -58,7 +58,7 @@ int fuseeStatut = CONFIGURATION;
 
 /* Données de navigation */
 int dureeEtape[NB_ETAPES];
-char commandeEtape[NB_ETAPES][LONGUEUR_MAX_CHAINE_CARACTERES];
+char commandeEtape[NB_ETAPES][LONGUEUR_MAX_COMMANDE];
 long dateLancement = 0;
 long dateEtapeSuivante = -1;
 long dateCourante = 0;
