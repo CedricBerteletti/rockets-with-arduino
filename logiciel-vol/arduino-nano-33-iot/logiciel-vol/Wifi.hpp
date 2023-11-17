@@ -18,7 +18,7 @@ class Wifi
   public:
     Wifi();
     bool actif = false;
-    bool loggingIo = false;
+    bool loggingIo = true;
     void listerReseaux();
     void connecter();
     void connecterAvecFallback(const char ssid[], const char pwd[]);

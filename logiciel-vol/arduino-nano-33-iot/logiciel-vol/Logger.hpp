@@ -25,7 +25,7 @@ class Logger
     bool toSerial = true;
     bool toSdcard = false;
     bool toUdp = false;
-    bool loggingFlush = false;
+    bool loggingFlush = true;
     Wifi *wifi;
   private:
     static const char MODULE_LOGGER[];
