@@ -23,7 +23,7 @@ static const long DELAI_COMMANDE = 100; // (en ms) Tentative de lecture d'une no
 /* Variable globales */
 // Instanciation d'un loggeur
 Logger logger;
-bool loggingRocketStatus = true;
+bool loggingRocketStatus = false;
 // Instanciation d'un objet gérant la connexion et les communications wifi
 Wifi wifi;
 // Instanciation de l'objet gérant la centrale inertielle (constructeur nécessitant un logger en paramètre)
