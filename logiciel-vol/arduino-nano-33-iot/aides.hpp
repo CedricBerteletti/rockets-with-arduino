@@ -14,6 +14,7 @@
 inline constexpr char SEPARATEUR[] = ", ";
 inline constexpr char GUILLEMETS[] = "\"";
 inline constexpr int LONGUEUR_NOMBRE = 10;
+inline constexpr int LONGUEUR_MAX_COMMANDE = 50;
 inline constexpr int LONGUEUR_MAX_CHAINE_CARACTERES = 256;
 inline constexpr int LONGUEUR_ADRESSE_IP = 20;
 

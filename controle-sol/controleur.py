@@ -17,12 +17,12 @@ dict_compilation = {"wifi.connectNetwork": "WC",
                     "logger.status": "LS",
                     "logger.initSdcard": "LC",
                     "logger.flushToSdcard": "LF",
-                    "logger.activateLogImuData": "LI",
-                    "logger.deactivateLogImuData": "Li",
-                    "logger.activateLogFlush": "LW",
-                    "logger.deactivateLogFlush": "Lw",
-                    "logger.activateLogRocketStatus": "LR",
-                    "logger.deactivateLogRocketStatus": "Lr",
+                    "logger.activateLogImuData": "LI 1",
+                    "logger.deactivateLogImuData": "LI 0",
+                    "logger.activateLogFlush": "LW 1",
+                    "logger.deactivateLogFlush": "LW 0",
+                    "logger.activateLogRocketStatus": "LR 1",
+                    "logger.deactivateLogRocketStatus": "LR 0",
                     
                     "rocket.status": "RS",
                     "rocket.launch": "F0",
@@ -37,14 +37,15 @@ dict_compilation = {"wifi.connectNetwork": "WC",
                     
                     "pin.setMode": "PC",
                     "pin.digitalWrite": "PD",
-                    "pin.digitalWrite": "PD",
-                    "pin.fire": "PD", # TODO
+                    "pin.fire": "PD {} 1",
                     "pin.tone": "PT",
-                    "pin.toneStop": "Pt",
+                    "pin.toneStop": "PR",
                     
                     "servo.setPosition": "SP",
                     }
 
+
+ERROR_COMMANDE_INCONNUE = "ERREUR : commande inconnue"
 
 
 class Controleur():
@@ -59,12 +60,34 @@ class Controleur():
 
     def envoyer_commande_brute(self, commande_brute):
         commande = self.compiler_commande(commande_brute)
-        self.connexion.envoyer(commande)
+        if commande[0:3] != "ERR":
+            self.connexion.envoyer(commande)
         return commande
 
     def compiler_commande(self, commande_brute):
-        commande = commande_brute.strip()
-        # TODO
+        operation, arguments = commande_brute.strip().split(sep=" ", maxsplit=1)
+
+        if operation in dict_compilation:
+            operation_abbregee = dict_compilation[operation]
+
+            if operation_abbregee[0:2] == "FC":
+                # Cas particulier de l'instruction déclarant les instructions du plan de vol
+                num_instruction, duree, commande_planifiee_brute = arguments.split(sep=" ", maxsplit=2)
+                commande_planifiee = self.compiler_commande(commande_planifiee_brute)
+                if commande_planifiee[0:3] != "ERR":
+                    commande = f"FC {num_instruction} {duree} {commande_planifiee}"
+                else:
+                    commande = ERROR_COMMANDE_INCONNUE
+            elif "{}" not in operation_abbregee:
+                # Remplacement simple
+                commande = f"{operation_abbregee} {arguments}"
+            else:
+                # Remplacement en respectant un formatage
+                args = arguments.split(" ")
+                commande = operation_abbregee.format(args)
+        else:
+            commande = ERROR_COMMANDE_INCONNUE
+
         return commande
 
     def traduire_logs(self, log):
