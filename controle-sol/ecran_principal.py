@@ -231,7 +231,7 @@ class EcranPrincipal(QFrame):
         self.tb_logs.insertHtml(f"<h1 style=\"color:blue;\">> {commande}</h1>\n")
         self.tb_logs.insertPlainText("\n")
         
-        if commande[0:13] == "wifi.initUdp ":
+        if commande[0:24] == "wifi.broadcastUdpClient ":
             connect, ip, port = commande.split()
             self.controleur.connecter(ip, int(port))
         else:
