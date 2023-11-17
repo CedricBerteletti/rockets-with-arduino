@@ -23,7 +23,7 @@ static const long DELAI_COMMANDE = 100; // (en ms) Tentative de lecture d'une no
 /* Variable globales */
 // Instanciation d'un loggeur
 Logger logger;
-bool loggingRocketStatus = false;
+bool loggingRocketStatus = true;
 // Instanciation d'un objet gérant la connexion et les communications wifi
 Wifi wifi;
 // Instanciation de l'objet gérant la centrale inertielle (constructeur nécessitant un logger en paramètre)
@@ -194,22 +194,22 @@ et les variables créées dans la pile */
 void executerCommande(const char commande[]) {
   logger.log(MODULE_COMMANDE, "COMMAND_RECEPTION", commande);
 
-  if(chaineCommencePar(commande, "status.")) {
-    executerCommandeStatus(commande);
-  }
-  else if(chaineCommencePar(commande, "pin.")) {
+  if(chaineCommencePar(commande, "P")) {
     executerCommandePin(commande);
   }
-  else if(chaineCommencePar(commande, "rocket.")) {
+  else if(chaineCommencePar(commande, "R")) {
     executerCommandeRocket(commande);
   }
-  else if(chaineCommencePar(commande, "servo.")) {
+  else if(chaineCommencePar(commande, "F")) {
+    executerCommandePlanDeVol(commande);
+  }  
+  else if(chaineCommencePar(commande, "S")) {
     executerCommandeServo(commande);
   }
-  else if(chaineCommencePar(commande, "logger.")) {
+  else if(chaineCommencePar(commande, "L")) {
     executerCommandeLogger(commande);
   }
-  else if(chaineCommencePar(commande, "wifi.")) {
+  else if(chaineCommencePar(commande, "W")) {
     executerCommandeWifi(commande);
   }
   else if(chaineCommencePar(commande, "#")) {
@@ -220,27 +220,12 @@ void executerCommande(const char commande[]) {
   }
 }
 
-void executerCommandeStatus(const char commande[]) {
-  if(chaineCommencePar(commande, "status.rocket")) {
-    logRocketStatus();
-  }
-  else if(chaineCommencePar(commande, "status.logger")) {
-    logger.logStatut();
-  }
-  else if(chaineCommencePar(commande, "status.wifi")) {
-    wifi.logStatut();
-  }
-  else {
-    logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
-  }
-}
-
 void executerCommandePin(const char commande[]) {
   char chPin[LONGUEUR_NOMBRE];
   char chParam[LONGUEUR_NOMBRE];
   int pin;
   int param;
-  if(chaineCommencePar(commande, "pin.setMode ")) {
+  if(chaineCommencePar(commande, "PC ")) {
     copierToken(commande, " ", 1, chPin);
     copierToken(commande, " ", 2, chParam);
     pin = atoi(chPin);
@@ -252,21 +237,21 @@ void executerCommandePin(const char commande[]) {
     }
     pinMode(pin, param);
   }
-  else if(chaineCommencePar(commande, "pin.digitalWrite ")) {
+  else if(chaineCommencePar(commande, "PD ")) {
     copierToken(commande, " ", 1, chPin);
     copierToken(commande, " ", 2, chParam);
     pin = atoi(chPin);
     param = atoi(chParam);
     digitalWrite(pin, param);
   }
-  else if(chaineCommencePar(commande, "pin.tone ")) {
+  else if(chaineCommencePar(commande, "PT ")) {
     copierToken(commande, " ", 1, chPin);
     copierToken(commande, " ", 2, chParam);
     pin = atoi(chPin);
     param = atoi(chParam);
     tone(pin, param);
   }
-  else if(chaineCommencePar(commande, "pin.toneStop ")) {
+  else if(chaineCommencePar(commande, "PR ")) {
     copierToken(commande, " ", 1, chPin);
     pin = atoi(chPin);
     noTone(pin);
@@ -282,7 +267,26 @@ void executerCommandeRocket(const char commande[]) {
   int etape;
   int delai;
 
-  if(chaineCommencePar(commande, "rocket.configureStep ")) {
+  
+  if(chaineCommencePar(commande, "RS")) {
+    logRocketStatus();
+  }
+  else if(chaineCommencePar(commande, "RE")) {    
+    // TODO
+  }
+  else {
+    logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
+  }
+}
+
+void executerCommandePlanDeVol(const char commande[]) {
+  char chEtape[LONGUEUR_NOMBRE];
+  char chDelai[LONGUEUR_NOMBRE];
+  int etape;
+  int delai;
+
+  
+  if(chaineCommencePar(commande, "FC ")) {
     copierToken(commande, " ", 1, chEtape);
     copierToken(commande, " ", 2, chDelai);
     etape = atoi(chEtape);
@@ -290,23 +294,23 @@ void executerCommandeRocket(const char commande[]) {
     dureeEtape[etape] = delai;
     copierToken(commande, " ", 3, commandeEtape[etape], true);
   }
-  else if(chaineCommencePar(commande, "rocket.getSteps")) {
+  else if(chaineCommencePar(commande, "FS")) {
     for (int i = 0; i < NB_ETAPES; i++ ) {
       sprintf(strLog, "%i | %i ms | %s", i, dureeEtape[i], commandeEtape[i]);
-      logger.log(MODULE_SYSTEME, "ROCKET_STEP", strLog);
+      logger.log(MODULE_SYSTEME, "FLIGHTPLAN_STEP", strLog);
     }
   }
-  else if(chaineCommencePar(commande, "rocket.launch ") || chaineCommencePar(commande, "rocket.stage ")) {
+  else if(chaineCommencePar(commande, "F0 ")) {
     if(codeCorrect(commande)) {
       etapeSuivante();
     }
   }
-  else if(chaineCommencePar(commande, "rocket.stop ")) {
+  else if(chaineCommencePar(commande, "FZ ")) {
     if(codeCorrect(commande)) {
       fuseeStatut = -1;
     }
   }
-  else if(chaineCommencePar(commande, "rocket.goStep ")) {
+  else if(chaineCommencePar(commande, "FG ")) {
     if(fuseeStatut > CONFIGURATION) {
       copierToken(commande, " ", 1, chEtape);
       fuseeStatut = atoi(chEtape);
@@ -347,7 +351,7 @@ void executerCommandeServo(const char commande[]) {
   char chParam[LONGUEUR_NOMBRE];
   int servo;
   int param;
-  if(chaineCommencePar(commande, "servo.setPosition ")) {    
+  if(chaineCommencePar(commande, "SP ")) {    
     copierToken(commande, " ", 1, chServo);
     copierToken(commande, " ", 2, chParam);
     servo = atoi(chServo);
@@ -360,20 +364,32 @@ void executerCommandeServo(const char commande[]) {
 }
 
 void executerCommandeLogger(const char commande[]) {
-  if(chaineCommencePar(commande, "logger.initSdcard")) {
+  if(chaineCommencePar(commande, "LC")) {
     logger.initSdcard();
   }
-  else if(chaineCommencePar(commande, "logger.flushToSdcard")) {
+  else if(chaineCommencePar(commande, "LF")) {
     logger.flush();
   }
-  else if(chaineCommencePar(commande, "logger.toggleLogImuData")) {
-    centrale.loggingData = !centrale.loggingData;
+  else if(chaineCommencePar(commande, "LS")) {
+    logger.logStatut();
   }
-  else if(chaineCommencePar(commande, "logger.toggleLogFlush")) {
-    logger.loggingFlush = !logger.loggingFlush;
+  else if(chaineCommencePar(commande, "LI 0")) {
+    centrale.loggingData = false;
   }
-  else if(chaineCommencePar(commande, "logger.toggleLogRocketStatus")) {
-    loggingRocketStatus = !loggingRocketStatus;
+  else if(chaineCommencePar(commande, "LI 1")) {
+    centrale.loggingData = true;
+  }
+  else if(chaineCommencePar(commande, "LW 0")) {
+    logger.loggingFlush = false;
+  }
+  else if(chaineCommencePar(commande, "LW 1")) {
+    logger.loggingFlush = true;
+  }
+  else if(chaineCommencePar(commande, "LR 0")) {
+    loggingRocketStatus = false;
+  }
+  else if(chaineCommencePar(commande, "LR 1")) {
+    loggingRocketStatus = true;
   }
   else {
     logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
@@ -383,12 +399,15 @@ void executerCommandeLogger(const char commande[]) {
 void executerCommandeWifi(const char commande[]) {
   char ssid[LONGUEUR_MAX_CHAINE_CARACTERES];
   char pwd[LONGUEUR_MAX_CHAINE_CARACTERES];
-  if(chaineCommencePar(commande, "wifi.connect ")) {
+  if(chaineCommencePar(commande, "WC ")) {
     copierToken(commande, " ", 1, ssid);
     copierToken(commande, " ", 2, pwd);
     wifi.connecterAvecFallback(ssid, pwd);
   }
-  else if(chaineCommencePar(commande, "wifi.initUdp ")) {
+  else if(chaineCommencePar(commande, "WS")) {
+    wifi.logStatut();
+  }
+  else if(chaineCommencePar(commande, "WB ")) {
     // Ne rien faire : on a déjà récupéré l'IP de l'émetteur dans le module Wifi
   }
   else {
@@ -399,7 +418,7 @@ void executerCommandeWifi(const char commande[]) {
 void executerCommandeAutre(const char commande[]) {  
   char chNombre[LONGUEUR_NOMBRE];
   int nombre;
-  if (chaineCommencePar(commande, "delay ")) {
+  if (chaineCommencePar(commande, "0D ")) {
     copierToken(commande, " ", 1, chNombre);
     nombre = atoi(chNombre);
     delay(nombre);

@@ -65,7 +65,11 @@ class Controleur():
         return commande
 
     def compiler_commande(self, commande_brute):
-        operation, arguments = commande_brute.strip().split(sep=" ", maxsplit=1)
+        if " " in commande_brute:
+            operation, arguments = commande_brute.strip().split(sep=" ", maxsplit=1)
+        else:
+            operation = commande_brute
+            arguments = ""
 
         if operation in dict_compilation:
             operation_abbregee = dict_compilation[operation]
