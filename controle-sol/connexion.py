@@ -35,8 +35,9 @@ class Connexion():
 
     def envoyer(self, message):
         if self.actif:
-            logging.info(message)        
-            self.sock_send.sendto(message.encode(), (self.ip, self.port))
+            logging.info(f"Envoi {message} à {self.ip}:{self.port}")
+            bytes_envoyes = self.sock_send.sendto(message.encode(), (self.ip, self.port))
+            logging.info(f"{bytes_envoyes} octets envoyés")
 
     def recevoir(self):
         str = ""
