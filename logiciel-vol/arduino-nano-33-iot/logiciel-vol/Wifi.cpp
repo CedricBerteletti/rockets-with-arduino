@@ -83,11 +83,15 @@ void Wifi::connecter(const char ssid[], const char pwd[])
     tempsAttente = tempsAttente + 1000;
   }
 
-  if (statut == WL_CONNECTED) {
-    actif = true;
-    log(MODULE_WIFI, "UDP_BEGIN", ssid, true);
-    udp.begin(PORT_LOCAL);
-    log(MODULE_WIFI, "CONNECTED", ssid, true);
+  if (statut == WL_CONNECTED) {    
+    log(MODULE_WIFI, "UDP_BEGIN", ssid, false);
+    if(udp.begin(PORT_LOCAL) == 1) {
+      actif = true;
+      log(MODULE_WIFI, "CONNECTED", ssid, false);
+    }
+    else {
+      log(MODULE_WIFI, "UDP_NOT_CONNECTED", ssid, true);
+    }
   }
   else {
     log(MODULE_WIFI, "ERROR_CONNECTION", ssid, true);
@@ -103,12 +107,15 @@ void Wifi::logStatut()
 }
 
 void Wifi::lireUdp(char message[]) {
+  //Serial.println("RECEPTION Lecture ?");
   if (actif) {
     // Paquet disponible ?
     int taillePaquet = udp.parsePacket();
+    //Serial.println("RECEPTION Lecture");
     if (taillePaquet != 0) {
       remoteIp = udp.remoteIP();
       remotePort = udp.remotePort();
+      //Serial.println("RECEPTION Paquet reçu");
 
       // Lecture du paquet dans le buffer de réception
       int len = udp.read(message, 255);
@@ -130,8 +137,11 @@ void Wifi::lireUdp(char message[]) {
 }
 
 void Wifi::ecrireUdp(const char message[]) {
-  if (actif && udp.remoteIP()) {
-    udp.beginPacket(udp.remoteIP(), PORT_LOCAL);
+  Serial.println("Ecriture ?");
+  Serial.println(remoteIp);
+  if (actif && remoteIp) {
+    Serial.println("Ecriture");
+    udp.beginPacket(remoteIp, remotePort);
     udp.write(message);
     udp.endPacket();
     logIo("SENDING", message);
