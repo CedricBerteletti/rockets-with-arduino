@@ -7,7 +7,6 @@ Gestion de la connexion WiFi à la fusée
 
 import errno
 import logging
-import select
 import socket
 from time import sleep
 
@@ -17,53 +16,53 @@ class Connexion():
     timeout = 1 # en seconde
 
     def __init__(self):
-        self.ip = ""
-        self.port = 0
+        self.rocket_ip = ""
+        self.rocket_port = 0
         self.actif = False
 
-    def init(self, ip, port):
-        self.ip = ip
-        self.port = port
-        self.sock_send = socket.socket(socket.AF_INET, # Internet
-            socket.SOCK_DGRAM) # UDP
-        local_ip = ""
-        self.sock_rec = socket.socket(socket.AF_INET, # Internet
-            socket.SOCK_DGRAM) # UDP
-        self.sock_rec.bind((local_ip, self.port))
-        self.sock_rec.setblocking(0)
+    def init(self, rocket_ip, rocket_port):
+        if self.actif:
+            self.fermer()
+
+        self.rocket_ip = rocket_ip;
+        self.rocket_port = rocket_port;
+
+        self.socket = socket.socket(socket.AF_INET, # Internet
+            socket.SOCK_DGRAM, socket.IPPROTO_UDP) # UDP
+        self.socket.connect((self.rocket_ip, self.rocket_port))
+        self.socket.setblocking(0)
+
         self.actif = True
 
     def envoyer(self, message):
         if self.actif:
-            logging.info(f"Envoi {message} à {self.ip}:{self.port}")
-            bytes_envoyes = self.sock_send.sendto(message.encode(), (self.ip, self.port))
+            logging.info(f"Envoi {message} à {self.rocket_ip}:{self.rocket_port}")
+            bytes_envoyes = self.socket.sendto(message.encode(), (self.rocket_ip, self.rocket_port))
             logging.info(f"{bytes_envoyes} octets envoyés")
 
     def recevoir(self):
         str = ""
         if self.actif:
-            ready = select.select([self.sock_rec], [], [], self.timeout)
-            if ready[0]:        
-                try:
-                    data, addr = self.sock_rec.recv(255) # taille du buffer
-                except socket.error as e:
-                    err = e.args[0]
-                    if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
-                        # pas d'erreur, simplement pas de nouvelle donnée disponible
-                        sleep(0.01)
-                    else:
-                        # Erreur réelle
-                        logging.error("Erreur lors de la tentative de lecture de l'Arduino : ", e)
+            try:
+                data, addr = self.socket.recvfrom(255) # taille du buffer
+            except socket.error as e:
+                err = e.args[0]
+                if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
+                    # pas d'erreur, simplement pas de nouvelle donnée disponible
+                    logging.debug(err)
+                    sleep(0.01)
                 else:
-                    logging.debug(str)
-                    str = data.decode()
+                    # Erreur réelle
+                    logging.error("Erreur lors de la tentative de lecture de l'Arduino : ", e)
+            else:
+                str = data.decode()
+            
+            logging.debug(str)
         return str
 
     def fermer(self):
-        self.sock_send.shutdown(socket.SHUT_RDWR)
-        self.sock_send.close()
-        self.sock_rec.shutdown(socket.SHUT_RDWR)
-        self.sock_rec.close()
+        self.socket.shutdown(socket.SHUT_RDWR)
+        self.socket.close()
 
 
 

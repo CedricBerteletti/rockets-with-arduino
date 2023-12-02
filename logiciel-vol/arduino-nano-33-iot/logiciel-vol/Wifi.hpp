@@ -13,6 +13,9 @@
 #include "aides.hpp"
 #include "secrets.h"
 
+// Constantes générales
+inline constexpr int NOMBRE_MAX_CLIENTS = 5;
+
 class Wifi
 {
   public:
@@ -25,6 +28,7 @@ class Wifi
     void logStatut();
     void lireUdp(char message[]);
     void ecrireUdp(const char message[]);
+    void confUdpClient(int n);
   private:
     static const char MODULE_WIFI[];
     static const unsigned int PORT_LOCAL;
@@ -32,8 +36,10 @@ class Wifi
     char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
     char strTmp[LONGUEUR_MAX_CHAINE_CARACTERES];
     WiFiUDP udp;
-    IPAddress remoteIp;
-    unsigned int remotePort;
+    IPAddress currentRemoteIp;
+    unsigned int currentRemotePort;
+    IPAddress remoteIps[NOMBRE_MAX_CLIENTS];
+    unsigned int remotePorts[NOMBRE_MAX_CLIENTS] {0};
     void connecter(const char ssid[], const char pwd[]);
     void typeChiffrement(char str[], int type);
     void adresseIp(char addresse[], IPAddress ip);

@@ -107,15 +107,12 @@ void Wifi::logStatut()
 }
 
 void Wifi::lireUdp(char message[]) {
-  //Serial.println("RECEPTION Lecture ?");
   if (actif) {
     // Paquet disponible ?
     int taillePaquet = udp.parsePacket();
-    //Serial.println("RECEPTION Lecture");
     if (taillePaquet != 0) {
-      remoteIp = udp.remoteIP();
-      remotePort = udp.remotePort();
-      //Serial.println("RECEPTION Paquet reçu");
+      currentRemoteIp = udp.remoteIP();
+      currentRemotePort = udp.remotePort();
 
       // Lecture du paquet dans le buffer de réception
       int len = udp.read(message, 255);
@@ -136,14 +133,23 @@ void Wifi::lireUdp(char message[]) {
   }
 }
 
+void Wifi::confUdpClient(int n) {
+  remoteIps[n] = currentRemoteIp;
+  remotePorts[n] = currentRemotePort;
+}
+
 void Wifi::ecrireUdp(const char message[]) {
-  Serial.println("Ecriture ?");
-  Serial.println(remoteIp);
-  if (actif && remoteIp) {
-    Serial.println("Ecriture");
-    udp.beginPacket(remoteIp, remotePort);
-    udp.write(message);
-    udp.endPacket();
+  if (actif && currentRemoteIp) {
+    for (unsigned int i = 0; i < NOMBRE_MAX_CLIENTS; i++)
+    {
+      if (remotePorts[i] != 0) {
+        Serial.println(remoteIps[i]);
+        Serial.println(remotePorts[i]);
+        udp.beginPacket(remoteIps[i], remotePorts[i]);
+        udp.write(message);
+        udp.endPacket();
+      }
+    }
     logIo("SENDING", message);
   }
 }
@@ -191,8 +197,8 @@ void Wifi::log(const char module[], const char message[], const char details[], 
 void Wifi::logIo(const char parameter[], const char message[]) {
   if (loggingIo) {
     char adresse[LONGUEUR_ADRESSE_IP];
-    adresseIp(adresse, udp.remoteIP());
-    sprintf(strTmp, "%s | %i | %s", adresse, udp.remotePort(), message);
+    adresseIp(adresse, currentRemoteIp);
+    sprintf(strTmp, "%s | %i | %s", adresse, currentRemotePort, message);
     log(MODULE_WIFI, parameter, strTmp, false);
   }
 }

@@ -54,9 +54,9 @@ class Controleur():
     def __init__(self, connexion):
         self.connexion = connexion
 
-    def connecter(self, ip, port):
-        self.connexion.init(ip, port)
-        self.envoyer_commande_brute("wifi.broadcastUdpClient " + ip + " " + str(port))
+    def connecter(self, pc_id, rocket_ip, rocket_port):
+        self.connexion.init(rocket_ip, rocket_port)
+        self.envoyer_commande_brute("wifi.broadcastUdpClient " + pc_id + " " + rocket_ip + " " + str(rocket_port))
 
     def envoyer_commande_brute(self, commande_brute):
         commande = self.compiler_commande(commande_brute)
