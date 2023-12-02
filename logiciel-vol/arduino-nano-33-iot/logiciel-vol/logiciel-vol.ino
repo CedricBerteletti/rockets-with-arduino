@@ -399,6 +399,7 @@ void executerCommandeLogger(const char commande[]) {
 void executerCommandeWifi(const char commande[]) {
   char ssid[LONGUEUR_MAX_CHAINE_CARACTERES];
   char pwd[LONGUEUR_MAX_CHAINE_CARACTERES];
+  char nombre[LONGUEUR_NOMBRE];
   if(chaineCommencePar(commande, "WC ")) {
     copierToken(commande, " ", 1, ssid);
     copierToken(commande, " ", 2, pwd);
@@ -408,7 +409,10 @@ void executerCommandeWifi(const char commande[]) {
     wifi.logStatut();
   }
   else if(chaineCommencePar(commande, "WB ")) {
-    // Ne rien faire : on a déjà récupéré l'IP de l'émetteur dans le module Wifi
+    // On a déjà récupéré l'IP et le port de l'émetteur dans le module Wifi
+    // On se contente d'envoyer le numéro de client
+    copierToken(commande, " ", 1, nombre); // n° client UDP
+    wifi.confUdpClient(atoi(nombre));
   }
   else {
     logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");

@@ -1,7 +1,7 @@
 # Script d'example pour configurer le vol d'une fusée
 
 # Connexion à la fusée et vérification des différents statuts
-wifi.broadcastUdpClient 192.168.0.8 23900
+wifi.broadcastUdpClient 0 192.168.0.8 23900
 wifi.status
 logger.status
 rocket.status
@@ -35,7 +35,7 @@ flightplan.configureStep 8 0 flightplan.goStep 6
 flightplan.getSteps
 
 # Logs des données de la centrale inertielle
-logger.toggleLogImuData
+logger.activateLogImuData
 
 # Lancement
 # rocket.launch code
