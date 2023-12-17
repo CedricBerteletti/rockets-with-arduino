@@ -37,10 +37,12 @@ long dateLectureCommandeSuivante = 0;
 char commande[LONGUEUR_MAX_COMMANDE];
 // Chaîne de caractère pour les logs
 char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
-// Servomoteurs des ailerons sur les broches 20 et 21
-Servo servos[2];
-static const int SERVO0_PIN = 20;
-static const int SERVO1_PIN = 21;
+// Servomoteurs des ailerons et de la tuyère sur les broches 18 à 21
+Servo servos[4];
+static const int SERVO0_PIN = 18;
+static const int SERVO1_PIN = 19;
+static const int SERVO2_PIN = 20;
+static const int SERVO3_PIN = 21;
 
 /* Etats de la fusée */
 static const int CONFIGURATION = -1;
@@ -90,9 +92,11 @@ void setup() {
     dureeEtape[i] = -1;
   }
 
-  // 2 servomoteurs sur les broches 20 et 21
+  // 4 servomoteurs sur les broches 18 à 21
   servos[0].attach(SERVO0_PIN);
   servos[1].attach(SERVO1_PIN);
+  servos[2].attach(SERVO2_PIN);
+  servos[3].attach(SERVO3_PIN);
 
   delay(1000);
   dateCourante = millis();

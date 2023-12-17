@@ -17,6 +17,7 @@ inline constexpr int LONGUEUR_NOMBRE = 10;
 inline constexpr int LONGUEUR_MAX_COMMANDE = 50;
 inline constexpr int LONGUEUR_MAX_CHAINE_CARACTERES = 256;
 inline constexpr int LONGUEUR_ADRESSE_IP = 20;
+inline constexpr int PIN_LED_DEBUG = 8;
 
 // Formatage des log
 void formatLog(char destination[], const char module[], const char message[], const char details[]);
@@ -36,5 +37,8 @@ char *trim(char *str);
 void copierToken(const char chaine[], const char separateur[], int index, char *token, bool dernierToken);
 // Copie une sous-chaîne à l'index donné de la chaîne principale, comprise entre des séparateurs
 void copierToken(const char chaine[], const char separateur[], int index, char *token);
+
+// Flash lumineux sur la broche pin
+void flash(int pin);
 
 #endif

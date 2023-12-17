@@ -38,8 +38,11 @@ void Wifi::listerReseaux()
 
 void Wifi::connecter()
 {
+  flash(PIN_LED_DEBUG);
   connecter(WIFI1_SSID, WIFI1_PASS);
   if (!actif) {
+    flash(PIN_LED_DEBUG);
+    flash(PIN_LED_DEBUG);
     connecter(WIFI2_SSID, WIFI2_PASS);
   }
 }
@@ -87,6 +90,7 @@ void Wifi::connecter(const char ssid[], const char pwd[])
     log(MODULE_WIFI, "UDP_BEGIN", ssid, false);
     if(udp.begin(PORT_LOCAL) == 1) {
       actif = true;
+      digitalWrite(PIN_LED_DEBUG, 1);
       log(MODULE_WIFI, "CONNECTED", ssid, false);
     }
     else {
