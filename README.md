@@ -80,3 +80,8 @@ netstat | grep {port}
 
 Application Python permettant de configurer le vol de la fusée, de vérifier son statut, de lancer le compte à rebours final et d'acquérir et d'afficher les infos de vol.
 
+## Electronique
+
+- Possibilité d'alimenter les servo-moteurs à une tension supérieure aux 5V de l'Arduino (par exemple avec les 7,4 V de la batterie), pour accélérer la vitesse de rotation.
+
+
