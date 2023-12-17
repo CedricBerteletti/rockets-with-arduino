@@ -105,3 +105,10 @@ void copierToken(const char *chaine, const char separateur[], int index, char *t
 void copierToken(const char *chaine, const char separateur[], int index, char *token) {
   copierToken(chaine, separateur, index, token, false);
 }
+
+void flash(int pin) {
+  digitalWrite(pin, 1);
+  delay(200);
+  digitalWrite(pin, 0);
+  delay(200);
+}

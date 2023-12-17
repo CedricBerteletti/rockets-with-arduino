@@ -14,12 +14,17 @@ pin.setMode 4 OUTPUT
 pin.setMode 5 OUTPUT
 pin.setMode 6 OUTPUT
 pin.setMode 7 OUTPUT
+
 pin.setMode 8 OUTPUT
+pin.digitalWrite 8 1
 pin.setMode 9 OUTPUT
+pin.digitalWrite 9 1
+
 pin.setMode 14 OUTPUT
 pin.setMode 15 OUTPUT
 pin.setMode 16 OUTPUT
 pin.setMode 17 OUTPUT
+
 
 # Configuration des étapes de vol (stagging)
 flightplan.configureStep 0 10000 logger.activateLogFlush
