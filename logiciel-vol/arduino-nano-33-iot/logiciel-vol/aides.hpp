@@ -20,7 +20,7 @@ inline constexpr int LONGUEUR_ADRESSE_IP = 20;
 inline constexpr int PIN_LED_DEBUG = 8;
 
 // Formatage des log
-void formatLog(char destination[], const char module[], const char message[], const char details[]);
+void formaterLog(char destination[], const char module[], const char message[], const char details[]);
 
 // Teste si une chaîne de caractères commence par un prefixe donné
 bool chaineCommencePar(const char chaine[], const char prefix[]);

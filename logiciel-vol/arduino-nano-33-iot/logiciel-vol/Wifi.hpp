@@ -28,7 +28,7 @@ class Wifi
     void logStatut();
     void lireUdp(char message[]);
     void ecrireUdp(const char message[]);
-    void confUdpClient(int n);
+    void confClientUdp(int n);
   private:
     static const char MODULE_WIFI[];
     static const unsigned int PORT_LOCAL;

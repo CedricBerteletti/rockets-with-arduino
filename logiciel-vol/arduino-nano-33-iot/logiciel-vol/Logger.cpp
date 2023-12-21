@@ -55,12 +55,6 @@ void Logger::initSdcard() {
       volumesize /= 1024;
       itoa(volumesize, strLog, 10);
       log(MODULE_LOGGER, "SDCARD_VOLUME_SIZE_MB", strLog);
-
-      // log(MODULE_LOGGER, "SDCARD_VOLUME_ALL_FILES", "");
-      // root.openRoot(volume);
-      // // list all files in the card with date and size
-      // root.ls(LS_R | LS_DATE | LS_SIZE);
-      // root.close();
     }
   }
 
@@ -98,7 +92,7 @@ void Logger::flush() {
 // Fonctions d'écriture des logs
 void Logger::log(const char module[], const char message[], const char details[]) {
   if (toSerial || toSdcard || toUdp) {
-    formatLog(strLog, module, message, details);
+    formaterLog(strLog, module, message, details);
   }
 
   if(toSerial) Serial.println(strLog);

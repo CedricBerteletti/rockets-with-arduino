@@ -6,6 +6,10 @@
 - Entraxe Lego engrenage 12 dents - 20 dents : 16.5 mm
 - Entraxe Lego engrenage 12 dents - 20 dents : 18.75 mm
 - Entraxe Lego engrenage 12 dents - 20 dents : 24.5 mm
+- Engrenage Lego : module 1,0 mm
+- Engrenage Servo MG90 / SG90 / AD002 : module 0,20 mm ; 24 dents
+
+
 
 
 
