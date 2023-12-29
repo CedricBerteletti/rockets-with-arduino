@@ -233,9 +233,9 @@ class EcranPrincipal(QFrame):
         
         if commande[0:24] == "wifi.broadcastUdpClient ":
             connect, pc_id, rocket_ip, rocket_port = commande.split()
-            self.controleur.connecter(pc_id, rocket_ip, int(rocket_port))
+            commande_envoyee = self.controleur.connecter(pc_id, rocket_ip, int(rocket_port))
         else:
             commande_envoyee = self.controleur.envoyer_commande_brute(commande)
-            self.tb_logs.insertPlainText(f"Commande envoyée : {commande_envoyee}\n")
+        self.tb_logs.insertPlainText(f"Commande envoyée : {commande_envoyee}\n")
 
         self.tb_logs.moveCursor(QTextCursor.End)

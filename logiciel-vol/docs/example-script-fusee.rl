@@ -1,7 +1,7 @@
 # Script d'example pour configurer le vol d'une fusée
 
 # Connexion à la fusée et vérification des différents statuts
-wifi.broadcastUdpClient 0 192.168.0.50 23900
+wifi.broadcastUdpClient 0 192.168.0.3 23900
 wifi.status
 logger.status
 rocket.status
@@ -41,6 +41,7 @@ flightplan.getSteps
 
 # Logs des données de la centrale inertielle
 logger.activateLogImuData
+imu.getBuffer
 
 # Lancement
 # rocket.launch code
@@ -55,16 +56,24 @@ logger.activateLogImuData
 #pin.tone 2 528
 
 
-# servo.setPosition servo angle (de 0 à 180°)
-servo.setPosition 1 90
+# servo.setAngle servo angle (de 0 à 180°)
+servo.setAngle 1 90
 
 # Tests servo
-flightplan.configureStep 0 500 servo.setPosition 0 90
-flightplan.configureStep 1 500 servo.setPosition 1 90
-flightplan.configureStep 2 500 servo.setPosition 0 110
-flightplan.configureStep 3 500 servo.setPosition 1 110
-flightplan.configureStep 4 500 servo.setPosition 1 90
-flightplan.configureStep 5 500 servo.setPosition 1 70
-flightplan.configureStep 6 500 servo.setPosition 0 90
-flightplan.configureStep 7 500 servo.setPosition 0 70
+flightplan.configureStep 0 500 servo.setAngle 0 90
+flightplan.configureStep 1 500 servo.setAngle 1 90
+flightplan.configureStep 2 500 servo.setAngle 0 110
+flightplan.configureStep 3 500 servo.setAngle 1 110
+flightplan.configureStep 4 500 servo.setAngle 1 90
+flightplan.configureStep 5 500 servo.setAngle 1 70
+flightplan.configureStep 6 500 servo.setAngle 0 90
+flightplan.configureStep 7 500 servo.setAngle 0 70
 flightplan.configureStep 8 0 flightplan.goStep 0
+
+
+
+# Test boucle
+flightplan.configureStep 0 000 logger.activateLogImuData
+flightplan.configureStep 1 500 pin.digitalWrite 17 1
+flightplan.configureStep 2 500 pin.digitalWrite 17 0
+flightplan.configureStep 3 0 flightplan.goStep 1

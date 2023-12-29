@@ -71,7 +71,7 @@ class Telemetrie(threading.Thread):
                 logging.debug("Essai lecture données Arduino")
                 str = self.connexion.recevoir()
                 if str:
-                    if str.find(", IMU_DATA,") != -1:
+                    if str.find(", IMU_DATA, \"t, accX, accY, accZ, vAlpha, vBeta, vGamma\"") != -1:
                         self.logsImu.append(str)
                         self.tempLogsImu.append(str)
                     else:

@@ -28,12 +28,16 @@ dict_compilation = {"wifi.connectNetwork": "WC",
                     "rocket.launch": "F0",
                     "rocket.stage": "RE",
                     
-                    
                     "flightplan.start": "F0",
                     "flightplan.stop": "FZ",
                     "flightplan.configureStep": "FC",
                     "flightplan.getSteps": "FS",
                     "flightplan.goStep": "FG",
+
+                    "imu.getBuffer": "IB",
+                    "imu.calibrate": "IC",                    
+                    "imu.setMinAccelerationFilter": "IA",
+                    "imu.setMinAngularVelocityFilter": "IV",
                     
                     "pin.setMode": "PC",
                     "pin.digitalWrite": "PD",
@@ -41,6 +45,7 @@ dict_compilation = {"wifi.connectNetwork": "WC",
                     "pin.tone": "PT",
                     "pin.toneStop": "PR",
                     
+                    "servo.setAngle": "SA",
                     "servo.setPosition": "SP",
                     }
 
@@ -56,19 +61,23 @@ class Controleur():
 
     def connecter(self, pc_id, rocket_ip, rocket_port):
         self.connexion.init(rocket_ip, rocket_port)
-        self.envoyer_commande_brute("wifi.broadcastUdpClient " + pc_id + " " + rocket_ip + " " + str(rocket_port))
+        return self.envoyer_commande_brute("wifi.broadcastUdpClient " + pc_id + " " + rocket_ip + " " + str(rocket_port))
 
     def envoyer_commande_brute(self, commande_brute):
         commande = self.compiler_commande(commande_brute)
-        if commande[0:3] != "ERR":
+        if commande[0:3] != "ERR" and commande:
             self.connexion.envoyer(commande)
         return commande
 
     def compiler_commande(self, commande_brute):
-        if " " in commande_brute:
-            operation, arguments = commande_brute.strip().split(sep=" ", maxsplit=1)
+        commande_nettoyee = commande_brute
+
+        # TODO : supprimer commentaire après le signe #
+
+        if " " in commande_nettoyee:
+            operation, arguments = commande_nettoyee.strip().split(sep=" ", maxsplit=1)
         else:
-            operation = commande_brute
+            operation = commande_nettoyee
             arguments = ""
 
         if operation in dict_compilation:

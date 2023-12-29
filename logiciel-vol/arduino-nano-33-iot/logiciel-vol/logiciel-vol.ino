@@ -12,8 +12,8 @@
 #include "CentraleInertielle.hpp"
 #include <Servo.h>
 
-// Nombre d'étapes du vol
-#define NB_ETAPES 100
+// Nombre d'étapes/instructions du programme de vol
+static const int NB_ETAPES = 100;
 
 static const char MODULE_SYSTEME[] = "SYSTEM";
 static const char MODULE_COMMANDE[] = "COMMAND";
@@ -23,50 +23,46 @@ static const long DELAI_COMMANDE = 100; // (en ms) Tentative de lecture d'une no
 /* Variable globales */
 // Instanciation d'un loggeur
 Logger logger;
-bool loggingRocketStatus = false;
+bool loggingStatutFusee = false;
+
 // Instanciation d'un objet gérant la connexion et les communications wifi
 Wifi wifi;
+
 // Instanciation de l'objet gérant la centrale inertielle (constructeur nécessitant un logger en paramètre)
 CentraleInertielle centrale(logger);
+
 // Date à laquelle réaliser un nouveau flush des données de logs
 // (pas à chaque écriture car prend trop de temps)
 long dateFlushSuivant = 0;
+
 // Date à laquelle vérifier la présence de nouvelles commandes
 long dateLectureCommandeSuivante = 0;
+
 // Dernière commande reçue (déclaration globale pour éviter la réallocation dans la pile à chaque appel de lireCommande)
 char commande[LONGUEUR_MAX_COMMANDE];
+
 // Chaîne de caractère pour les logs
 char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
+
 // Servomoteurs des ailerons et de la tuyère sur les broches 18 à 21
 Servo servos[4];
-static const int SERVO0_PIN = 18;
-static const int SERVO1_PIN = 19;
+static const int SERVO0_PIN = 16;
+static const int SERVO1_PIN = 17;
 static const int SERVO2_PIN = 20;
 static const int SERVO3_PIN = 21;
 
 /* Etats de la fusée */
 static const int CONFIGURATION = -1;
 static const int DECOMPTE_FINAL = 0;
-static const int ETAGE_1 = 1; // Booster
-static const int ETAGE_2 = 2; // Etage supérieur
-static const int ETAGE_3 = 3; // Capsule
-static const int SUITE_1 = 4;
-static const int SUITE_2 = 5;
-static const int SUITE_3 = 6;
-static const int SUITE_4 = 7;
-static const int SUITE_5 = 8;
-static const int SUITE_6 = 9;
-int fuseeStatut = CONFIGURATION;
+int etage = 0;
 
-/* Données de navigation */
+/* Programme de vol */
+int etape = CONFIGURATION;
 int dureeEtape[NB_ETAPES];
 char commandeEtape[NB_ETAPES][LONGUEUR_MAX_COMMANDE];
 long dateLancement = 0;
 long dateEtapeSuivante = -1;
 long dateCourante = 0;
-// Instanciation d'un objet pour stocker les valeurs courantes des accéléromètres et gyroscopes
-DonneesInertielles donneesInertiellesCourantes;
-
 
 /* Initialisation générale de la fusée */
 void setup() {
@@ -108,14 +104,14 @@ void setup() {
 // Boucle principale : lecture des capteurs ou des commandes et actions
 void loop() {
   dateCourante = millis();
-  centrale.lire(donneesInertiellesCourantes);  
+  centrale.lire();
 
   // Actions à fréquence réduite (pas effectuées à chaque itération de loop())
   if(dateCourante > dateFlushSuivant) {
     logger.flush();
     dateFlushSuivant = dateFlushSuivant + DELAI_FLUSH;
-    if(loggingRocketStatus) {
-      logRocketStatus();
+    if(loggingStatutFusee) {
+      logStatutFusee();
     }
   }
   if(dateCourante > dateLectureCommandeSuivante) {
@@ -124,7 +120,7 @@ void loop() {
   }
 
   if(dateEtapeSuivante != -1 && dateCourante > dateEtapeSuivante) {
-    // Stagging: il est temps de passer à l'étage supérieur !
+    // On passe à l'instruction suivante dans le programme de vol
     etapeSuivante();
   }
 }
@@ -136,61 +132,68 @@ void initSerial() {
 }
 
 /* Log l'état/étape/étage actuel de la fusée */
-void logRocketStatus() {
-  if(fuseeStatut > CONFIGURATION) {
+void logStatutFusee() {
+  if(etape > CONFIGURATION) {
+    // t = 0s commence lorsque l'on arrive à l'instruction/étape 1
     int dateEnSeconde = (dateCourante - dateLancement - dureeEtape[0])/1000;
-    sprintf(strLog, "t=%is | Etape %i", dateEnSeconde, fuseeStatut);
+    sprintf(strLog, "t=%is | Étape %i | Étage %i", dateEnSeconde, etape, etage);
   }
   else {
-    sprintf(strLog, "En attente | Etape %i", fuseeStatut);
+    sprintf(strLog, "En attente | Étape %i | Étage %i", etape, etage);
   }
   logger.log(MODULE_SYSTEME, "ROCKET_STATUS", strLog);
 }
 
-/* Stagging : la fusée passe à une nouvelle séquence du vol (par exemple, du 1° au 2° étage)
-  - on incrémente le statut/étage de la fusée (initalement à -1)
+/* La fusée passe l'instruction suivante du pprogramme de vol
+  - on incrémente le pointeur d'étape/instruction de la fusée (initalement à -1)
   - on exécute la commande correspondant à cette nouvelle étape
   - on indique la date de la prochaine transition d'étage
 */
 void etapeSuivante() {
-  fuseeStatut = fuseeStatut + 1;
-  if(fuseeStatut > CONFIGURATION) {
-    if(fuseeStatut == DECOMPTE_FINAL) {
+  etape = etape + 1;
+  if(etape > CONFIGURATION) {
+    if(etape == DECOMPTE_FINAL) {
       // Première étape : le décompte final ! La fusée est en auto à partir de maintenant
       // (ie, transition d'état selon ce qui a été précédemment paramétré)
       dateLancement = millis();
       // On commence à afficher les logs sur les 
-      loggingRocketStatus = true;
+      loggingStatutFusee = true;
       // Initialisation de la dateEtapeSuivante à la date courante
       dateEtapeSuivante = dateLancement;
     }
 
-    itoa(fuseeStatut, strLog, 10);
-    logger.log(MODULE_SYSTEME, "STAGGING", strLog);
+    itoa(etape, strLog, 10);
+    logger.log(MODULE_SYSTEME, "STEP", strLog);
 
-    if(dureeEtape[fuseeStatut] != -1) {
-      // La condition de passage à l'étape suivante est une durée
-      dateEtapeSuivante = dateEtapeSuivante + dureeEtape[fuseeStatut];
-    }
-    else {
-      // La condition de passage à l'étape suivante n'est pas une durée
-      dateEtapeSuivante = -1;
-    }
-    verifierEtExecuterCommande(commandeEtape[fuseeStatut]);
+    executerEtapeEtPreparerEtapeSuivante();
   }
 }
 
+void executerEtapeEtPreparerEtapeSuivante() {
+  if(dureeEtape[etape] != -1) {
+    // La condition de passage à l'étape suivante est une durée
+    dateEtapeSuivante = dateEtapeSuivante + dureeEtape[etape];
+  }
+  else {
+    // La condition de passage à l'étape suivante n'est pas une durée
+    dateEtapeSuivante = -1;
+  }
+  verifierEtExecuterCommande(commandeEtape[etape]);
+}
 
 /* GESTION DES COMMANDES ENVOYEES A LA FUSEE */
 
-void lireCommande() {
+void lireCommande() {  
   wifi.lireUdp(commande);
   trim(commande);
   verifierEtExecuterCommande(commande);
 }
 
 void verifierEtExecuterCommande(const char commande[]) {
-  if(strlen(commande) > 0) executerCommande(commande);
+  if(strlen(commande) > 0) {
+    Serial.println ("Lire commande");
+    executerCommande(commande);
+  }
 }
 
 /* Premier switch sur la classe de commandes, pour rationaliser le nombre de comparaisons
@@ -199,14 +202,17 @@ void executerCommande(const char commande[]) {
   logger.log(MODULE_COMMANDE, "COMMAND_RECEPTION", commande);
 
   if(chaineCommencePar(commande, "P")) {
-    executerCommandePin(commande);
+    executerCommandeBroche(commande);
   }
   else if(chaineCommencePar(commande, "R")) {
-    executerCommandeRocket(commande);
+    executerCommandeFusee(commande);
   }
   else if(chaineCommencePar(commande, "F")) {
     executerCommandePlanDeVol(commande);
-  }  
+  }
+  else if(chaineCommencePar(commande, "I")) {
+    executerCommandeCentraleInertielle(commande);
+  }
   else if(chaineCommencePar(commande, "S")) {
     executerCommandeServo(commande);
   }
@@ -224,11 +230,13 @@ void executerCommande(const char commande[]) {
   }
 }
 
-void executerCommandePin(const char commande[]) {
+void executerCommandeBroche(const char commande[]) {
   char chPin[LONGUEUR_NOMBRE];
   char chParam[LONGUEUR_NOMBRE];
   int pin;
   int param;
+
+  // Configuration d'une broche de l'Arduino
   if(chaineCommencePar(commande, "PC ")) {
     copierToken(commande, " ", 1, chPin);
     copierToken(commande, " ", 2, chParam);
@@ -241,6 +249,7 @@ void executerCommandePin(const char commande[]) {
     }
     pinMode(pin, param);
   }
+  // Écriture numérique sur une broche
   else if(chaineCommencePar(commande, "PD ")) {
     copierToken(commande, " ", 1, chPin);
     copierToken(commande, " ", 2, chParam);
@@ -248,6 +257,7 @@ void executerCommandePin(const char commande[]) {
     param = atoi(chParam);
     digitalWrite(pin, param);
   }
+  // Sortie audio sur une broche
   else if(chaineCommencePar(commande, "PT ")) {
     copierToken(commande, " ", 1, chPin);
     copierToken(commande, " ", 2, chParam);
@@ -255,6 +265,7 @@ void executerCommandePin(const char commande[]) {
     param = atoi(chParam);
     tone(pin, param);
   }
+  // Arrêter le signal audio
   else if(chaineCommencePar(commande, "PR ")) {
     copierToken(commande, " ", 1, chPin);
     pin = atoi(chPin);
@@ -265,18 +276,21 @@ void executerCommandePin(const char commande[]) {
   }
 }
 
-void executerCommandeRocket(const char commande[]) {
+void executerCommandeFusee(const char commande[]) {
   char chEtape[LONGUEUR_NOMBRE];
   char chDelai[LONGUEUR_NOMBRE];
   int etape;
   int delai;
 
-  
+  // Renvoyer le statut de la fusée
   if(chaineCommencePar(commande, "RS")) {
-    logRocketStatus();
+    logStatutFusee();
   }
+  // Passer à l'étage suivant de la fusée (uniquement indicatif)
   else if(chaineCommencePar(commande, "RE")) {    
-    // TODO
+    etage = etage + 1;
+    itoa(etape, strLog, 10);
+    logger.log(MODULE_SYSTEME, "STAGGING", strLog);
   }
   else {
     logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
@@ -286,52 +300,53 @@ void executerCommandeRocket(const char commande[]) {
 void executerCommandePlanDeVol(const char commande[]) {
   char chEtape[LONGUEUR_NOMBRE];
   char chDelai[LONGUEUR_NOMBRE];
-  int etape;
-  int delai;
+  int paramEtape;
+  int paramDelai;
 
-  
+  // Configurer l'étape de vol
   if(chaineCommencePar(commande, "FC ")) {
     copierToken(commande, " ", 1, chEtape);
     copierToken(commande, " ", 2, chDelai);
-    etape = atoi(chEtape);
-    delai = atoi(chDelai);
-    dureeEtape[etape] = delai;
-    copierToken(commande, " ", 3, commandeEtape[etape], true);
+    paramEtape = atoi(chEtape);
+    paramDelai = atoi(chDelai);
+    dureeEtape[paramEtape] = paramDelai;
+    copierToken(commande, " ", 3, commandeEtape[paramEtape], true);
   }
+  // Lister ligne par ligne tout le programme de vol
   else if(chaineCommencePar(commande, "FS")) {
     for (int i = 0; i < NB_ETAPES; i++ ) {
       sprintf(strLog, "%i | %i ms | %s", i, dureeEtape[i], commandeEtape[i]);
       logger.log(MODULE_SYSTEME, "FLIGHTPLAN_STEP", strLog);
     }
   }
+  // Lancer le programme de vol (instruction 0)
   else if(chaineCommencePar(commande, "F0 ")) {
     if(codeCorrect(commande)) {
+      etape = -1;
+      etage = 0;
+      dateEtapeSuivante = -1;
       etapeSuivante();
     }
   }
+  // Arrêt d'urgence et retour à l'initialisation
   else if(chaineCommencePar(commande, "FZ ")) {
     if(codeCorrect(commande)) {
-      fuseeStatut = -1;
+      etape = -1;
+      etage = 0;
+      dateEtapeSuivante = -1;
     }
   }
+  // Aller directement à une étape/instruction spécifique
   else if(chaineCommencePar(commande, "FG ")) {
-    if(fuseeStatut > CONFIGURATION) {
+    if(etape > CONFIGURATION) {
       copierToken(commande, " ", 1, chEtape);
-      fuseeStatut = atoi(chEtape);
+      etape = atoi(chEtape);
       dateEtapeSuivante = millis();
 
-      itoa(fuseeStatut, strLog, 10);
-      logger.log(MODULE_SYSTEME, "JUMPING_TO_STEP", strLog);
+      itoa(etape, strLog, 10);
+      logger.log(MODULE_SYSTEME, "GOTO_STEP", strLog);
 
-      if(dureeEtape[fuseeStatut] != -1) {
-        // La condition de passage à l'étape suivante est une durée
-        dateEtapeSuivante = dateEtapeSuivante + dureeEtape[fuseeStatut];
-      }
-      else {
-        // La condition de passage à l'étape suivante n'est pas une durée
-        dateEtapeSuivante = -1;
-      }
-      verifierEtExecuterCommande(commandeEtape[fuseeStatut]);
+      executerEtapeEtPreparerEtapeSuivante();
     }
   }
   else {
@@ -345,7 +360,7 @@ bool codeCorrect(const char commande[]) {
     codeCorrect = true;
   }
   else {
-    logger.log(MODULE_COMMANDE, "COMMAND_ERROR_CODE", "Code de derrouillage de la commande incorrect");
+    logger.log(MODULE_COMMANDE, "COMMAND_ERROR_CODE", "Code de déverrouillage de la commande incorrect");
   }
   return codeCorrect;
 }
@@ -355,12 +370,21 @@ void executerCommandeServo(const char commande[]) {
   char chParam[LONGUEUR_NOMBRE];
   int servo;
   int param;
-  if(chaineCommencePar(commande, "SP ")) {    
+
+  // Servo sur un angle de 0 à 180
+  if(chaineCommencePar(commande, "SA ")) {    
     copierToken(commande, " ", 1, chServo);
     copierToken(commande, " ", 2, chParam);
     servo = atoi(chServo);
     param = atoi(chParam);
     servos[servo].write(param);
+  }// Servo sur une position (avec calibration) de 0 à 100
+  if(chaineCommencePar(commande, "SP ")) {    
+    copierToken(commande, " ", 1, chServo);
+    copierToken(commande, " ", 2, chParam);
+    servo = atoi(chServo);
+    param = atoi(chParam);
+    // TODO
   }
   else {
     logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
@@ -368,32 +392,41 @@ void executerCommandeServo(const char commande[]) {
 }
 
 void executerCommandeLogger(const char commande[]) {
+  // Initialiser carte SD
   if(chaineCommencePar(commande, "LC")) {
     logger.initSdcard();
   }
+  // Forcer l'écriture sur la carte SD
   else if(chaineCommencePar(commande, "LF")) {
     logger.flush();
   }
+  // Statuts des loggers
   else if(chaineCommencePar(commande, "LS")) {
     logger.logStatut();
   }
+  // Désactiver les logs des données inertielles
   else if(chaineCommencePar(commande, "LI 0")) {
     centrale.loggingData = false;
   }
+  // Activer les logs des données inertielles
   else if(chaineCommencePar(commande, "LI 1")) {
     centrale.loggingData = true;
   }
+  // Désactiver les logs des flushes SD
   else if(chaineCommencePar(commande, "LW 0")) {
     logger.loggingFlush = false;
   }
+  // Activer les logs des flushes SD
   else if(chaineCommencePar(commande, "LW 1")) {
     logger.loggingFlush = true;
   }
+  // Désactiver les logs d'états de la fusée
   else if(chaineCommencePar(commande, "LR 0")) {
-    loggingRocketStatus = false;
+    loggingStatutFusee = false;
   }
+  // Activer les logs d'états de la fusée
   else if(chaineCommencePar(commande, "LR 1")) {
-    loggingRocketStatus = true;
+    loggingStatutFusee = true;
   }
   else {
     logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
@@ -404,19 +437,52 @@ void executerCommandeWifi(const char commande[]) {
   char ssid[LONGUEUR_MAX_CHAINE_CARACTERES];
   char pwd[LONGUEUR_MAX_CHAINE_CARACTERES];
   char nombre[LONGUEUR_NOMBRE];
+
+  // Se connecter à un réseau WiFi
   if(chaineCommencePar(commande, "WC ")) {
     copierToken(commande, " ", 1, ssid);
     copierToken(commande, " ", 2, pwd);
     wifi.connecterAvecFallback(ssid, pwd);
   }
+  // Statut du WiFi
   else if(chaineCommencePar(commande, "WS")) {
     wifi.logStatut();
   }
+  // Enregistrer un nouveau PC connecté à la fusée
   else if(chaineCommencePar(commande, "WB ")) {
     // On a déjà récupéré l'IP et le port de l'émetteur dans le module Wifi
     // On se contente d'envoyer le numéro de client
     copierToken(commande, " ", 1, nombre); // n° client UDP
-    wifi.confUdpClient(atoi(nombre));
+    wifi.confClientUdp(atoi(nombre));
+  }
+  else {
+    logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
+  }
+}
+
+void executerCommandeCentraleInertielle(const char commande[]) {
+  char ax[LONGUEUR_NOMBRE];
+  char ay[LONGUEUR_NOMBRE];
+  char az[LONGUEUR_NOMBRE];
+  char valpha[LONGUEUR_NOMBRE];
+  char vbeta[LONGUEUR_NOMBRE];
+  char vgamma[LONGUEUR_NOMBRE];
+  
+  // Renvoie toutes les données inertielles contenues dans le buffer de calibration
+  if(chaineCommencePar(commande, "IB")) {
+    centrale.logBuffer();
+  }
+  // Intégre des offsets dans les données brutes des capteurs de façon à avoir exactement les valeurs passées en calibration
+  else if(chaineCommencePar(commande, "IC ")) {
+    // TODO
+  }
+  // Paramètre l'accélération minimale
+  else if(chaineCommencePar(commande, "IA ")) {
+    // TODO
+  }
+  // Paramètre la vitesse angulaire minimale
+  else if(chaineCommencePar(commande, "IV ")) {
+    // TODO
   }
   else {
     logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
@@ -426,6 +492,8 @@ void executerCommandeWifi(const char commande[]) {
 void executerCommandeAutre(const char commande[]) {  
   char chNombre[LONGUEUR_NOMBRE];
   int nombre;
+
+  // Délai
   if (chaineCommencePar(commande, "0D ")) {
     copierToken(commande, " ", 1, chNombre);
     nombre = atoi(chNombre);
