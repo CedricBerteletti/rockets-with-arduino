@@ -137,7 +137,7 @@ void Wifi::lireUdp(char message[]) {
   }
 }
 
-void Wifi::confUdpClient(int n) {
+void Wifi::confClientUdp(int n) {
   remoteIps[n] = currentRemoteIp;
   remotePorts[n] = currentRemotePort;
 }
@@ -147,8 +147,6 @@ void Wifi::ecrireUdp(const char message[]) {
     for (unsigned int i = 0; i < NOMBRE_MAX_CLIENTS; i++)
     {
       if (remotePorts[i] != 0) {
-        Serial.println(remoteIps[i]);
-        Serial.println(remotePorts[i]);
         udp.beginPacket(remoteIps[i], remotePorts[i]);
         udp.write(message);
         udp.endPacket();
@@ -191,7 +189,7 @@ void Wifi::adresseIp(char addresse[], IPAddress ip) {
 }
 
 void Wifi::log(const char module[], const char message[], const char details[], bool toWifi) {
-  formatLog(strLog, module, message, details);
+  formaterLog(strLog, module, message, details);
   Serial.println(strLog);
   if(actif && toWifi) {
     ecrireUdp(strLog);
