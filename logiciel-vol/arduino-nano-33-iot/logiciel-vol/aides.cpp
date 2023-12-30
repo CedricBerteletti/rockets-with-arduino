@@ -112,3 +112,7 @@ void flash(int pin) {
   digitalWrite(pin, 0);
   delay(200);
 }
+
+void flash(int pin, int nombre) {
+  // TODO
+}

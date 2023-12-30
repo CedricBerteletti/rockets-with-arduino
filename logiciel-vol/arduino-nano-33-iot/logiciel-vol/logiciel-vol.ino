@@ -23,7 +23,7 @@ static const long DELAI_COMMANDE = 100; // (en ms) Tentative de lecture d'une no
 /* Variable globales */
 // Instanciation d'un loggeur
 Logger logger;
-bool loggingStatutFusee = false;
+bool loggingStatutFusee = true;
 
 // Instanciation d'un objet gérant la connexion et les communications wifi
 Wifi wifi;
@@ -45,7 +45,8 @@ char commande[LONGUEUR_MAX_COMMANDE];
 char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
 
 // Servomoteurs des ailerons et de la tuyère sur les broches 18 à 21
-Servo servos[4];
+static const int NB_SERVOS = 4;
+Servo servos[NB_SERVOS - 1];
 static const int SERVO0_PIN = 16;
 static const int SERVO1_PIN = 17;
 static const int SERVO2_PIN = 20;
@@ -310,6 +311,7 @@ void executerCommandePlanDeVol(const char commande[]) {
     paramEtape = atoi(chEtape);
     paramDelai = atoi(chDelai);
     dureeEtape[paramEtape] = paramDelai;
+    // TODO Vérifier paramEtape
     copierToken(commande, " ", 3, commandeEtape[paramEtape], true);
   }
   // Lister ligne par ligne tout le programme de vol
@@ -340,6 +342,7 @@ void executerCommandePlanDeVol(const char commande[]) {
   else if(chaineCommencePar(commande, "FG ")) {
     if(etape > CONFIGURATION) {
       copierToken(commande, " ", 1, chEtape);
+      // TODO Vérifier chEtape
       etape = atoi(chEtape);
       dateEtapeSuivante = millis();
 
@@ -377,6 +380,7 @@ void executerCommandeServo(const char commande[]) {
     copierToken(commande, " ", 2, chParam);
     servo = atoi(chServo);
     param = atoi(chParam);
+    // TODO Vérifier servo
     servos[servo].write(param);
   }// Servo sur une position (avec calibration) de 0 à 100
   if(chaineCommencePar(commande, "SP ")) {    
@@ -384,6 +388,7 @@ void executerCommandeServo(const char commande[]) {
     copierToken(commande, " ", 2, chParam);
     servo = atoi(chServo);
     param = atoi(chParam);
+    // TODO Vérifier servo
     // TODO
   }
   else {
@@ -453,6 +458,7 @@ void executerCommandeWifi(const char commande[]) {
     // On a déjà récupéré l'IP et le port de l'émetteur dans le module Wifi
     // On se contente d'envoyer le numéro de client
     copierToken(commande, " ", 1, nombre); // n° client UDP
+    // TODO Vérifier nombre
     wifi.confClientUdp(atoi(nombre));
   }
   else {
