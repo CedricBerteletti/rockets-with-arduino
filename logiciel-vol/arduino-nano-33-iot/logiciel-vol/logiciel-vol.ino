@@ -46,9 +46,9 @@ char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
 
 // Servomoteurs des ailerons et de la tuyère sur les broches 18 à 21
 static const int NB_SERVOS = 4;
-Servo servos[NB_SERVOS - 1];
-static const int SERVO0_PIN = 16;
-static const int SERVO1_PIN = 17;
+Servo servos[NB_SERVOS];
+static const int SERVO0_PIN = 6;
+static const int SERVO1_PIN = 7;
 static const int SERVO2_PIN = 20;
 static const int SERVO3_PIN = 21;
 
@@ -375,7 +375,7 @@ void executerCommandeServo(const char commande[]) {
   int param;
 
   // Servo sur un angle de 0 à 180
-  if(chaineCommencePar(commande, "SA ")) {    
+  if(chaineCommencePar(commande, "SA ")) {
     copierToken(commande, " ", 1, chServo);
     copierToken(commande, " ", 2, chParam);
     servo = atoi(chServo);
@@ -383,7 +383,7 @@ void executerCommandeServo(const char commande[]) {
     // TODO Vérifier servo
     servos[servo].write(param);
   }// Servo sur une position (avec calibration) de 0 à 100
-  if(chaineCommencePar(commande, "SP ")) {    
+  else if(chaineCommencePar(commande, "SP ")) {
     copierToken(commande, " ", 1, chServo);
     copierToken(commande, " ", 2, chParam);
     servo = atoi(chServo);
