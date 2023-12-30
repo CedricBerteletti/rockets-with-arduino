@@ -40,5 +40,6 @@ void copierToken(const char chaine[], const char separateur[], int index, char *
 
 // Flash lumineux sur la broche pin
 void flash(int pin);
+void flash(int pin, int nombre);
 
 #endif

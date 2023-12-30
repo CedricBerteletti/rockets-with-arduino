@@ -69,13 +69,13 @@ void CentraleInertielle::setMinAngularVelocityFilter(float minV) {
 
 void CentraleInertielle::logBuffer() {
   logger.log(SOUS_MODULE_IMU_BUFFER, "BUFFER_BEGIN", "Début des données dans le cache de calibration");
-  delay(10);
+  delay(DELAI_ENVOI_UDP);
   for (unsigned int i = 0; i < TAILLE_BUFFER_DONNEES_INERTIELLES; i++)  
   {
     log(donneesInertielles[i], SOUS_MODULE_IMU_BUFFER, ENTETE_DATA);
-    delay(10);
+    delay(DELAI_ENVOI_UDP);
   }
-  delay(10);
+  delay(DELAI_ENVOI_UDP);
   logger.log(SOUS_MODULE_IMU_BUFFER, "BUFFER_END", "Fin des données dans le cache de calibration");
 }
 

@@ -15,6 +15,7 @@
 
 // Constantes générales
 inline constexpr int NOMBRE_MAX_CLIENTS = 5;
+inline constexpr int DELAI_ENVOI_UDP = 2;
 
 class Wifi
 {
