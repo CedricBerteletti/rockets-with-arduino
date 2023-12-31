@@ -66,6 +66,8 @@ class CentraleInertielle
     // Buffer de données inertielles sur une certaine période (notamment nécessaire pour la calibration)
     DonneesInertielles donneesInertielles[TAILLE_BUFFER_DONNEES_INERTIELLES];
     
+    DonneesInertielles donneesInertiellesPrecedentes;
+    
     // Paramètres de calibration
     float offsetAccX = 0.0f; // Unité : g
     float offsetAccY = 0.0f; // Unité : g
