@@ -47,8 +47,8 @@ char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
 // Servomoteurs des ailerons et de la tuyère sur les broches 18 à 21
 static const int NB_SERVOS = 4;
 Servo servos[NB_SERVOS];
-static const int SERVO0_PIN = 6;
-static const int SERVO1_PIN = 7;
+static const int SERVO0_PIN = 7;
+static const int SERVO1_PIN = 6;
 static const int SERVO2_PIN = 20;
 static const int SERVO3_PIN = 21;
 
