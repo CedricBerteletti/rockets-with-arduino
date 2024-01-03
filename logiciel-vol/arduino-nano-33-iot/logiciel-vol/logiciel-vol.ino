@@ -473,6 +473,10 @@ void executerCommandeCentraleInertielle(const char commande[]) {
   char valpha[LONGUEUR_NOMBRE];
   char vbeta[LONGUEUR_NOMBRE];
   char vgamma[LONGUEUR_NOMBRE];
+  char chMinV[LONGUEUR_NOMBRE];
+  char chMinAcc[LONGUEUR_NOMBRE];
+  float minV;
+  float minAcc;
   
   // Renvoie toutes les données inertielles contenues dans le buffer de calibration
   if(chaineCommencePar(commande, "IB")) {
@@ -480,15 +484,25 @@ void executerCommandeCentraleInertielle(const char commande[]) {
   }
   // Intégre des offsets dans les données brutes des capteurs de façon à avoir exactement les valeurs passées en calibration
   else if(chaineCommencePar(commande, "IC ")) {
-    // TODO
+    copierToken(commande, " ", 1, ax);
+    copierToken(commande, " ", 2, ay);
+    copierToken(commande, " ", 3, az);
+    copierToken(commande, " ", 4, valpha);
+    copierToken(commande, " ", 5, vbeta);
+    copierToken(commande, " ", 6, vgamma);
+    centrale.calibrate(atof(ax), atof(ay), atof(az), atof(valpha), atof(vbeta), atof(vgamma));
   }
   // Paramètre l'accélération minimale
   else if(chaineCommencePar(commande, "IA ")) {
-    // TODO
+    copierToken(commande, " ", 1, chMinAcc);
+    minAcc = atof(chMinAcc);
+    centrale.setMinAngularVelocityFilter(minAcc);
   }
   // Paramètre la vitesse angulaire minimale
   else if(chaineCommencePar(commande, "IV ")) {
-    // TODO
+    copierToken(commande, " ", 1, chMinV);
+    minV = atof(chMinV);
+    centrale.setMinAngularVelocityFilter(minV);
   }
   else {
     logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");

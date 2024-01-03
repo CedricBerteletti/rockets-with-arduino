@@ -48,6 +48,7 @@ class CentraleInertielle
     void setMinAccelerationFilter(float minAcc);
     void setMinAngularVelocityFilter(float minV);
     void logBuffer();
+    void calibrate(float ax, float ay, float az, float valpha, float vbeta, float vgamma);
   
   private:
     static const char MODULE_IMU[];
@@ -65,13 +66,15 @@ class CentraleInertielle
     // Buffer de données inertielles sur une certaine période (notamment nécessaire pour la calibration)
     DonneesInertielles donneesInertielles[TAILLE_BUFFER_DONNEES_INERTIELLES];
     
+    DonneesInertielles donneesInertiellesPrecedentes;
+    
     // Paramètres de calibration
     float offsetAccX = 0.0f; // Unité : g
     float offsetAccY = 0.0f; // Unité : g
     float offsetAccZ = 0.0f; // Unité : g
-    float offsetAlpha = 0.0f; // Unité : °/s
-    float offsetBeta = 0.0f; // Unité : °/s
-    float offsetGamma = 0.0f; // Unité : °/s
+    float offsetVAlpha = 0.0f; // Unité : °/s
+    float offsetVBeta = 0.0f; // Unité : °/s
+    float offsetVGamma = 0.0f; // Unité : °/s
     float minAccX = 0.0f; // Unité : g
     float minAccY = 0.0f; // Unité : g
     float minAccZ = 0.0f; // Unité : g
