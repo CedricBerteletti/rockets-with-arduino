@@ -8,11 +8,11 @@
 #include "Servomoteur.hpp"
 
 int positionEnAngle(int position, int offset, float slope) {
-  return position*slope + offset + 90;
+  return position*slope + offset;
 }
 
 int angleEnPosition(int angle, int offset, float slope) {
-  return (angle - offset - 90) / slope;
+  return (angle - offset) / slope;
 }
 
 
@@ -26,6 +26,7 @@ void Servomoteur::init(int i, int b, Logger *l) {
   broche = b;
   logger = l;
   servo.attach(broche);
+  logStatut();
 }
 
 void Servomoteur::setDecalage(int d) {
@@ -46,6 +47,6 @@ void Servomoteur::position(int p) {
 }
 
 void Servomoteur::logStatut() {
-  sprintf(strTmp, "Servo: %i | Angle: %i", id, servo.read());
+  sprintf(strTmp, "Servo: %i | Angle: %i | Décalage: %i | Pente: %f", id, servo.read(), decalage, pente);
   logger->log(MODULE_SERVO, "STATUT", strTmp);
 }

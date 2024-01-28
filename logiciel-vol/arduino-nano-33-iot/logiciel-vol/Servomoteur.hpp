@@ -12,6 +12,9 @@
 #include "Logger.hpp"
 #include <Servo.h>
 
+inline constexpr int SERVO_DECALAGE_PAR_DEFAUT = 90;
+inline constexpr float SERVO_PENTE_PAR_DEFAUT = 0.9f;
+
 class Servomoteur
 {
   public:
@@ -30,8 +33,8 @@ class Servomoteur
     Servo servo;
     int id;
     int broche;
-    int decalage = 0;
-    float pente = 1.0f;    
+    int decalage = SERVO_DECALAGE_PAR_DEFAUT;
+    float pente = SERVO_PENTE_PAR_DEFAUT;    
 };
 
 #endif

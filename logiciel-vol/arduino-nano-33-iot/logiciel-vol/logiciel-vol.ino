@@ -74,11 +74,6 @@ void setup() {
   initSerie();
   delay(1000);
 
-  // Initialisation des valeurs par défaut de calibration des servo-moteurs
-  for(int i=0; i<NB_SERVOS; i++) {
-    servos[i].init(i, servosBroches[i], &logger);
-  }
-
   logger.initCarteSd();
   
   wifi.listerReseaux();
@@ -95,6 +90,11 @@ void setup() {
   // Blocage des transitions automatiques
   for (int i = 0; i < NB_ETAPES; i++ ) {
     dureeEtape[i] = -1;
+  }
+
+  // Initialisation des valeurs par défaut de calibration des servo-moteurs
+  for(int i=0; i<NB_SERVOS; i++) {
+    servos[i].init(i, servosBroches[i], &logger);
   }
 
   delay(1000);
