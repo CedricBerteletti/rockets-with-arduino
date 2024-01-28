@@ -58,7 +58,11 @@ Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
 	- *pin.toneStop pin* : coupe le son sur la sortie *pin*.
 - Gestion des servo-moteurs
 	- *servo.setAngle servo angle* : positionne (mais sans correction/calibration) sur un *angle* précis (de 0 à 180°) le servo moteur n°*servo*.
-	- *servo.setPosition servo position* : positionne le servo moteur n°*servo* sur une position repérée de 0 à 100 (en tenant compte de la calibration du servo).
+	- *servo.setPosition servo position* : positionne le servo moteur n°*servo* sur une position repérée de -100 à 100 (en tenant compte de la calibration du servo).
+	- *servo.setOffset servo offset* : indique un décalage du 0 pour le servo moteur n°*servo*
+	- *servo.setSlope servo slope* : indique le coefficient entre angle et position pour le servo moteur n°*servo*
+	- *servo.status servo* : indique le status pour le servo moteur n°*servo* (paramètres de calibration et consigne actuelle)
+
 
 
 Remarques sur l'Arduino Nano 33 IoT :

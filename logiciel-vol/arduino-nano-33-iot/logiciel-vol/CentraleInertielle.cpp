@@ -86,19 +86,19 @@ void CentraleInertielle::lire() {
   }
 }
 
-void CentraleInertielle::setMinAccelerationFilter(float minAcc) {
+void CentraleInertielle::setFiltreMinAcceleration(float minAcc) {
   minAccX = minAcc;
   minAccY = minAcc;
   minAccZ = minAcc;
 }
 
-void CentraleInertielle::setMinAngularVelocityFilter(float minV) {
+void CentraleInertielle::setFiltreMinVitesseAngulaire(float minV) {
   minVAlpha = minV;
   minVBeta = minV;
   minVGamma = minV;
 }
 
-void CentraleInertielle::calibrate(float ax, float ay, float az, float valpha, float vbeta, float vgamma) {
+void CentraleInertielle::calibrer(float ax, float ay, float az, float valpha, float vbeta, float vgamma) {
   float axSum = 0;
   float aySum = 0;
   float azSum = 0;
@@ -106,7 +106,7 @@ void CentraleInertielle::calibrate(float ax, float ay, float az, float valpha, f
   float vbetaSum = 0;
   float vgammaSum = 0;
 
-  for(int i = 0; i < TAILLE_BUFFER_DONNEES_INERTIELLES; ++i) {
+  for(int i = 0; i < TAILLE_BUFFER_DONNEES_INERTIELLES; i++) {
     axSum += donneesInertielles[i].accX;
     aySum += donneesInertielles[i].accY;
     azSum += donneesInertielles[i].accZ;
@@ -123,7 +123,7 @@ void CentraleInertielle::calibrate(float ax, float ay, float az, float valpha, f
   
 }
 
-void CentraleInertielle::logBuffer() {
+void CentraleInertielle::logDonneesCalibration() {
   logger.log(SOUS_MODULE_IMU_BUFFER, "BUFFER_BEGIN", "Début des données dans le cache de calibration");
   delay(DELAI_ENVOI_UDP);
   for (unsigned int i = 0; i < TAILLE_BUFFER_DONNEES_INERTIELLES; i++)  

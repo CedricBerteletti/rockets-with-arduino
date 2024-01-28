@@ -45,10 +45,10 @@ class CentraleInertielle
     DonneesInertielles donneesInertiellesCourantes;
     void init();
     void lire();
-    void setMinAccelerationFilter(float minAcc);
-    void setMinAngularVelocityFilter(float minV);
-    void logBuffer();
-    void calibrate(float ax, float ay, float az, float valpha, float vbeta, float vgamma);
+    void setFiltreMinAcceleration(float minAcc);
+    void setFiltreMinVitesseAngulaire(float minV);
+    void logDonneesCalibration();
+    void calibrer(float ax, float ay, float az, float valpha, float vbeta, float vgamma);
   
   private:
     static const char MODULE_IMU[];

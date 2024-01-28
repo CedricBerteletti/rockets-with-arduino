@@ -8,11 +8,7 @@ from connexion import Connexion
 
 
 # Dictionnaire de compilation
-dict_compilation = {"wifi.connectNetwork": "WC",
-                    "wifi.broadcastUdpClient": "WB",
-                    "wifi.status": "WS",
-
-                    "system.delay": "0D",
+dict_compilation = {"system.delay": "0D",
 
                     "logger.status": "LS",
                     "logger.initSdcard": "LC",
@@ -47,6 +43,13 @@ dict_compilation = {"wifi.connectNetwork": "WC",
                     
                     "servo.setAngle": "SA",
                     "servo.setPosition": "SP",
+                    "servo.setOffset": "SO",
+                    "servo.setSlope": "SS",
+                    "servo.status": "SR",
+                    
+                    "wifi.connectNetwork": "WC",
+                    "wifi.broadcastUdpClient": "WB",
+                    "wifi.status": "WS",
                     }
 
 

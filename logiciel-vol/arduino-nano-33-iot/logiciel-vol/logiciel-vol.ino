@@ -10,7 +10,7 @@
 #include "Logger.hpp"
 #include "Wifi.hpp"
 #include "CentraleInertielle.hpp"
-#include <Servo.h>
+#include "Servomoteur.hpp"
 
 // Nombre d'étapes/instructions du programme de vol
 static const int NB_ETAPES = 100;
@@ -19,6 +19,11 @@ static const char MODULE_SYSTEME[] = "SYSTEM";
 static const char MODULE_COMMANDE[] = "COMMAND";
 static const long DELAI_FLUSH = 1000; // (en ms) Flush des logs sur la carte SD toutes les secondes
 static const long DELAI_COMMANDE = 100; // (en ms) Tentative de lecture d'une nouvelle commande toutes les 100 ms
+
+static const int SERVO0_PIN = 7;
+static const int SERVO1_PIN = 6;
+static const int SERVO2_PIN = 20;
+static const int SERVO3_PIN = 21;
 
 /* Variable globales */
 // Instanciation d'un loggeur
@@ -46,11 +51,9 @@ char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
 
 // Servomoteurs des ailerons et de la tuyère sur les broches 18 à 21
 static const int NB_SERVOS = 4;
-Servo servos[NB_SERVOS];
-static const int SERVO0_PIN = 7;
-static const int SERVO1_PIN = 6;
-static const int SERVO2_PIN = 20;
-static const int SERVO3_PIN = 21;
+Servomoteur servos[NB_SERVOS];
+int servosBroches[NB_SERVOS] = {SERVO0_PIN, SERVO1_PIN, SERVO2_PIN, SERVO3_PIN};
+
 
 /* Etats de la fusée */
 static const int CONFIGURATION = -1;
@@ -68,19 +71,24 @@ long dateCourante = 0;
 /* Initialisation générale de la fusée */
 void setup() {
   logger.log(MODULE_SYSTEME, "SYSTEM_INIT", "Initialisation générale");
-  initSerial();
+  initSerie();
   delay(1000);
 
-  logger.initSdcard();
+  // Initialisation des valeurs par défaut de calibration des servo-moteurs
+  for(int i=0; i<NB_SERVOS; i++) {
+    servos[i].init(i, servosBroches[i], &logger);
+  }
+
+  logger.initCarteSd();
   
   wifi.listerReseaux();
   wifi.connecter();
   wifi.logStatut();
 
   logger.wifi = &wifi;
-  logger.toUdp = true;
+  logger.logUdpActif = true;
 
-  // Pour éviter de polLuer les logs, on désactive les logs des données inertielles avant le lanCement
+  // Pour éviter de polLuer les logs, on désactive les logs des données inertielles avant le lancement
   centrale.loggingData = false;
   centrale.init();
 
@@ -88,12 +96,6 @@ void setup() {
   for (int i = 0; i < NB_ETAPES; i++ ) {
     dureeEtape[i] = -1;
   }
-
-  // 4 servomoteurs sur les broches 18 à 21
-  servos[0].attach(SERVO0_PIN);
-  servos[1].attach(SERVO1_PIN);
-  servos[2].attach(SERVO2_PIN);
-  servos[3].attach(SERVO3_PIN);
 
   delay(1000);
   dateCourante = millis();
@@ -109,7 +111,7 @@ void loop() {
 
   // Actions à fréquence réduite (pas effectuées à chaque itération de loop())
   if(dateCourante > dateFlushSuivant) {
-    logger.flush();
+    logger.forcerEcritureSurCarteSd();
     dateFlushSuivant = dateFlushSuivant + DELAI_FLUSH;
     if(loggingStatutFusee) {
       logStatutFusee();
@@ -127,7 +129,7 @@ void loop() {
 }
 
 /* Initialisation de la liaison série (pour débogage sur un PC) */
-void initSerial() {
+void initSerie() {
   Serial.begin(115200);
   logger.log(MODULE_SYSTEME, "SERIAL_INIT", "Liaison série initialisée");
 }
@@ -373,6 +375,7 @@ void executerCommandeServo(const char commande[]) {
   char chParam[LONGUEUR_NOMBRE];
   int servo;
   int param;
+  float f;
 
   // Servo sur un angle de 0 à 180
   if(chaineCommencePar(commande, "SA ")) {
@@ -381,15 +384,41 @@ void executerCommandeServo(const char commande[]) {
     servo = atoi(chServo);
     param = atoi(chParam);
     // TODO Vérifier servo
-    servos[servo].write(param);
-  }// Servo sur une position (avec calibration) de 0 à 100
+    servos[servo].angle(param);
+  }
+  // Servo sur une position (avec calibration) de -100 à 100
   else if(chaineCommencePar(commande, "SP ")) {
     copierToken(commande, " ", 1, chServo);
     copierToken(commande, " ", 2, chParam);
     servo = atoi(chServo);
     param = atoi(chParam);
     // TODO Vérifier servo
-    // TODO
+    servos[servo].position(param);
+  }
+  // Déalage d'offset pour un servo
+  else if(chaineCommencePar(commande, "SO ")) {
+    copierToken(commande, " ", 1, chServo);
+    copierToken(commande, " ", 2, chParam);
+    servo = atoi(chServo);
+    param = atoi(chParam);
+    // TODO Vérifier servo
+    servos[servo].setDecalage(param);
+  }
+  // Coefficient entre angle et position
+  else if(chaineCommencePar(commande, "SS ")) {
+    copierToken(commande, " ", 1, chServo);
+    copierToken(commande, " ", 2, chParam);
+    servo = atoi(chServo);
+    f = atof(chParam);
+    // TODO Vérifier servo
+    servos[servo].setPente(f);
+  }
+  // Paramètres et consigne actuelle du servo
+  else if(chaineCommencePar(commande, "SR ")) {
+    copierToken(commande, " ", 1, chServo);
+    servo = atoi(chServo);
+    // TODO Vérifier servo
+    servos[servo].logStatut();
   }
   else {
     logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
@@ -399,11 +428,11 @@ void executerCommandeServo(const char commande[]) {
 void executerCommandeLogger(const char commande[]) {
   // Initialiser carte SD
   if(chaineCommencePar(commande, "LC")) {
-    logger.initSdcard();
+    logger.initCarteSd();
   }
   // Forcer l'écriture sur la carte SD
   else if(chaineCommencePar(commande, "LF")) {
-    logger.flush();
+    logger.forcerEcritureSurCarteSd();
   }
   // Statuts des loggers
   else if(chaineCommencePar(commande, "LS")) {
@@ -419,11 +448,11 @@ void executerCommandeLogger(const char commande[]) {
   }
   // Désactiver les logs des flushes SD
   else if(chaineCommencePar(commande, "LW 0")) {
-    logger.loggingFlush = false;
+    logger.logForcageEcritureSurCarteSd = false;
   }
   // Activer les logs des flushes SD
   else if(chaineCommencePar(commande, "LW 1")) {
-    logger.loggingFlush = true;
+    logger.logForcageEcritureSurCarteSd = true;
   }
   // Désactiver les logs d'états de la fusée
   else if(chaineCommencePar(commande, "LR 0")) {
@@ -480,7 +509,7 @@ void executerCommandeCentraleInertielle(const char commande[]) {
   
   // Renvoie toutes les données inertielles contenues dans le buffer de calibration
   if(chaineCommencePar(commande, "IB")) {
-    centrale.logBuffer();
+    centrale.logDonneesCalibration();
   }
   // Intégre des offsets dans les données brutes des capteurs de façon à avoir exactement les valeurs passées en calibration
   else if(chaineCommencePar(commande, "IC ")) {
@@ -490,19 +519,19 @@ void executerCommandeCentraleInertielle(const char commande[]) {
     copierToken(commande, " ", 4, valpha);
     copierToken(commande, " ", 5, vbeta);
     copierToken(commande, " ", 6, vgamma);
-    centrale.calibrate(atof(ax), atof(ay), atof(az), atof(valpha), atof(vbeta), atof(vgamma));
+    centrale.calibrer(atof(ax), atof(ay), atof(az), atof(valpha), atof(vbeta), atof(vgamma));
   }
   // Paramètre l'accélération minimale
   else if(chaineCommencePar(commande, "IA ")) {
     copierToken(commande, " ", 1, chMinAcc);
     minAcc = atof(chMinAcc);
-    centrale.setMinAngularVelocityFilter(minAcc);
+    centrale.setFiltreMinAcceleration(minAcc);
   }
   // Paramètre la vitesse angulaire minimale
   else if(chaineCommencePar(commande, "IV ")) {
     copierToken(commande, " ", 1, chMinV);
     minV = atof(chMinV);
-    centrale.setMinAngularVelocityFilter(minV);
+    centrale.setFiltreMinVitesseAngulaire(minV);
   }
   else {
     logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
