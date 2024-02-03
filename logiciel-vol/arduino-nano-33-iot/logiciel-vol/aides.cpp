@@ -114,5 +114,7 @@ void flash(int pin) {
 }
 
 void flash(int pin, int nombre) {
-  // TODO
+  for(int i=0; i < nombre; i++) {
+    flash(pin);
+  }
 }

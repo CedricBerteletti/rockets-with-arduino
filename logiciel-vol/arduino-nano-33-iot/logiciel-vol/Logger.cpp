@@ -14,8 +14,8 @@ const char Logger::NOM_FICHIER_LOGS[] = "rlogs.csv";
 
 Logger::Logger() {}
 
-void Logger::initSdcard() {
-  toSdcard = false;
+void Logger::initCarteSd() {
+  logCarteSdActif = false;
 
   if (!carteSd.init(SPI_HALF_SPEED, chipSelect)) {
     log(MODULE_LOGGER, "ERROR_SDCARD_INIT", "Erreur d'initialisation de la carte SD");
@@ -67,7 +67,7 @@ void Logger::initSdcard() {
     fichier = SD.open(NOM_FICHIER_LOGS, FILE_WRITE);
     if(fichier) {
       log(MODULE_LOGGER, "LOG_FILE_OPEN", "Fichier de logs ouvert");
-      toSdcard = true;
+      logCarteSdActif = true;
     }
     else {
       log(MODULE_LOGGER, "ERROR_LOG_FILE", "Impossible d'ouvrir le fichier de logs");
@@ -77,27 +77,27 @@ void Logger::initSdcard() {
 
 void Logger::logStatut()
 {
-  sprintf(strTmp, "Logger série %i | Logger SD %i | Logger wifi %i", toSerial, toSdcard, toUdp);
+  sprintf(strTmp, "Logger série %i | Logger SD %i | Logger wifi %i", logSerieActif, logCarteSdActif, logUdpActif);
   log(MODULE_LOGGER, "STATUS", strTmp);  
 }
 
 // Force l'écriture du cache sur la carte SD
-void Logger::flush() {
+void Logger::forcerEcritureSurCarteSd() {
   if(fichier) {
     fichier.flush();
-    if(loggingFlush) log(MODULE_LOGGER, "SDCARD_FLUSH", "Ecriture des données du cache sur la carte SD");
+    if(logForcageEcritureSurCarteSd) log(MODULE_LOGGER, "SDCARD_FLUSH", "Ecriture des données du cache sur la carte SD");
   }
 }
 
 // Fonctions d'écriture des logs
 void Logger::log(const char module[], const char message[], const char details[]) {
-  if (toSerial || toSdcard || toUdp) {
+  if (logSerieActif || logCarteSdActif || logUdpActif) {
     formaterLog(strLog, module, message, details);
   }
 
-  if(toSerial) Serial.println(strLog);
-  if(toUdp) wifi->ecrireUdp(strLog);
-  if(toSdcard) fichier.println(strLog);
+  if(logSerieActif) Serial.println(strLog);
+  if(logUdpActif) wifi->ecrireUdp(strLog);
+  if(logCarteSdActif) fichier.println(strLog);
 }
 
 void Logger::log(const char module[], const char message[], String details) {

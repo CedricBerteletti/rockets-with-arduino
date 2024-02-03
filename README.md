@@ -46,6 +46,12 @@ Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
 	- *imu.calibrate ax ay az valpha vbeta vgamma* : intégre des offsets dans les données brutes des capteurs de façon à avoir exactement les valeurs passées en calibration
 	- *imu.setMinAccelerationFilter mina" : paramètre l'accélération minimale à prendre en compte dans la centrale inertielle (les accélérations inférieures seront considérées comme nulles pour éviter la dérive)
 	- *imu.setMinAngularVelocityFilter minv" : paramètre la vitesse angulaire minimale à prendre en compte dans la centrale inertielle (les accélérations inférieures seront considérées comme nulles pour éviter la dérive)
+	- *imu.setRcsServoX n* : indique que le servo-moteur n servira pour le contrôle de l'axe X par la tuyère orientable
+	- *imu.setRcsServoX n* : indique que le servo-moteur n servira pour le contrôle de l'axe Y par la tuyère orientable
+	- *imu.setWcsServoX n* : indique que le servo-moteur n servira pour le contrôle de l'axe X par les ailerons
+	- *imu.setWcsServoY n* : indique que le servo-moteur n servira pour le contrôle de l'axe Y par les ailerons
+	- *imu.activateRcs* et *imu.deactivateRcs* : active et désactive la stabilisation par la tuyère orientable
+	- *imu.activateWcs* et *imu.deactivateWcs* : active et désactive la stabilisation par les ailerons
 - Lancement et actions générales :
 	- *rocket.launch code* ou *flightplan.start code* : Lance l'exécution du plan de vol avec le lancement de l'étape 0. Protégé par un code.
 	- *rocket.stage n* : Sans effet. Permet de générer un log indiquant que l'on est passé à l'étage n de la fusée.
@@ -58,7 +64,11 @@ Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
 	- *pin.toneStop pin* : coupe le son sur la sortie *pin*.
 - Gestion des servo-moteurs
 	- *servo.setAngle servo angle* : positionne (mais sans correction/calibration) sur un *angle* précis (de 0 à 180°) le servo moteur n°*servo*.
-	- *servo.setPosition servo position* : positionne le servo moteur n°*servo* sur une position repérée de 0 à 100 (en tenant compte de la calibration du servo).
+	- *servo.setPosition servo position* : positionne le servo moteur n°*servo* sur une position repérée de -100 à 100 (en tenant compte de la calibration du servo).
+	- *servo.setOffset servo offset* : indique un décalage du 0 pour le servo moteur n°*servo*
+	- *servo.setSlope servo slope* : indique le coefficient entre angle et position pour le servo moteur n°*servo*
+	- *servo.status servo* : indique le status pour le servo moteur n°*servo* (paramètres de calibration et consigne actuelle)
+
 
 
 Remarques sur l'Arduino Nano 33 IoT :
