@@ -12,6 +12,8 @@
 #include <Arduino_LSM6DS3.h>  // Bibliothèque pour la gestion de l'IMU (Inertial Measurement Unit)
 #include <avr/dtostrf.h>
 #include "Logger.hpp"
+#include "Servomoteur.hpp"
+
 
 struct DonneesInertielles {
   unsigned long t = 0; // Unité : ms
@@ -41,14 +43,22 @@ class CentraleInertielle
   public:
     CentraleInertielle(Logger &logger);
     bool loggingData = false;
-    int decimales = 2;    
-    DonneesInertielles donneesInertiellesCourantes;
+    bool rcsActif = false;  // Stabilisation par les ailerons
+    bool wcsActif = false;  // Stabilisation par la tuyère orientable
+    int decimales = 2;
+    DonneesInertielles donneesInertiellesFrenetCourantes;
+    DonneesInertielles donneesInertiellesTerrestreFrenetCourantes;
     void init();
     void lire();
-    void setMinAccelerationFilter(float minAcc);
-    void setMinAngularVelocityFilter(float minV);
-    void logBuffer();
-    void calibrate(float ax, float ay, float az, float valpha, float vbeta, float vgamma);
+    void stabiliser();
+    void setFiltreMinAcceleration(float minAcc);
+    void setFiltreMinVitesseAngulaire(float minV);
+    void logDonneesCalibration();
+    void calibrer(float ax, float ay, float az, float valpha, float vbeta, float vgamma);
+    void setRcsServoX(Servomoteur *servo);
+    void setRcsServoY(Servomoteur *servo);
+    void setWcsServoX(Servomoteur *servo);
+    void setWcsServoY(Servomoteur *servo);
   
   private:
     static const char MODULE_IMU[];
@@ -64,9 +74,11 @@ class CentraleInertielle
     int index = 0;
     
     // Buffer de données inertielles sur une certaine période (notamment nécessaire pour la calibration)
-    DonneesInertielles donneesInertielles[TAILLE_BUFFER_DONNEES_INERTIELLES];
+    DonneesInertielles donneesInertiellesFrenet[TAILLE_BUFFER_DONNEES_INERTIELLES];
+    DonneesInertielles donneesInertiellesTerrestre[TAILLE_BUFFER_DONNEES_INERTIELLES];
     
-    DonneesInertielles donneesInertiellesPrecedentes;
+    DonneesInertielles donneesInertiellesFrenetPrecedentes;
+    DonneesInertielles donneesInertiellesTerrestrePrecedentes;
     
     // Paramètres de calibration
     float offsetAccX = 0.0f; // Unité : g
@@ -81,9 +93,19 @@ class CentraleInertielle
     float minVAlpha = 0.0f; // Unité : °/s
     float minVBeta = 0.0f; // Unité : °/s
     float minVGamma = 0.0f; // Unité : °/s
+
+    // Servo-moteurs des systèmes de contrôle
+    Servomoteur *rcsServoX;
+    Servomoteur *rcsServoY;
+    Servomoteur *wcsServoX;
+    Servomoteur *wcsServoY;
     
     Logger &logger;
     void log(DonneesInertielles &data, const char module[], const char message[]);
+
+    void integration();
+    void stabiliserParAilerons();
+    void stabiliserParTuyere();
 };
 
 #endif
