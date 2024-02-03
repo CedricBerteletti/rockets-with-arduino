@@ -31,9 +31,19 @@ dict_compilation = {"system.delay": "0D",
                     "flightplan.goStep": "FG",
 
                     "imu.getBuffer": "IB",
-                    "imu.calibrate": "IC",                    
-                    "imu.setMinAccelerationFilter": "IA",
-                    "imu.setMinAngularVelocityFilter": "IV",
+                    "imu.calibrate": "IC",
+                    "imu.setMinAccelerationFilter": "IACC",
+                    "imu.setMinAngularVelocityFilter": "IANG",
+
+                    "imu.activateRcs": "IR 1",
+                    "imu.deactivateRcs": "IR 0",
+                    "imu.setRcsServoX": "IU",
+                    "imu.setRcsServoY": "IV",
+                    
+                    "imu.activateWcs": "IW 1",
+                    "imu.deactivateWcs": "IW 0",
+                    "imu.setWcsServoX": "IX",
+                    "imu.setWcsServoY": "IY",                    
                     
                     "pin.setMode": "PC",
                     "pin.digitalWrite": "PD",

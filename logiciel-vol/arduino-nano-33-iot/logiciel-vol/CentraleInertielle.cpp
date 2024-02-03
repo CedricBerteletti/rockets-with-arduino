@@ -35,44 +35,47 @@ void CentraleInertielle::init()
 
 void CentraleInertielle::lire() {
   if (IMU.accelerationAvailable() && IMU.gyroscopeAvailable()) {
-    donneesInertiellesCourantes.t = millis();
-    donneesInertiellesPrecedentes = donneesInertiellesCourantes;
-    IMU.readAcceleration(donneesInertiellesCourantes.accX, donneesInertiellesCourantes.accY, donneesInertiellesCourantes.accZ);
-    IMU.readGyroscope(donneesInertiellesCourantes.vAlpha, donneesInertiellesCourantes.vBeta, donneesInertiellesCourantes.vGamma);
+    donneesInertiellesFrenetCourantes.t = millis();
+    donneesInertiellesFrenetPrecedentes = donneesInertiellesFrenetCourantes;
+    IMU.readAcceleration(donneesInertiellesFrenetCourantes.accX, donneesInertiellesFrenetCourantes.accY, donneesInertiellesFrenetCourantes.accZ);
+    IMU.readGyroscope(donneesInertiellesFrenetCourantes.vAlpha, donneesInertiellesFrenetCourantes.vBeta, donneesInertiellesFrenetCourantes.vGamma);
 
     //On calibre et on filtre les valeurs
-    donneesInertiellesCourantes.accX += offsetAccX;
-    donneesInertiellesCourantes.accY += offsetAccY;
-    donneesInertiellesCourantes.accZ += offsetAccZ;
-    donneesInertiellesCourantes.vAlpha += offsetVAlpha;
-    donneesInertiellesCourantes.vBeta += offsetVBeta;
-    donneesInertiellesCourantes.vGamma += offsetVGamma;
+    donneesInertiellesFrenetCourantes.accX += offsetAccX;
+    donneesInertiellesFrenetCourantes.accY += offsetAccY;
+    donneesInertiellesFrenetCourantes.accZ += offsetAccZ;
+    donneesInertiellesFrenetCourantes.vAlpha += offsetVAlpha;
+    donneesInertiellesFrenetCourantes.vBeta += offsetVBeta;
+    donneesInertiellesFrenetCourantes.vGamma += offsetVGamma;
 
-    if (abs(donneesInertiellesCourantes.accX-donneesInertiellesPrecedentes.accX) <= minAccX) {
-      donneesInertiellesCourantes.accX = donneesInertiellesPrecedentes.accX;
+    if (abs(donneesInertiellesFrenetCourantes.accX-donneesInertiellesFrenetPrecedentes.accX) <= minAccX) {
+      donneesInertiellesFrenetCourantes.accX = donneesInertiellesFrenetPrecedentes.accX;
     }
 
-    if (abs(donneesInertiellesCourantes.accY-donneesInertiellesPrecedentes.accY) <= minAccY) {
-      donneesInertiellesCourantes.accY = donneesInertiellesPrecedentes.accY;
+    if (abs(donneesInertiellesFrenetCourantes.accY-donneesInertiellesFrenetPrecedentes.accY) <= minAccY) {
+      donneesInertiellesFrenetCourantes.accY = donneesInertiellesFrenetPrecedentes.accY;
     }
 
-    if (abs(donneesInertiellesCourantes.accZ-donneesInertiellesPrecedentes.accZ) <= minAccZ) {
-      donneesInertiellesCourantes.accZ = donneesInertiellesPrecedentes.accZ;
+    if (abs(donneesInertiellesFrenetCourantes.accZ-donneesInertiellesFrenetPrecedentes.accZ) <= minAccZ) {
+      donneesInertiellesFrenetCourantes.accZ = donneesInertiellesFrenetPrecedentes.accZ;
     }
 
-    if (abs(donneesInertiellesCourantes.vAlpha-donneesInertiellesPrecedentes.vAlpha) <= minVAlpha) {
-      donneesInertiellesCourantes.vAlpha = donneesInertiellesPrecedentes.vAlpha;
+    if (abs(donneesInertiellesFrenetCourantes.vAlpha-donneesInertiellesFrenetPrecedentes.vAlpha) <= minVAlpha) {
+      donneesInertiellesFrenetCourantes.vAlpha = donneesInertiellesFrenetPrecedentes.vAlpha;
     }
 
-    if (abs(donneesInertiellesCourantes.vBeta-donneesInertiellesPrecedentes.vBeta) <= minVBeta) {
-      donneesInertiellesCourantes.vBeta = donneesInertiellesPrecedentes.vBeta;
+    if (abs(donneesInertiellesFrenetCourantes.vBeta-donneesInertiellesFrenetPrecedentes.vBeta) <= minVBeta) {
+      donneesInertiellesFrenetCourantes.vBeta = donneesInertiellesFrenetPrecedentes.vBeta;
     }
 
-    if (abs(donneesInertiellesCourantes.vGamma-donneesInertiellesPrecedentes.vGamma) <= minVGamma) {
-      donneesInertiellesCourantes.vGamma = donneesInertiellesPrecedentes.vGamma;
+    if (abs(donneesInertiellesFrenetCourantes.vGamma-donneesInertiellesFrenetPrecedentes.vGamma) <= minVGamma) {
+      donneesInertiellesFrenetCourantes.vGamma = donneesInertiellesFrenetPrecedentes.vGamma;
     }
     // On sauvegarde les valeurs courantes dans le buffer des données inertielles
-    donneesInertielles[index] = donneesInertiellesCourantes;
+    donneesInertiellesFrenet[index] = donneesInertiellesFrenetCourantes;
+
+    // Intégration et changement de référentiel
+    integration();
 
     // La prochaine fois, on stockera la valeur lue dans la "case" suivante du buffer
     index++;
@@ -81,7 +84,7 @@ void CentraleInertielle::lire() {
     }
     
     if (loggingData) {
-      log(donneesInertiellesCourantes, SOUS_MODULE_IMU_DATA, ENTETE_DATA);
+      log(donneesInertiellesFrenetCourantes, SOUS_MODULE_IMU_DATA, ENTETE_DATA);
     }
   }
 }
@@ -98,6 +101,22 @@ void CentraleInertielle::setFiltreMinVitesseAngulaire(float minV) {
   minVGamma = minV;
 }
 
+void CentraleInertielle::setRcsServoX(Servomoteur *servo) {
+  rcsServoX = servo;
+}
+
+void CentraleInertielle::setRcsServoY(Servomoteur *servo) {
+  rcsServoY = servo;
+}
+
+void CentraleInertielle::setWcsServoX(Servomoteur *servo) {
+  wcsServoX = servo;
+}
+
+void CentraleInertielle::setWcsServoY(Servomoteur *servo) {
+  wcsServoY = servo;
+}
+
 void CentraleInertielle::calibrer(float ax, float ay, float az, float valpha, float vbeta, float vgamma) {
   float axSum = 0;
   float aySum = 0;
@@ -107,12 +126,12 @@ void CentraleInertielle::calibrer(float ax, float ay, float az, float valpha, fl
   float vgammaSum = 0;
 
   for(int i = 0; i < TAILLE_BUFFER_DONNEES_INERTIELLES; i++) {
-    axSum += donneesInertielles[i].accX;
-    aySum += donneesInertielles[i].accY;
-    azSum += donneesInertielles[i].accZ;
-    valphaSum += donneesInertielles[i].vAlpha;
-    vbetaSum += donneesInertielles[i].vBeta;
-    vgammaSum += donneesInertielles[i].vGamma;
+    axSum += donneesInertiellesFrenet[i].accX;
+    aySum += donneesInertiellesFrenet[i].accY;
+    azSum += donneesInertiellesFrenet[i].accZ;
+    valphaSum += donneesInertiellesFrenet[i].vAlpha;
+    vbetaSum += donneesInertiellesFrenet[i].vBeta;
+    vgammaSum += donneesInertiellesFrenet[i].vGamma;
   }
   offsetAccX = ax - axSum/TAILLE_BUFFER_DONNEES_INERTIELLES;
   offsetAccY = ay - aySum/TAILLE_BUFFER_DONNEES_INERTIELLES;
@@ -128,7 +147,7 @@ void CentraleInertielle::logDonneesCalibration() {
   delay(DELAI_ENVOI_UDP);
   for (unsigned int i = 0; i < TAILLE_BUFFER_DONNEES_INERTIELLES; i++)  
   {
-    log(donneesInertielles[i], SOUS_MODULE_IMU_BUFFER, ENTETE_DATA);
+    log(donneesInertiellesFrenet[i], SOUS_MODULE_IMU_BUFFER, ENTETE_DATA);
     delay(DELAI_ENVOI_UDP);
   }
   delay(DELAI_ENVOI_UDP);
@@ -165,4 +184,25 @@ void CentraleInertielle::log(DonneesInertielles &data, const char module[], cons
   strcat(strLog, strNumber);
 
   logger.log(module, message, strLog);
+}
+
+void CentraleInertielle::integration() {
+  // TODO
+}
+
+void CentraleInertielle::stabiliser() {
+  if(rcsActif) {
+    stabiliserParTuyere();
+  }
+  if(wcsActif) {
+    stabiliserParAilerons();
+  }
+}
+
+void CentraleInertielle::stabiliserParAilerons() {
+  // TODO
+}
+
+void CentraleInertielle::stabiliserParTuyere() {
+  // TODO
 }

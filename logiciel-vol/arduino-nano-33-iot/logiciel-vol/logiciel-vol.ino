@@ -18,7 +18,7 @@ static const int NB_ETAPES = 100;
 static const char MODULE_SYSTEME[] = "SYSTEM";
 static const char MODULE_COMMANDE[] = "COMMAND";
 static const long DELAI_FLUSH = 1000; // (en ms) Flush des logs sur la carte SD toutes les secondes
-static const long DELAI_COMMANDE = 100; // (en ms) Tentative de lecture d'une nouvelle commande toutes les 100 ms
+static const long DELAI_COMMANDE = 50; // (en ms) Tentative de lecture d'une nouvelle commande toutes les 100 ms
 
 static const int SERVO0_PIN = 7;
 static const int SERVO1_PIN = 6;
@@ -108,6 +108,7 @@ void setup() {
 void loop() {
   dateCourante = millis();
   centrale.lire();
+  centrale.stabiliser();
 
   // Actions à fréquence réduite (pas effectuées à chaque itération de loop())
   if(dateCourante > dateFlushSuivant) {
@@ -506,6 +507,8 @@ void executerCommandeCentraleInertielle(const char commande[]) {
   char chMinAcc[LONGUEUR_NOMBRE];
   float minV;
   float minAcc;
+  char chServo[LONGUEUR_NOMBRE];
+  int servo;
   
   // Renvoie toutes les données inertielles contenues dans le buffer de calibration
   if(chaineCommencePar(commande, "IB")) {
@@ -522,17 +525,64 @@ void executerCommandeCentraleInertielle(const char commande[]) {
     centrale.calibrer(atof(ax), atof(ay), atof(az), atof(valpha), atof(vbeta), atof(vgamma));
   }
   // Paramètre l'accélération minimale
-  else if(chaineCommencePar(commande, "IA ")) {
+  else if(chaineCommencePar(commande, "IACC ")) {
     copierToken(commande, " ", 1, chMinAcc);
     minAcc = atof(chMinAcc);
     centrale.setFiltreMinAcceleration(minAcc);
   }
   // Paramètre la vitesse angulaire minimale
-  else if(chaineCommencePar(commande, "IV ")) {
+  else if(chaineCommencePar(commande, "IANG ")) {
     copierToken(commande, " ", 1, chMinV);
     minV = atof(chMinV);
     centrale.setFiltreMinVitesseAngulaire(minV);
   }
+  
+  // Activition de la stabilisation par la tuyère orientable
+  else if(chaineCommencePar(commande, "IR 1")) {
+    centrale.rcsActif = true;
+  }
+  // Désactivition de la stabilisation par la tuyère orientable
+  else if(chaineCommencePar(commande, "IR 0")) {
+    centrale.rcsActif = false;
+  }
+  // Servo contrôlant l'axe X pour la stabilisation par la tuyère orientable
+  else if(chaineCommencePar(commande, "IU ")) {
+    copierToken(commande, " ", 1, chServo);
+    servo = atoi(chServo);
+    // TODO vérifier servo
+    centrale.setRcsServoX(&servos[servo]);
+  }
+  // Servo contrôlant l'axe X pour la stabilisation par la tuyère orientable
+  else if(chaineCommencePar(commande, "IV ")) {
+    copierToken(commande, " ", 1, chServo);
+    servo = atoi(chServo);
+    // TODO vérifier servo
+    centrale.setRcsServoY(&servos[servo]);
+  }
+  
+  // Activition de la stabilisation par les ailerons
+  else if(chaineCommencePar(commande, "IW 1")) {
+    centrale.wcsActif = true;
+  }
+  // Désactivition de la stabilisation par les ailerons
+  else if(chaineCommencePar(commande, "IW 0")) {
+    centrale.wcsActif = false;
+  }
+  // Servo contrôlant l'axe X pour la stabilisation par les ailerons
+  else if(chaineCommencePar(commande, "IX ")) {
+    copierToken(commande, " ", 1, chServo);
+    servo = atoi(chServo);
+    // TODO vérifier servo
+    centrale.setWcsServoX(&servos[servo]);
+  }
+  // Servo contrôlant l'axe X pour la stabilisation par les ailerons
+  else if(chaineCommencePar(commande, "IY ")) {
+    copierToken(commande, " ", 1, chServo);
+    servo = atoi(chServo);
+    // TODO vérifier servo
+    centrale.setWcsServoY(&servos[servo]);
+  }
+
   else {
     logger.log(MODULE_COMMANDE, "COMMAND_ERROR_UNKNOWN", "Commande non reconnue");
   }
