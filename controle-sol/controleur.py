@@ -8,11 +8,7 @@ from connexion import Connexion
 
 
 # Dictionnaire de compilation
-dict_compilation = {"wifi.connectNetwork": "WC",
-                    "wifi.broadcastUdpClient": "WB",
-                    "wifi.status": "WS",
-
-                    "system.delay": "0D",
+dict_compilation = {"system.delay": "0D",
 
                     "logger.status": "LS",
                     "logger.initSdcard": "LC",
@@ -35,9 +31,19 @@ dict_compilation = {"wifi.connectNetwork": "WC",
                     "flightplan.goStep": "FG",
 
                     "imu.getBuffer": "IB",
-                    "imu.calibrate": "IC",                    
-                    "imu.setMinAccelerationFilter": "IA",
-                    "imu.setMinAngularVelocityFilter": "IV",
+                    "imu.calibrate": "IC",
+                    "imu.setMinAccelerationFilter": "IACC",
+                    "imu.setMinAngularVelocityFilter": "IANG",
+
+                    "imu.activateRcs": "IR 1",
+                    "imu.deactivateRcs": "IR 0",
+                    "imu.setRcsServoX": "IU",
+                    "imu.setRcsServoY": "IV",
+                    
+                    "imu.activateWcs": "IW 1",
+                    "imu.deactivateWcs": "IW 0",
+                    "imu.setWcsServoX": "IX",
+                    "imu.setWcsServoY": "IY",                    
                     
                     "pin.setMode": "PC",
                     "pin.digitalWrite": "PD",
@@ -47,6 +53,13 @@ dict_compilation = {"wifi.connectNetwork": "WC",
                     
                     "servo.setAngle": "SA",
                     "servo.setPosition": "SP",
+                    "servo.setOffset": "SO",
+                    "servo.setSlope": "SS",
+                    "servo.status": "SR",
+                    
+                    "wifi.connectNetwork": "WC",
+                    "wifi.broadcastUdpClient": "WB",
+                    "wifi.status": "WS",
                     }
 
 

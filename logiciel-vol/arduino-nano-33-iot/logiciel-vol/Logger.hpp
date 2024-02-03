@@ -17,15 +17,15 @@ class Logger
 {
   public:
     Logger();
-    void initSdcard();
+    void initCarteSd();
     void logStatut();
     void log(const char module[], const char message[], String details);
     void log(const char module[], const char message[], const char details[]);
-    void flush();
-    bool toSerial = true;
-    bool toSdcard = false;
-    bool toUdp = false;
-    bool loggingFlush = true;
+    void forcerEcritureSurCarteSd();
+    bool logSerieActif = true;
+    bool logCarteSdActif = false;
+    bool logUdpActif = false;
+    bool logForcageEcritureSurCarteSd = true;
     Wifi *wifi;
   private:
     static const char MODULE_LOGGER[];
