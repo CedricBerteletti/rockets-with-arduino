@@ -7,7 +7,7 @@ Graphiques pour représenter les données de la centrale inertielle
 import logging
 import time
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox
 import pyqtgraph as pg
 
 

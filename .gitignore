@@ -2,4 +2,5 @@
 *.FCBak
 *.obj
 *.FCStd1
-logiciel-vol/arduino-nano-33-iot/secrets.h
+**/.venv/**
+logiciel-vol/arduino-nano-33-iot/logiciel-vol/secrets.h

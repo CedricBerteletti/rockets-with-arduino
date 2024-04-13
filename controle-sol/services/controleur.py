@@ -4,7 +4,7 @@
 Envoi des commandes à la fusée et réception
 """
 
-from connexion import Connexion
+from services.connexion import Connexion
 
 
 # Dictionnaire de compilation

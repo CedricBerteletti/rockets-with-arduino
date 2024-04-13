@@ -10,7 +10,7 @@ import math
 import threading
 from time import sleep, time
 
-from connexion import Connexion
+from services.connexion import Connexion
 
 
 def synchronized(lock):

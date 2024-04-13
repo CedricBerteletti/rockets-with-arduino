@@ -6,7 +6,7 @@ Calculs à partir des données inertielles (accéléromètres et gyroscopes)
 
 import logging
 
-import settings
+import services.settings as settings
 
 from dataclasses import dataclass
 

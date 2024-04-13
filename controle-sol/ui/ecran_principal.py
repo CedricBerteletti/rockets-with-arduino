@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 """
 @author: Cédric Berteletti
-Ecran principal
+Écran principal
 """
+
 
 import logging
 import time
 
-import graphiques
-import settings
-from visualisation_fusee import VisualisationFusee
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QTextCursor
+from PyQt6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QGridLayout, QGroupBox, QLineEdit, QTextEdit, QPushButton, QSplitter, QCheckBox
 
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QGridLayout, QGroupBox, QLineEdit, QTextEdit, QPushButton, QSplitter, QCheckBox
-
+import ui.graphiques as graphiques
+from ui.ui_utils import set_default_layout_params
+from ui.visualisation_fusee import VisualisationFusee
+import services.settings as settings
 
 
 class EcranPrincipal(QFrame):
@@ -33,29 +34,33 @@ class EcranPrincipal(QFrame):
 
     def init_ui(self):
         # Préparation de l'écran
-        splitter_general = QSplitter(Qt.Horizontal)
+        splitter_general = QSplitter(Qt.Orientation.Horizontal)
         self.setLayout(QHBoxLayout())
+        set_default_layout_params(self.layout())
         self.layout().addWidget(splitter_general)
 
         # Panneau de gauche
         panneau_gauche = QFrame()
-        panneau_gauche.setFrameShape(QFrame.StyledPanel)
+        #panneau_gauche.setFrameShape(QFrame.Shape.StyledPanel)
         panneau_gauche.setLayout(QVBoxLayout())
+        set_default_layout_params(panneau_gauche.layout())
         splitter_general.addWidget(panneau_gauche)        
-        splitter_panneau_gauche = QSplitter(Qt.Vertical)
+        splitter_panneau_gauche = QSplitter(Qt.Orientation.Vertical)
         panneau_gauche.layout().addWidget(splitter_panneau_gauche)
 
         frame = QFrame()
         splitter_panneau_gauche.addWidget(frame)
-        frame.setFrameShape(QFrame.StyledPanel)
+        #frame.setFrameShape(QFrame.Shape.StyledPanel)
         frame.setLayout(QVBoxLayout())
+        set_default_layout_params(frame.layout())
         self.creer_groupe_visualisation()
         frame.layout().addWidget(self.grp_visu)
 
         frame = QFrame()
         splitter_panneau_gauche.addWidget(frame)
-        frame.setFrameShape(QFrame.StyledPanel)
+        #frame.setFrameShape(QFrame.Shape.StyledPanel)
         frame.setLayout(QVBoxLayout())
+        set_default_layout_params(frame.layout())
         self.creer_groupe_commandes()
         frame.layout().addWidget(self.grp_command)
         self.creer_groupe_logs()
@@ -63,8 +68,9 @@ class EcranPrincipal(QFrame):
       
         # Panneau de droite
         panneau_droit = QFrame()
-        panneau_droit.setFrameShape(QFrame.StyledPanel)
+        #panneau_droit.setFrameShape(QFrame.Shape.StyledPanel)
         panneau_droit.setLayout(QVBoxLayout())
+        set_default_layout_params(panneau_droit.layout())
         splitter_general.addWidget(panneau_droit)
 
         self.creer_groupe_graphiques()
@@ -82,6 +88,7 @@ class EcranPrincipal(QFrame):
     def creer_groupe_visualisation(self):
         self.grp_visu = QGroupBox("Visualisation")
         self.grp_visu.setLayout(QVBoxLayout())
+        set_default_layout_params(self.grp_visu.layout())
         self.visualisation = VisualisationFusee()
         self.grp_visu.layout().addWidget(self.visualisation)
 
@@ -89,6 +96,7 @@ class EcranPrincipal(QFrame):
     def creer_groupe_commandes(self):
         self.grp_command = QGroupBox("Commandes générales")
         self.grp_command.setLayout(QGridLayout())
+        set_default_layout_params(self.grp_command.layout())
 
         button = QPushButton("Connecter")
         self.grp_command.layout().addWidget(button, 0, 0)
@@ -110,6 +118,7 @@ class EcranPrincipal(QFrame):
     def creer_groupe_logs(self):
         self.grp_logs = QGroupBox("Logs généraux")
         self.grp_logs.setLayout(QVBoxLayout())
+        set_default_layout_params(self.grp_logs.layout())
 
         self.tb_logs = QTextEdit ()
         self.tb_logs.setReadOnly(True)        
@@ -123,6 +132,7 @@ class EcranPrincipal(QFrame):
     def creer_groupe_graphiques(self):
         self.grp_graphs = QGroupBox("Graphiques IMU")
         self.grp_graphs.setLayout(QVBoxLayout())
+        set_default_layout_params(self.grp_graphs.layout())
 
         if settings.get_bool("graphs.debug"):
             self.graphiques = graphiques.BaseGraphiquesIntegres(self.grp_graphs)
@@ -134,8 +144,10 @@ class EcranPrincipal(QFrame):
     def creer_groupe_imu(self):
         self.grp_imu = QGroupBox("IMU")
         self.grp_imu.setLayout(QVBoxLayout())
+        set_default_layout_params(self.grp_imu.layout())
        
         layout_command = QGridLayout()
+        set_default_layout_params(layout_command)
         self.grp_imu.layout().addLayout(layout_command)
 
         button = QPushButton("Vider logs")
@@ -178,7 +190,7 @@ class EcranPrincipal(QFrame):
             self.tb_logs.insertPlainText(s + "\n")
             s = self.telemetrie.logSuivant()
         if nouveauLog:
-            self.tb_logs.moveCursor(QTextCursor.End)
+            self.tb_logs.moveCursor(QTextCursor.MoveOperation.End)
 
         # Logs de la centrale inertielle
         s = self.telemetrie.logImuSuivant()
@@ -190,7 +202,7 @@ class EcranPrincipal(QFrame):
             self.tb_imu_logs.insertPlainText(s + "\n")
             s = self.telemetrie.logImuSuivant()
         if nouveauLog and self.cb_imu_logs_defil.isChecked():
-            self.tb_imu_logs.moveCursor(QTextCursor.End)
+            self.tb_imu_logs.moveCursor(QTextCursor.MoveOperation.End)
 
         # MAJ graphique sur un échantillon des données
         if nouveauLog:
@@ -238,4 +250,4 @@ class EcranPrincipal(QFrame):
             commande_envoyee = self.controleur.envoyer_commande_brute(commande)
         self.tb_logs.insertPlainText(f"Commande envoyée : {commande_envoyee}\n")
 
-        self.tb_logs.moveCursor(QTextCursor.End)
+        self.tb_logs.moveCursor(QTextCursor.MoveOperation.End)

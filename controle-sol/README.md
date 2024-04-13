@@ -3,6 +3,27 @@
 ## Description
 
 
+## Launching
+
+Au besoin, créer le Python virtual environment and installer les différents packages.
+```
+python.exe -m pip install --upgrade pip
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install PyQt6
+pip install pyqtgraph
+```
+
+Activer le Python virtual environment
+```
+.\.venv\Scripts\activate
+```
+
+Lancement
+```
+python main.py
+```
+
 
 ## TODO
 
