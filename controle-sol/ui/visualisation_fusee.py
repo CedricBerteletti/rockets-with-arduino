@@ -5,7 +5,7 @@ Widget QT pour la visualisation 3D de la fusée
 """
 
 
-from PyQt5.QtWidgets import QWidget
+from PyQt6.QtWidgets import QWidget
 
 
 class VisualisationFusee(QWidget):
@@ -13,11 +13,11 @@ class VisualisationFusee(QWidget):
 
 
 
-# from PyQt5.QtWidgets import QWidget
+# from PyQt6.QtWidgets import QWidget
 # from OpenGL.GL import *
 # from OpenGL.GLU import *
-# from PyQt5 import QtGui
-# from PyQt5.QtOpenGL import *
+# from PyQt6 import QtGui
+# from PyQt6.QtOpenGL import *
 
 
 # class VisualisationFusee(QWidget):
