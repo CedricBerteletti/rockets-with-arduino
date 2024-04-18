@@ -8,6 +8,8 @@ import functools
 import logging
 import math
 import threading
+import services.settings as settings
+
 from time import sleep, time
 
 from services.connexion import Connexion
@@ -40,6 +42,7 @@ class Telemetrie(threading.Thread):
         self.connexion = connexion
         self.actif = False
         self.debug = False
+        self.delay = settings.get_int("telemetry.refresh_delay_ms") / 1000
 
     def stop(self):
         self.actif = False
@@ -77,6 +80,7 @@ class Telemetrie(threading.Thread):
                     else:
                         self.logs.append(str)
                         self.tempLogs.append(str)
+                sleep(self.delay)
         else:
             start = time()
             while self.actif:
@@ -86,7 +90,7 @@ class Telemetrie(threading.Thread):
                 str = f"00000, IMU_DATA, \"t, accX, accY, accZ, vAlpha, vBeta, vGamma\", \"{t_ms}, {value}, {value}, {value}, {100*value}, {100*value}, {100*value}\""
                 self.logsImu.append(str)
                 self.tempLogsImu.append(str)
-                sleep(0.1)
+                sleep(self.delay)
 
         logging.info("Fin du thread d'aquisition des données")
 
