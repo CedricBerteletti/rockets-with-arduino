@@ -19,6 +19,16 @@ Trou pour insert M3 : 4,0 mm
 Trou pour insert M3 : 4,0 mm
 
 
+## Dimensionnement des parachutes
+
+- 125 cm : 600 - 1400 g
+- 90 cm : 400 - 600 g
+- 70cm : 300 - 400 g
+- 55 cm : 200 - 300 g
+- 45 cm : 100 - 200 g
+- 35 cm : 50 - 100 g
+
+
 
 
 
