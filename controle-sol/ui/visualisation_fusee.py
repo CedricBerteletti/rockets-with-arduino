@@ -5,47 +5,30 @@ Widget QT pour la visualisation 3D de la fusée
 """
 
 
-from PyQt6.QtWidgets import QWidget
+import numpy as np
+from pyqtgraph.opengl import GLViewWidget, MeshData, GLMeshItem
+from stl import Mesh
 
 
-class VisualisationFusee(QWidget):
+
+class VisualisationFusee(GLViewWidget):
     "Représentation en 3D de l'orientation et de l'état de la fusée"
+    "Documentation : https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html"
 
 
+    def __init__(self):
+        super().__init__()        
+        self.setMinimumSize(640, 480)
+        self.init_scene()
 
-# from PyQt6.QtWidgets import QWidget
-# from OpenGL.GL import *
-# from OpenGL.GLU import *
-# from PyQt6 import QtGui
-# from PyQt6.QtOpenGL import *
+    
+    def init_scene(self):
+        stl_mesh = Mesh.from_file("../modeles-3d/etage2_base.stl")
 
+        points = stl_mesh.points.reshape(-1, 3)
+        faces = np.arange(points.shape[0]).reshape(-1, 3)
 
-# class VisualisationFusee(QWidget):
-#     "Représentation en 3D de l'orientation et de l'état de la fusée"
-
-#     def __init__(self):
-#         super().__init__()        
-#         self.setMinimumSize(640, 480)
-
-#     def paintGL(self):
-#         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-#         glLoadIdentity()
-#         glTranslatef(-2.5, 0.5, -6.0)
-#         glColor3f( 1.0, 1.5, 0.0 );
-#         glPolygonMode(GL_FRONT, GL_FILL);
-#         glBegin(GL_TRIANGLES)
-#         glVertex3f(2.0,-1.2,0.0)
-#         glVertex3f(2.6,0.0,0.0)
-#         glVertex3f(2.9,-1.2,0.0)
-#         glEnd()
-#         glFlush()
-
-#     def initializeGL(self):
-#         glClearDepth(1.0)              
-#         glDepthFunc(GL_LESS)
-#         glEnable(GL_DEPTH_TEST)
-#         glShadeModel(GL_SMOOTH)
-#         glMatrixMode(GL_PROJECTION)
-#         glLoadIdentity()                    
-#         gluPerspective(45.0,1.33,0.1, 100.0) 
-#         glMatrixMode(GL_MODELVIEW)
+        mesh_data = MeshData(vertexes=points, faces=faces)
+        mesh = GLMeshItem(meshdata=mesh_data, smooth=True, drawFaces=False, drawEdges=True, edgeColor=(0, 1, 0, 1))
+        self.addItem(mesh)
+    

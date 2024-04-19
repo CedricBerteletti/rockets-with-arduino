@@ -12,6 +12,8 @@ python -m venv .venv
 .\.venv\Scripts\activate
 pip install PyQt6
 pip install pyqtgraph
+pip install PyOpenGL
+pip install numpy-stl
 ```
 
 Activer le Python virtual environment
