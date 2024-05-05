@@ -552,7 +552,7 @@ void executerCommandeCentraleInertielle(const char commande[]) {
     // TODO vérifier servo
     centrale.setRcsServoX(&servos[servo]);
   }
-  // Servo contrôlant l'axe X pour la stabilisation par la tuyère orientable
+  // Servo contrôlant l'axe Y pour la stabilisation par la tuyère orientable
   else if(chaineCommencePar(commande, "IV ")) {
     copierToken(commande, " ", 1, chServo);
     servo = atoi(chServo);
@@ -575,12 +575,16 @@ void executerCommandeCentraleInertielle(const char commande[]) {
     // TODO vérifier servo
     centrale.setWcsServoX(&servos[servo]);
   }
-  // Servo contrôlant l'axe X pour la stabilisation par les ailerons
+  // Servo contrôlant l'axe Y pour la stabilisation par les ailerons
   else if(chaineCommencePar(commande, "IY ")) {
     copierToken(commande, " ", 1, chServo);
     servo = atoi(chServo);
     // TODO vérifier servo
     centrale.setWcsServoY(&servos[servo]);
+  }
+  // Paramètres de la fonction de correction (asservissement de la trajectoire)
+  else if(chaineCommencePar(commande, "ICF ")) {
+    // TODO
   }
 
   else {
