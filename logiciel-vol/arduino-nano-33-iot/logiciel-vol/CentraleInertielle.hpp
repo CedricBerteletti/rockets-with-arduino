@@ -59,6 +59,7 @@ class CentraleInertielle
     void setRcsServoY(Servomoteur *servo);
     void setWcsServoX(Servomoteur *servo);
     void setWcsServoY(Servomoteur *servo);
+    void setCorrectionFunctionParameters(float a, float b, float c, float d);
   
   private:
     static const char MODULE_IMU[];
@@ -93,6 +94,12 @@ class CentraleInertielle
     float minVAlpha = 0.0f; // Unité : °/s
     float minVBeta = 0.0f; // Unité : °/s
     float minVGamma = 0.0f; // Unité : °/s
+
+    // Paramètre de la fonction de correction (asservissement de la trajectoire), de la forme a.err³ + b.err² + c.err + d
+    float a = 0.0f;    
+    float b = 0.0f;
+    float c = 0.0f;
+    float d = 0.0f;
 
     // Servo-moteurs des systèmes de contrôle
     Servomoteur *rcsServoX;

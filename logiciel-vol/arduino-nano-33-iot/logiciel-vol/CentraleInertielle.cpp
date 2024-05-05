@@ -206,3 +206,7 @@ void CentraleInertielle::stabiliserParAilerons() {
 void CentraleInertielle::stabiliserParTuyere() {
   // TODO
 }
+
+void CentraleInertielle::setCorrectionFunctionParameters(float a, float b, float c, float d) {
+  // TODO
+}
