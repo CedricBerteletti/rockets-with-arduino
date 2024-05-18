@@ -199,14 +199,26 @@ void CentraleInertielle::stabiliser() {
   }
 }
 
+float CentraleInertielle::funcCorrection(float var){
+  return a*pow(var,3) + b*pow(var,2) + c*var + d;
+
+}
+
 void CentraleInertielle::stabiliserParAilerons() {
-  // TODO
+  float xCorrection = funcCorrection(donneesInertiellesFrenet[index].accX);
+  float yCorrection = funcCorrection(donneesInertiellesFrenet[index].accY);
+  
+  wcsServoX->position(xCorrection);
+  wcsServoY->position(yCorrection);
 }
 
 void CentraleInertielle::stabiliserParTuyere() {
   // TODO
 }
 
-void CentraleInertielle::setCorrectionFunctionParameters(float a, float b, float c, float d) {
-  // TODO
+void CentraleInertielle::setCorrectionFunctionParameters(float a2, float b2, float c2, float d2) {
+  a = a2;
+  b = b2;
+  c = c2;
+  d = d2;
 }

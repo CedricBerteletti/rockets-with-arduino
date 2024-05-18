@@ -59,7 +59,7 @@ class CentraleInertielle
     void setRcsServoY(Servomoteur *servo);
     void setWcsServoX(Servomoteur *servo);
     void setWcsServoY(Servomoteur *servo);
-    void setCorrectionFunctionParameters(float a, float b, float c, float d);
+    void setCorrectionFunctionParameters(float a2, float b2, float c2, float d2);
   
   private:
     static const char MODULE_IMU[];
@@ -113,6 +113,7 @@ class CentraleInertielle
     void integration();
     void stabiliserParAilerons();
     void stabiliserParTuyere();
+    float funcCorrection(float var);
 };
 
 #endif

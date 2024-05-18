@@ -584,7 +584,11 @@ void executerCommandeCentraleInertielle(const char commande[]) {
   }
   // Paramètres de la fonction de correction (asservissement de la trajectoire)
   else if(chaineCommencePar(commande, "ICF ")) {
-    // TODO
+    copierToken(commande, " ", 1, ax);
+    copierToken(commande, " ", 2, ay);
+    copierToken(commande, " ", 3, az);
+    copierToken(commande, " ", 4, valpha);
+    centrale.setCorrectionFunctionParameters(atof(ax), atof(ay), atof(az), atof(valpha));
   }
 
   else {
