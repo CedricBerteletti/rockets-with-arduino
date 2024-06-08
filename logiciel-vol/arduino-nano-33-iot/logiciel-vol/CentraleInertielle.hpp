@@ -59,7 +59,7 @@ class CentraleInertielle
     void setRcsServoY(Servomoteur *servo);
     void setWcsServoX(Servomoteur *servo);
     void setWcsServoY(Servomoteur *servo);
-    void setCorrectionFunctionParameters(float a, float b, float c, float d);
+    void setCorrectionFunctionParameters(float a2, float b2, float c2, float d2);
   
   private:
     static const char MODULE_IMU[];
@@ -67,7 +67,7 @@ class CentraleInertielle
     static const char SOUS_MODULE_IMU_BUFFER[];
     static const char ENTETE_DATA[];
     static const char SEPARATEUR_DATA[];
-    static const int TAILLE_BUFFER_DONNEES_INERTIELLES = 100;
+    static const int TAILLE_BUFFER_DONNEES_INERTIELLES = 50;
     
     // Une seule allocation des buffers/strings au chargement de l'instance
     char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
@@ -113,6 +113,7 @@ class CentraleInertielle
     void integration();
     void stabiliserParAilerons();
     void stabiliserParTuyere();
+    float funcCorrection(float var);
 };
 
 #endif

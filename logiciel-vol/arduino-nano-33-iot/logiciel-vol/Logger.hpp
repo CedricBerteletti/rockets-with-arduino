@@ -19,7 +19,6 @@ class Logger
     Logger();
     void initCarteSd();
     void logStatut();
-    void log(const char module[], const char message[], String details);
     void log(const char module[], const char message[], const char details[]);
     void forcerEcritureSurCarteSd();
     bool logSerieActif = true;
