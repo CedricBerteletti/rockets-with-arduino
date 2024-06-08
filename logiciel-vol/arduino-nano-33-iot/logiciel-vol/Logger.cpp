@@ -92,6 +92,7 @@ void Logger::forcerEcritureSurCarteSd() {
 // Fonctions d'écriture des logs
 void Logger::log(const char module[], const char message[], const char details[]) {
   if (logSerieActif || logCarteSdActif || logUdpActif) {
+    delay(1); // Attente minimale pour éviter d'envoyer plein de logs à la suite (risque de perte)
     formaterLog(strLog, module, message, details);
   }
 
@@ -100,10 +101,6 @@ void Logger::log(const char module[], const char message[], const char details[]
   if(logCarteSdActif) fichier.println(strLog);
 }
 
-void Logger::log(const char module[], const char message[], String details) {
-  char str[LONGUEUR_MAX_CHAINE_CARACTERES];
-  details.toCharArray(str, LONGUEUR_MAX_CHAINE_CARACTERES);
-  log(module, message, str);
-}
+
 
 

@@ -67,7 +67,7 @@ class CentraleInertielle
     static const char SOUS_MODULE_IMU_BUFFER[];
     static const char ENTETE_DATA[];
     static const char SEPARATEUR_DATA[];
-    static const int TAILLE_BUFFER_DONNEES_INERTIELLES = 100;
+    static const int TAILLE_BUFFER_DONNEES_INERTIELLES = 50;
     
     // Une seule allocation des buffers/strings au chargement de l'instance
     char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];

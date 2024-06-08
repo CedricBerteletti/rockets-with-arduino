@@ -13,11 +13,13 @@
 #include "Servomoteur.hpp"
 
 // Nombre d'étapes/instructions du programme de vol
-static const int NB_ETAPES = 100;
+static const int NB_ETAPES = 50;
 
 static const char MODULE_SYSTEME[] = "SYSTEM";
 static const char MODULE_COMMANDE[] = "COMMAND";
-static const long DELAI_FLUSH = 1000; // (en ms) Flush des logs sur la carte SD toutes les secondes
+static const long DELAI_FLUSH = 5000; // (en ms) Flush des logs sur la carte SD toutes les secondes
+static const long DELAI_STATUT = 1000;
+static const long DELAI_IMU = 50; // (en ms)
 static const long DELAI_COMMANDE = 50; // (en ms) Tentative de lecture d'une nouvelle commande toutes les 100 ms
 
 static const int SERVO0_PIN = 7;
@@ -39,6 +41,12 @@ CentraleInertielle centrale(logger);
 // Date à laquelle réaliser un nouveau flush des données de logs
 // (pas à chaque écriture car prend trop de temps)
 long dateFlushSuivant = 0;
+
+// Date à laquelle mettre à jour le statut de la fusée
+long dateStatutSuivant = 0;
+
+// Date à laquelle MAJ les données inertielles
+long dateLectureImuSuivante = 0;
 
 // Date à laquelle vérifier la présence de nouvelles commandes
 long dateLectureCommandeSuivante = 0;
@@ -107,20 +115,28 @@ void setup() {
 // Boucle principale : lecture des capteurs ou des commandes et actions
 void loop() {
   dateCourante = millis();
-  centrale.lire();
-  centrale.stabiliser();
 
   // Actions à fréquence réduite (pas effectuées à chaque itération de loop())
+
+  if(dateCourante > dateLectureImuSuivante) {
+    centrale.lire();
+    centrale.stabiliser();
+    dateLectureImuSuivante = dateCourante + DELAI_IMU;
+  }
+
+  if(dateCourante > dateLectureCommandeSuivante) {
+    lireCommande();
+    dateLectureCommandeSuivante = dateCourante + DELAI_COMMANDE;
+  }
+  
+  if(loggingStatutFusee && dateCourante > dateStatutSuivant) {
+    logStatutFusee();
+    dateStatutSuivant = dateCourante + DELAI_STATUT;
+  }
+  
   if(dateCourante > dateFlushSuivant) {
     logger.forcerEcritureSurCarteSd();
-    dateFlushSuivant = dateFlushSuivant + DELAI_FLUSH;
-    if(loggingStatutFusee) {
-      logStatutFusee();
-    }
-  }
-  if(dateCourante > dateLectureCommandeSuivante) {
-    dateLectureCommandeSuivante = dateLectureCommandeSuivante + DELAI_COMMANDE;
-    lireCommande();
+    dateFlushSuivant = dateCourante + DELAI_FLUSH;
   }
 
   if(dateEtapeSuivante != -1 && dateCourante > dateEtapeSuivante) {
