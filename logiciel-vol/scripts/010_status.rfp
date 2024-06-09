@@ -1,0 +1,6 @@
+# Script affichant tous les statuts de la fusée
+rocket.status
+wifi.status
+logger.status
+servo.status
+flightplan.getSteps
