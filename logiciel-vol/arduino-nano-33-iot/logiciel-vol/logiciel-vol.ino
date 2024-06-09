@@ -297,11 +297,6 @@ void executerCommandeBroche(const char commande[]) {
 }
 
 void executerCommandeFusee(const char commande[]) {
-  char chEtape[LONGUEUR_NOMBRE];
-  char chDelai[LONGUEUR_NOMBRE];
-  int etape;
-  int delai;
-
   // Renvoyer le statut de la fusée
   if(chaineCommencePar(commande, "RS")) {
     logStatutFusee();
@@ -309,7 +304,7 @@ void executerCommandeFusee(const char commande[]) {
   // Passer à l'étage suivant de la fusée (uniquement indicatif)
   else if(chaineCommencePar(commande, "RE")) {    
     etage = etage + 1;
-    itoa(etape, strLog, 10);
+    itoa(etage, strLog, 10);
     logger.log(MODULE_SYSTEME, "STAGGING", strLog);
   }
   else {
@@ -443,9 +438,15 @@ void executerCommandeServo(const char commande[]) {
 }
 
 void executerCommandeLogger(const char commande[]) {
+  char str[LONGUEUR_MAX_CHAINE_CARACTERES];
   // Initialiser carte SD
   if(chaineCommencePar(commande, "LC")) {
     logger.initCarteSd();
+  }
+  // Écriture d'un log quelconque
+  else if(chaineCommencePar(commande, "LL")) {
+    copierToken(commande, " ", 1, str);
+    logger.log(MODULE_COMMANDE, "CUSTOM_LOG", str);
   }
   // Forcer l'écriture sur la carte SD
   else if(chaineCommencePar(commande, "LF")) {

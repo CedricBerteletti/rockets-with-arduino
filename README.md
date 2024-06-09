@@ -32,6 +32,7 @@ Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
     - *rocket.status* : état de la fusée.
     - *wifi.status* : état de la connexion Wifi.
     - *logger.status* : indique les différents loggers actifs.
+	- *logger.log str* : écrit la chaîne quelconque str dans les logs. Possible d'utiliser des commandes au pré-processeur dans la chaîne (par exemple {{DATE}}).
     - *logger.initSdcard* : initialise et lance les logs sur la carte SD.
     - *logger.flushToSdcard* : force le vidage du cache des logs sur la carte SD.
     - *logger.activateLogImuData* et *logger.deactivateLogImuData* : active/désactive les logs (via serial, SD-Card et Wifi) des données de la centrale inertielle.
@@ -55,7 +56,7 @@ Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
     - *imu.setCorrectionFunctionParameters a b c d*: Passage des paramètres d'un polynome de degré 3 (a.err³ + b.err² + c.err + d) donnant la correction à appliquer sur la position des servomoteurs en fonction de l'écart à la verticale.
 - Lancement et actions générales :
     - *rocket.launch code* ou *flightplan.start code* : Lance l'exécution du plan de vol avec le lancement de l'étape 0. Protégé par un code.
-    - *rocket.stage n* : Sans effet. Permet de générer un log indiquant que l'on est passé à l'étage n de la fusée.
+    - *rocket.stage* : Sans effet. Permet de générer un log indiquant que l'on est passé à l'étage suivant de la fusée.
     - *flightplan.stop code* : interrompt le programme de la fusée et revient à l'étape initiale. Protégé par un code. Attention aux conséquences !
 - Gestion des signaux sur les broches de l'Arduino :
     - *pin.setMode pin mode* : configure la broche n°*pin* (OUTPUT/INPUT). 
