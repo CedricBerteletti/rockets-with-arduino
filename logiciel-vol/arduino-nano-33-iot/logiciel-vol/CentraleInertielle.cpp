@@ -37,8 +37,9 @@ void CentraleInertielle::lire() {
   if (IMU.accelerationAvailable() && IMU.gyroscopeAvailable()) {
     donneesInertiellesFrenetCourantes.t = millis();
     donneesInertiellesFrenetPrecedentes = donneesInertiellesFrenetCourantes;
-    IMU.readAcceleration(donneesInertiellesFrenetCourantes.accX, donneesInertiellesFrenetCourantes.accY, donneesInertiellesFrenetCourantes.accZ);
-    IMU.readGyroscope(donneesInertiellesFrenetCourantes.vAlpha, donneesInertiellesFrenetCourantes.vBeta, donneesInertiellesFrenetCourantes.vGamma);
+    // Adaptation à la position de montage de l'Arduino dans la fusée
+    IMU.readAcceleration(donneesInertiellesFrenetCourantes.accZ, donneesInertiellesFrenetCourantes.accY, donneesInertiellesFrenetCourantes.accX);
+    IMU.readGyroscope(donneesInertiellesFrenetCourantes.vGamma, donneesInertiellesFrenetCourantes.vBeta, donneesInertiellesFrenetCourantes.vAlpha);
 
     //On calibre et on filtre les valeurs
     donneesInertiellesFrenetCourantes.accX += offsetAccX;

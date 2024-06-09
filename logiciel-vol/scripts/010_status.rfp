@@ -4,3 +4,4 @@ wifi.status
 logger.status
 servo.status
 flightplan.getSteps
+imu.getBuffer
