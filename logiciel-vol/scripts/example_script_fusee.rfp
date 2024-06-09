@@ -7,6 +7,9 @@ logger.status
 rocket.status
 flightplan.getSteps
 
+logger.activateLogImuData
+
+
 # Vérifier le contrôle des entrées-sorties
 pin.setMode 2 OUTPUT
 pin.setMode 3 OUTPUT
@@ -58,6 +61,13 @@ imu.getBuffer
 
 # servo.setAngle servo angle (de 0 à 180°)
 servo.setAngle 1 90
+servo.setAngle
+servo.setPosition
+
+servo.setAngle servo angle
+servo.setPosition servo position
+servo.setOffset servo offset
+servo.setSlope servo slope
 
 # Tests servo
 flightplan.configureStep 0 500 servo.setAngle 0 90
