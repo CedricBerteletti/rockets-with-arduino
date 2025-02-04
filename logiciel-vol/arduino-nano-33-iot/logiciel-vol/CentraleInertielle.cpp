@@ -7,9 +7,13 @@
 
 #include "CentraleInertielle.hpp"
 
+inline constexpr int NOMBRE_FLOTTANT_DECIMALES = 2;
+inline constexpr int NOMBRE_FLOTTANT_LONGUEUR = 5 + NOMBRE_FLOTTANT_DECIMALES;
+
 const char CentraleInertielle::MODULE_IMU[] = "IMU";
 const char CentraleInertielle::SOUS_MODULE_IMU_DATA[] = "IMU_DATA";
 const char CentraleInertielle::SOUS_MODULE_IMU_BUFFER[] = "IMU_BUFFER";
+const char CentraleInertielle::SOUS_MODULE_IMU_STAB[] = "IMU_STAB";
 const char CentraleInertielle::ENTETE_DATA[] = "t, accX, accY, accZ, vAlpha, vBeta, vGamma";
 const char CentraleInertielle::SEPARATEUR_DATA[] = ", ";
 
@@ -84,7 +88,7 @@ void CentraleInertielle::lire() {
       index = 0;
     }
     
-    if (loggingData) {
+    if (isSampleForLog()) {
       log(donneesInertiellesFrenetCourantes, SOUS_MODULE_IMU_DATA, ENTETE_DATA);
     }
   }
@@ -155,31 +159,30 @@ void CentraleInertielle::logDonneesCalibration() {
 }
 
 void CentraleInertielle::log(DonneesInertielles &data, const char module[], const char message[]) {
-  int longueur = 5 + decimales;
   itoa(data.t, strLog, 10);
   strcat(strLog, SEPARATEUR_DATA);
 
-  dtostrf(data.accX, longueur, decimales, strNumber);
+  dtostrf(data.accX, NOMBRE_FLOTTANT_LONGUEUR, NOMBRE_FLOTTANT_DECIMALES, strNumber);
   strcat(strLog, strNumber);
   strcat(strLog, SEPARATEUR_DATA);
   
-  dtostrf(data.accY, longueur, decimales, strNumber);
+  dtostrf(data.accY, NOMBRE_FLOTTANT_LONGUEUR, NOMBRE_FLOTTANT_DECIMALES, strNumber);
   strcat(strLog, strNumber);
   strcat(strLog, SEPARATEUR_DATA);
   
-  dtostrf(data.accZ, longueur, decimales, strNumber);
+  dtostrf(data.accZ, NOMBRE_FLOTTANT_LONGUEUR, NOMBRE_FLOTTANT_DECIMALES, strNumber);
   strcat(strLog, strNumber);
   strcat(strLog, SEPARATEUR_DATA);
   
-  dtostrf(data.vAlpha, longueur, decimales, strNumber);
+  dtostrf(data.vAlpha, NOMBRE_FLOTTANT_LONGUEUR, NOMBRE_FLOTTANT_DECIMALES, strNumber);
   strcat(strLog, strNumber);
   strcat(strLog, SEPARATEUR_DATA);
   
-  dtostrf(data.vBeta, longueur, decimales, strNumber);
+  dtostrf(data.vBeta, NOMBRE_FLOTTANT_LONGUEUR, NOMBRE_FLOTTANT_DECIMALES, strNumber);
   strcat(strLog, strNumber);
   strcat(strLog, SEPARATEUR_DATA);
   
-  dtostrf(data.vGamma, longueur, decimales, strNumber);
+  dtostrf(data.vGamma, NOMBRE_FLOTTANT_LONGUEUR, NOMBRE_FLOTTANT_DECIMALES, strNumber);
   strcat(strLog, strNumber);
 
   logger.log(module, message, strLog);
@@ -200,7 +203,6 @@ void CentraleInertielle::stabiliser() {
 
 float CentraleInertielle::funcCorrection(float var){
   return a*pow(var,3) + b*pow(var,2) + c*var + d;
-
 }
 
 void CentraleInertielle::stabiliserParAilerons() {
@@ -209,10 +211,32 @@ void CentraleInertielle::stabiliserParAilerons() {
   
   wcsServoX->position(xCorrection);
   wcsServoY->position(yCorrection);
+
+  if (isSampleForLog()) {
+      log(xCorrection, yCorrection, SOUS_MODULE_IMU_STAB, "AILERONS");
+  }
 }
 
-void CentraleInertielle::stabiliserParTuyere() {
-  // TODO
+void CentraleInertielle::stabiliserParTuyere() {  
+  float xCorrection = funcCorrection(donneesInertiellesFrenet[index].accX);
+  float yCorrection = funcCorrection(donneesInertiellesFrenet[index].accY);
+  
+  rcsServoX->position(xCorrection);
+  rcsServoY->position(yCorrection);
+
+  if (isSampleForLog()) {
+      log(xCorrection, yCorrection, SOUS_MODULE_IMU_STAB, "TUYERE");
+  }
+}
+
+void CentraleInertielle::log(float xCorrection, float yCorrection, const char module[], const char message[]) {
+  dtostrf(xCorrection, NOMBRE_FLOTTANT_LONGUEUR, NOMBRE_FLOTTANT_DECIMALES, strLog);
+  strcat(strLog, SEPARATEUR_DATA);
+
+  dtostrf(yCorrection, NOMBRE_FLOTTANT_LONGUEUR, NOMBRE_FLOTTANT_DECIMALES, strNumber);
+  strcat(strLog, strNumber);
+
+  logger.log(module, message, strLog);
 }
 
 void CentraleInertielle::setCorrectionFunctionParameters(float a2, float b2, float c2, float d2) {
@@ -220,4 +244,8 @@ void CentraleInertielle::setCorrectionFunctionParameters(float a2, float b2, flo
   b = b2;
   c = c2;
   d = d2;
+}
+
+bool CentraleInertielle::isSampleForLog() {
+  return samplesByDataLog > 0 && index % samplesByDataLog == 0;
 }

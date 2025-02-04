@@ -144,6 +144,7 @@ void Wifi::confClientUdp(int n) {
 
 void Wifi::ecrireUdp(const char message[]) {
   if (actif && currentRemoteIp) {
+    delay(DELAI_ENVOI_UDP);
     for (unsigned int i = 0; i < NOMBRE_MAX_CLIENTS; i++)
     {
       if (remotePorts[i] != 0) {
@@ -190,9 +191,11 @@ void Wifi::adresseIp(char addresse[], IPAddress ip) {
 
 void Wifi::log(const char module[], const char message[], const char details[], bool toWifi) {
   formaterLog(strLog, module, message, details);
-  Serial.println(strLog);
   if(actif && toWifi) {
     ecrireUdp(strLog);
+  }
+  else {
+    Serial.println(strLog);
   }
 }
 

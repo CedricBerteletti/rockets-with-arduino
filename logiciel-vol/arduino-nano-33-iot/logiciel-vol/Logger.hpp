@@ -10,6 +10,7 @@
 
 #include <Arduino.h>
 #include <SD.h>
+#include "constants.h"
 #include "aides.hpp"
 #include "Wifi.hpp"
 

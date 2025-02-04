@@ -1,0 +1,14 @@
+# Script pour tester un program simple
+flightplan.configureStep 0 10000 logger.log DECOMPTE FINAL {{DATE}}
+
+flightplan.configureStep 1 500 logger.log JOUR
+flightplan.configureStep 2 500 logger.log NUIT
+flightplan.configureStep 3 500 logger.log JOUR
+flightplan.configureStep 4 500 logger.log NUIT
+flightplan.configureStep 5 500 logger.log JOUR
+flightplan.configureStep 6 500 logger.log NUIT
+flightplan.configureStep 7 5000 logger.log JOUR
+flightplan.configureStep 8 0 logger.log RETOUR A 1
+flightplan.configureStep 9 0 flightplan.goStep 1
+
+flightplan.getSteps

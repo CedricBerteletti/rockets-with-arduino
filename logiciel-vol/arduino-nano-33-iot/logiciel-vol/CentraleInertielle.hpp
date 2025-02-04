@@ -11,6 +11,7 @@
 #include <Arduino.h>
 #include <Arduino_LSM6DS3.h>  // Bibliothèque pour la gestion de l'IMU (Inertial Measurement Unit)
 #include <avr/dtostrf.h>
+#include "constants.h"
 #include "Logger.hpp"
 #include "Servomoteur.hpp"
 
@@ -42,10 +43,9 @@ class CentraleInertielle
 {
   public:
     CentraleInertielle(Logger &logger);
-    bool loggingData = false;
+    int samplesByDataLog = 0;
     bool rcsActif = false;  // Stabilisation par les ailerons
     bool wcsActif = false;  // Stabilisation par la tuyère orientable
-    int decimales = 2;
     DonneesInertielles donneesInertiellesFrenetCourantes;
     DonneesInertielles donneesInertiellesTerrestreFrenetCourantes;
     void init();
@@ -65,9 +65,9 @@ class CentraleInertielle
     static const char MODULE_IMU[];
     static const char SOUS_MODULE_IMU_DATA[];
     static const char SOUS_MODULE_IMU_BUFFER[];
+    static const char SOUS_MODULE_IMU_STAB[];
     static const char ENTETE_DATA[];
-    static const char SEPARATEUR_DATA[];
-    static const int TAILLE_BUFFER_DONNEES_INERTIELLES = 50;
+    static const char SEPARATEUR_DATA[];    
     
     // Une seule allocation des buffers/strings au chargement de l'instance
     char strLog[LONGUEUR_MAX_CHAINE_CARACTERES];
@@ -109,11 +109,13 @@ class CentraleInertielle
     
     Logger &logger;
     void log(DonneesInertielles &data, const char module[], const char message[]);
+    void log(float xCorrection, float yCorrection, const char module[], const char message[]);
 
     void integration();
     void stabiliserParAilerons();
     void stabiliserParTuyere();
     float funcCorrection(float var);
+    bool isSampleForLog();
 };
 
 #endif

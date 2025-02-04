@@ -18,13 +18,12 @@ int angleEnPosition(int angle, int offset, float slope) {
 
 const char Servomoteur::MODULE_SERVO[] = "SERVO";
 
-Servomoteur::Servomoteur() {
+Servomoteur::Servomoteur(Logger &logger):logger(logger) {
 }
 
-void Servomoteur::init(int i, int b, Logger *l) {
+void Servomoteur::init(int i, int b) {
   id = i;
   broche = b;
-  logger = l;
   servo.attach(broche);
   logStatut();
 }
@@ -39,8 +38,6 @@ void Servomoteur::setPente(float p) {
 
 void Servomoteur::angle(int a) {
   servo.write(a);
-  sprintf(strTmp, "%i | %i", id, a);
-  logger->log(MODULE_SERVO, "ANGLE", strTmp);
 }
 
 void Servomoteur::position(int p) {
@@ -49,5 +46,5 @@ void Servomoteur::position(int p) {
 
 void Servomoteur::logStatut() {
   sprintf(strTmp, "Servo: %i | Angle: %i | Décalage: %i | Pente: %f", id, servo.read(), decalage, pente);
-  logger->log(MODULE_SERVO, "STATUT", strTmp);
+  logger.log(MODULE_SERVO, "STATUT", strTmp);
 }
