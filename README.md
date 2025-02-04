@@ -37,7 +37,7 @@ Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
     - *logger.flushToSdcard* : force le vidage du cache des logs sur la carte SD.
 	- *logger.sizeLogsFile* : taille du fichier de logs
 	- *logger.clearLogsFile* : vider le fichier de logs
-    - *logger.activateLogImuData* et *logger.deactivateLogImuData* : active/désactive les logs (via serial, SD-Card et Wifi) des données de la centrale inertielle.
+    - *logger.setSamplesLogImuData n* : indique le *n* nombre d'échantillons sautés pour les logs (via serial, SD-Card et Wifi) des données de la centrale inertielle. 0 => pas de log.
     - *logger.activateLogFlush* et *logger.deactivateLogFlush*: active/désactive les logs de vidage du cache sur la carte SD.
     - *logger.activateLogRocketStatus* et *logger.deactivateLogRocketStatus* : active/désactive les logs d'état général de la fusée.
 	- *logger.activateLogToSerial* et *logger.deactivateLogToSerial*

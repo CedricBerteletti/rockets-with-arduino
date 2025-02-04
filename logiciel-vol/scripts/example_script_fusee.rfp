@@ -7,7 +7,7 @@ logger.status
 rocket.status
 flightplan.getSteps
 
-logger.activateLogImuData
+logger.setSamplesLogImuData 5
 
 
 # Vérifier le contrôle des entrées-sorties
@@ -43,7 +43,7 @@ flightplan.configureStep 8 0 flightplan.goStep 6
 flightplan.getSteps
 
 # Logs des données de la centrale inertielle
-logger.activateLogImuData
+logger.setSamplesLogImuData 5
 imu.getBuffer
 
 # Lancement
@@ -83,7 +83,7 @@ flightplan.configureStep 8 0 flightplan.goStep 0
 
 
 # Test boucle
-flightplan.configureStep 0 000 logger.activateLogImuData
+flightplan.configureStep 0 000 logger.setSamplesLogImuData 5
 flightplan.configureStep 1 500 pin.digitalWrite 17 1
 flightplan.configureStep 2 500 pin.digitalWrite 17 0
 flightplan.configureStep 3 0 flightplan.goStep 1

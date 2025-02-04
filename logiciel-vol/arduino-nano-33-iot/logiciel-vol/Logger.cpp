@@ -107,7 +107,6 @@ void Logger::viderFichierCarteSd() {
 // Fonctions d'écriture des logs
 void Logger::log(const char module[], const char message[], const char details[]) {
   if (logSerieActif || logCarteSdActif || logUdpActif) {
-    delay(1); // Attente minimale pour éviter d'envoyer plein de logs à la suite (risque de perte)
     formaterLog(strLog, module, message, details);
 
     if(logSerieActif) Serial.println(strLog);

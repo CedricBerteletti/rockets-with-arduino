@@ -23,7 +23,7 @@ class VisualisationFusee(GLViewWidget):
 
     
     def init_scene(self):
-        stl_mesh = Mesh.from_file("../modeles-3d/etage2_base.stl")
+        stl_mesh = Mesh.from_file("../modeles-3d/200_etage2_base.stl")
 
         points = stl_mesh.points.reshape(-1, 3)
         faces = np.arange(points.shape[0]).reshape(-1, 3)

@@ -10,19 +10,20 @@
 
 
 #include <WiFiNINA.h>
+#include "constants.h"
 #include "aides.hpp"
 #include "secrets.h"
 
 // Constantes générales
 inline constexpr int NOMBRE_MAX_CLIENTS = 5;
-inline constexpr int DELAI_ENVOI_UDP = 2;
+inline constexpr int DELAI_ENVOI_UDP = 1;
 
 class Wifi
 {
   public:
     Wifi();
     bool actif = false;
-    bool loggingIo = false;
+    bool loggingIo = LOGGING_WIFI_IO;
     void listerReseaux();
     void connecter();
     void connecterAvecFallback(const char ssid[], const char pwd[]);

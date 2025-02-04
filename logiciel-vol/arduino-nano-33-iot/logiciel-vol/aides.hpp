@@ -10,15 +10,6 @@
 
 #include <Arduino.h>
 
-// Constantes générales
-inline constexpr char SEPARATEUR[] = ", ";
-inline constexpr char GUILLEMETS[] = "\"";
-inline constexpr int LONGUEUR_NOMBRE = 10;
-inline constexpr int LONGUEUR_MAX_COMMANDE = 50;
-inline constexpr int LONGUEUR_MAX_CHAINE_CARACTERES = 256;
-inline constexpr int LONGUEUR_ADRESSE_IP = 20;
-inline constexpr int PIN_LED_DEBUG = 8;
-
 // Formatage des log
 void formaterLog(char destination[], const char module[], const char message[], const char details[]);
 
