@@ -20,10 +20,10 @@ inline constexpr int LONGUEUR_ADRESSE_IP = 20;
 
 inline constexpr char MODULE_SYSTEME[] = "SYSTEM";
 
-inline constexpr long DELAI_FLUSH = 2000; // (en ms) Flush des logs sur la carte SD toutes les secondes
+inline constexpr long DELAI_FLUSH = 3000; // (en ms) Flush des logs sur la carte SD toutes les secondes
 inline constexpr long DELAI_STATUT = 1000; // (en ms)
-inline constexpr long DELAI_IMU = 10; // (en ms)
-inline constexpr long DELAI_COMMANDE = 50; // (en ms) Tentative de lecture d'une nouvelle commande toutes les 50 ms
+inline constexpr long DELAI_IMU = 5; // (en ms)
+inline constexpr long DELAI_COMMANDE = 5; // (en ms) Tentative de lecture d'une nouvelle commande toutes les 50 ms
 
 inline constexpr bool LOGGING_WIFI_IO = false;
 

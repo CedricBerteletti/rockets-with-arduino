@@ -9,12 +9,12 @@
 #define secrets_h
 
 // Wifi
-inline constexpr char WIFI1_SSID[] = "freebox_cxbc";
-inline constexpr char WIFI1_PASS[] = "sudorem-dissideo8-fortasse-deperdent";
-inline constexpr char WIFI2_SSID[] = "android_ced";
-inline constexpr char WIFI2_PASS[] = "cxbccxbc";
+inline constexpr char WIFI1_SSID[] = "";
+inline constexpr char WIFI1_PASS[] = "";
+inline constexpr char WIFI2_SSID[] = "";
+inline constexpr char WIFI2_PASS[] = "";
 
 // Code de lancement
-inline constexpr char SECRET_COMMAND_CODE[] = "270829";
+inline constexpr char SECRET_COMMAND_CODE[] = "";
 
 #endif

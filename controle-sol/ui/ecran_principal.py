@@ -10,7 +10,8 @@ import time
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QTextCursor
-from PyQt6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QGridLayout, QFileDialog, QGroupBox, QLineEdit, QTextEdit, QPushButton, QSplitter, QCheckBox
+from PyQt6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QGridLayout, QFileDialog, \
+QGroupBox, QLineEdit, QTextEdit, QPushButton, QSplitter, QCheckBox, QLabel, QDialog, QDialogButtonBox
 
 import ui.graphiques as graphiques
 from ui.ui_utils import set_default_layout_params
@@ -29,6 +30,8 @@ class EcranPrincipal(QFrame):
         self.telemetrie = telemetrie
         self.centrale = centrale
         self.graphs_refresh_delay_ms = settings.get_int("graphs.refresh_delay_ms")
+        self.ip = settings.get("rocket.default_ip")
+        self.port = settings.get("rocket.default_port")
         self.password = ""
         self.init_ui()
 
@@ -101,7 +104,7 @@ class EcranPrincipal(QFrame):
 
         button = QPushButton("Connecter")
         self.grp_command.layout().addWidget(button, 0, 0)
-        # TODO
+        button.clicked.connect(self.demander_ip_port)
 
         button = QPushButton("Charger")
         self.grp_command.layout().addWidget(button, 0, 1)
@@ -113,11 +116,83 @@ class EcranPrincipal(QFrame):
 
         button = QPushButton("Lancer !")
         self.grp_command.layout().addWidget(button, 0, 3)
-        # TODO
+        button.clicked.connect(self.confirmer_lancement)
 
         button = QPushButton("Stop !")
         self.grp_command.layout().addWidget(button, 0, 4)
-        # TODO
+        button.clicked.connect(self.confirmer_stop)
+
+    def demander_ip_port(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Connexion")
+        dialog.setLayout(QVBoxLayout())
+
+        ip_label = QLabel("Adresse IP:")
+        ip_input = QLineEdit()
+        ip_input.setText(self.ip)
+        port_label = QLabel("Port:")
+        port_input = QLineEdit()
+        port_input.setText(self.port)
+
+        dialog.layout().addWidget(ip_label)
+        dialog.layout().addWidget(ip_input)
+        dialog.layout().addWidget(port_label)
+        dialog.layout().addWidget(port_input)
+
+        button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        dialog.layout().addWidget(button_box)
+
+        if dialog.exec():
+            self.ip = ip_input.text()
+            self.port = port_input.text()
+            self.executer_commande(f"wifi.broadcastUdpClient 0 {self.ip} {self.port}")
+
+    def confirmer_lancement(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Lancement !")
+        dialog.setLayout(QVBoxLayout())
+
+        password_label = QLabel("Mot de passe !")
+        password_input = QLineEdit()
+        password_input.setText(self.password)
+
+        dialog.layout().addWidget(password_label)
+        dialog.layout().addWidget(password_input)
+
+        button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        dialog.layout().addWidget(button_box)
+
+        if dialog.exec():
+            self.password = password_input.text()
+            self.executer_commande(f"rocket.launch {self.password}")
+
+    def confirmer_stop(self):
+        if self.password:
+            self.executer_commande(f"flightplan.stop {self.password}")
+        else:
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Stop !")
+            dialog.setLayout(QVBoxLayout())
+
+            password_label = QLabel("Mot de passe :")
+            password_input = QLineEdit()
+            password_input.setText(self.password)
+
+            dialog.layout().addWidget(password_label)
+            dialog.layout().addWidget(password_input)
+
+            button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+            button_box.accepted.connect(dialog.accept)
+            button_box.rejected.connect(dialog.reject)
+            dialog.layout().addWidget(button_box)
+
+            if dialog.exec():
+                self.password = password_input.text()
+                self.executer_commande(f"flightplan.stop {self.password}")
 
 
     def creer_groupe_logs(self):

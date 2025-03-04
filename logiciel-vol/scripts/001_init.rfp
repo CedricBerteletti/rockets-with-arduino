@@ -2,5 +2,6 @@
 wifi.broadcastUdpClient 0 192.168.0.8 23900
 logger.deactivateLogRocketStatus
 logger.deactivateLogFlush
-logger.deactivateLogToSerial
+logger.activateLogToSerial
+logger.activateLogToWifi
 logger.setSamplesLogImuData 5

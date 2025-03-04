@@ -1,0 +1,4 @@
+# Script arrêtant les statuts auto de la fusée
+logger.activateLogToSd
+logger.activateLogToWifi
+logger.setSamplesLogImuData 5

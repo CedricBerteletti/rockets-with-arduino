@@ -7,6 +7,7 @@ Gestion de la connexion WiFi à la fusée
 
 import errno
 import logging
+import services.settings as settings
 import socket
 from time import sleep
 
@@ -19,6 +20,7 @@ class Connexion():
         self.rocket_ip = ""
         self.rocket_port = 0
         self.actif = False
+        self.delay_between_commands = settings.get_int("delay.between_commands_ms") / 1000
 
     def init(self, rocket_ip, rocket_port):
         if self.actif:
@@ -39,6 +41,8 @@ class Connexion():
             logging.info(f"Envoi {message} à {self.rocket_ip}:{self.rocket_port}")
             bytes_envoyes = self.socket.sendto(message.encode(), (self.rocket_ip, self.rocket_port))
             logging.info(f"{bytes_envoyes} octets envoyés")
+            # Évite de saturer la connexion
+            sleep(self.delay_between_commands)
 
     def recevoir(self):
         str = ""
@@ -50,7 +54,6 @@ class Connexion():
                 if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
                     # pas d'erreur, simplement pas de nouvelle donnée disponible
                     logging.debug(err)
-                    sleep(0.01)
                 else:
                     # Erreur réelle
                     logging.error("Erreur lors de la tentative de lecture de l'Arduino : ", e)

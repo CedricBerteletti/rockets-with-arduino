@@ -26,7 +26,7 @@ Bibliothèques nécessaires :
 Permet de recevoir via Wifi les commandes (cf. exemple-script-fusee.rl) :
 - Commandes générales et connexion :
     - *wifi.connectNetwork ssid pwd*: permet de se connecter au réseau wifi *ssid* avec le mot de passe *pwd*.
-    - *wifi.broadcastUdpClient n ip_rocket port_rocket*: permet de connaître le client distant numéro n (de 0à 4) et de lui retourner les mesures et le statut de la fusée.
+    - *wifi.broadcastUdpClient n ip_rocket port_rocket*: permet de connaître le client distant numéro n (de 0 à 4) et de lui retourner les mesures et le statut de la fusée.
     - *system.delay duree* : bloque l'exécution de la boucle principale de l'Arduino pendant *duree* ms.
 - Loggers et différents états  :
     - *rocket.status* : état de la fusée.
