@@ -1,5 +1,14 @@
 # Script de configuration du plan de vol pour le lancememt de l'étage 2 seul (version 2b)
 
+# Allumage cabine
+pin.setMode 2 OUTPUT
+# Allumage 1° étage
+pin.setMode 14 OUTPUT
+# Allumage caméra
+pin.setMode 17 OUTPUT
+
+
+
 flightplan.configureStep 0 10000 logger.log DECOMPTE FINAL {{DATE}}
 
 flightplan.configureStep 1 0 pin.fire 14    # Allumage des étages avec les pins 14 à 17
