@@ -30,8 +30,8 @@ class EcranPrincipal(QFrame):
         self.telemetrie = telemetrie
         self.centrale = centrale
         self.graphs_refresh_delay_ms = settings.get_int("graphs.refresh_delay_ms")
-        self.ip = settings.get("rocket.default_ip")
-        self.port = settings.get("rocket.default_port")
+        self.ip = settings.get("telemetry.arduino.ip")
+        self.port = settings.get("telemetry.arduino.port")
         self.password = ""
         self.init_ui()
 

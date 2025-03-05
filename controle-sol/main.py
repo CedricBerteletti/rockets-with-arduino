@@ -31,7 +31,6 @@ def main(args):
     global ecran_principal
 
     connexion = Connexion()
-    #connexion.init(settings.get("telemetry.arduino.ip"), settings.get("telemetry.arduino.port"))
     controleur = Controleur(connexion)
     telemetrie = Telemetrie(connexion)
     if not settings.get_bool("telemetry.debug"):
