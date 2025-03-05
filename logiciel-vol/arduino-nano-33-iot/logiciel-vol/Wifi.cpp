@@ -89,6 +89,7 @@ void Wifi::connecter(const char ssid[], const char pwd[])
   if (statut == WL_CONNECTED) {    
     log(MODULE_WIFI, "UDP_BEGIN", ssid, false);
     if(udp.begin(PORT_LOCAL) == 1) {
+
       actif = true;
       digitalWrite(PIN_LED_DEBUG, 1);
       log(MODULE_WIFI, "CONNECTED", ssid, false);
@@ -144,16 +145,22 @@ void Wifi::confClientUdp(int n) {
 
 void Wifi::ecrireUdp(const char message[]) {
   if (actif && currentRemoteIp) {
-    delay(DELAI_ENVOI_UDP);
-    for (unsigned int i = 0; i < NOMBRE_MAX_CLIENTS; i++)
-    {
-      if (remotePorts[i] != 0) {
-        udp.beginPacket(remoteIps[i], remotePorts[i]);
-        udp.write(message);
-        udp.endPacket();
+    int t = millis();
+    if(dateDerniereEcriture < t + DELAI_ENVOI_UDP_MIN) {      
+      for (unsigned int i = 0; i < NOMBRE_MAX_CLIENTS; i++)
+      {
+        if (remotePorts[i] != 0) {
+          udp.beginPacket(remoteIps[i], remotePorts[i]);
+          udp.write(message);
+          udp.endPacket();
+        }
       }
+      logIo("SENDING", message);
+      dateDerniereEcriture = millis();
     }
-    logIo("SENDING", message);
+    else {
+      delay(t + DELAI_ENVOI_UDP_MIN - dateDerniereEcriture);
+    }
   }
 }
 

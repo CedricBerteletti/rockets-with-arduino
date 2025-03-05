@@ -16,7 +16,6 @@
 
 // Constantes générales
 inline constexpr int NOMBRE_MAX_CLIENTS = 5;
-inline constexpr int DELAI_ENVOI_UDP = 5;
 
 class Wifi
 {
@@ -41,6 +40,7 @@ class Wifi
     IPAddress currentRemoteIp;
     unsigned int currentRemotePort;
     IPAddress remoteIps[NOMBRE_MAX_CLIENTS];
+    long dateDerniereEcriture = 0;
     unsigned int remotePorts[NOMBRE_MAX_CLIENTS] {0};
     void connecter(const char ssid[], const char pwd[]);
     void typeChiffrement(char str[], int type);

@@ -148,13 +148,10 @@ void CentraleInertielle::calibrer(float ax, float ay, float az, float valpha, fl
 
 void CentraleInertielle::logDonneesCalibration() {
   logger.log(SOUS_MODULE_IMU_BUFFER, "BUFFER_BEGIN", "Début des données dans le cache de calibration");
-  delay(DELAI_ENVOI_UDP);
   for (unsigned int i = 0; i < TAILLE_BUFFER_DONNEES_INERTIELLES; i++)  
   {
     log(donneesInertiellesFrenet[i], SOUS_MODULE_IMU_BUFFER, ENTETE_DATA);
-    delay(DELAI_ENVOI_UDP);
   }
-  delay(DELAI_ENVOI_UDP);
   logger.log(SOUS_MODULE_IMU_BUFFER, "BUFFER_END", "Fin des données dans le cache de calibration");
 }
 

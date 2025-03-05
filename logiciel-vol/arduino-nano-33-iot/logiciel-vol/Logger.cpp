@@ -64,7 +64,7 @@ void Logger::initCarteSd() {
   else {
     log(MODULE_LOGGER, "SDCARD_INITIALIZED", "Carte SD initialisée");
 
-    fichier = SD.open(NOM_FICHIER_LOGS, FILE_WRITE);
+    fichier = SD.open(NOM_FICHIER_LOGS, O_CREAT | O_WRITE | O_APPEND);
     if(fichier) {
       log(MODULE_LOGGER, "LOG_FILE_OPEN", "Fichier de logs ouvert");
       logCarteSdActif = true;

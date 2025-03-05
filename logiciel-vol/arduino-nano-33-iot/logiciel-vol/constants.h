@@ -15,15 +15,17 @@ inline constexpr char SEPARATEUR[] = ", ";
 inline constexpr char GUILLEMETS[] = "\"";
 inline constexpr int LONGUEUR_NOMBRE = 10;
 inline constexpr int LONGUEUR_MAX_COMMANDE = 50;
-inline constexpr int LONGUEUR_MAX_CHAINE_CARACTERES = 256;
+inline constexpr int LONGUEUR_MAX_CHAINE_CARACTERES = 250;
 inline constexpr int LONGUEUR_ADRESSE_IP = 20;
 
 inline constexpr char MODULE_SYSTEME[] = "SYSTEM";
 
-inline constexpr long DELAI_FLUSH = 3000; // (en ms) Flush des logs sur la carte SD toutes les secondes
-inline constexpr long DELAI_STATUT = 1000; // (en ms)
-inline constexpr long DELAI_IMU = 5; // (en ms)
-inline constexpr long DELAI_COMMANDE = 5; // (en ms) Délai entre deux tentatives de lecture d'une nouvelle commande (en ms)
+inline constexpr int DELAI_FLUSH = 2000; // (en ms) Flush des logs sur la carte SD toutes les secondes
+inline constexpr int DELAI_STATUT = 1000; // (en ms)
+inline constexpr int DELAI_IMU = 5; // (en ms)
+inline constexpr int DELAI_COMMANDE = 5; // (en ms) Délai entre deux tentatives de lecture d'une nouvelle commande (en ms)
+inline constexpr int DELAI_ENVOI_UDP_MIN = 1; // (en ms)
+inline constexpr int DELAI_ENVOI_UDP_MAX = 100; // (en ms)
 
 inline constexpr bool LOGGING_WIFI_IO = false;
 
