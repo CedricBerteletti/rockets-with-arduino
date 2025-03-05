@@ -35,6 +35,8 @@ class EcranPrincipal(QFrame):
         self.password = ""
         self.init_ui()
 
+    
+    ###  CRÉATION DE L'INTERFACE GRAPHIQUE  ###
 
     def init_ui(self):
         # Préparation de l'écran
@@ -45,16 +47,14 @@ class EcranPrincipal(QFrame):
 
         # Panneau de gauche
         panneau_gauche = QFrame()
-        #panneau_gauche.setFrameShape(QFrame.Shape.StyledPanel)
         panneau_gauche.setLayout(QVBoxLayout())
         set_default_layout_params(panneau_gauche.layout())
-        splitter_general.addWidget(panneau_gauche)        
+        splitter_general.addWidget(panneau_gauche)
         splitter_panneau_gauche = QSplitter(Qt.Orientation.Vertical)
         panneau_gauche.layout().addWidget(splitter_panneau_gauche)
 
         frame = QFrame()
         splitter_panneau_gauche.addWidget(frame)
-        #frame.setFrameShape(QFrame.Shape.StyledPanel)
         frame.setLayout(QVBoxLayout())
         set_default_layout_params(frame.layout())
         self.creer_groupe_visualisation()
@@ -62,7 +62,6 @@ class EcranPrincipal(QFrame):
 
         frame = QFrame()
         splitter_panneau_gauche.addWidget(frame)
-        #frame.setFrameShape(QFrame.Shape.StyledPanel)
         frame.setLayout(QVBoxLayout())
         set_default_layout_params(frame.layout())
         self.creer_groupe_commandes()
@@ -72,16 +71,16 @@ class EcranPrincipal(QFrame):
       
         # Panneau de droite
         panneau_droit = QFrame()
-        #panneau_droit.setFrameShape(QFrame.Shape.StyledPanel)
         panneau_droit.setLayout(QVBoxLayout())
         set_default_layout_params(panneau_droit.layout())
-        splitter_general.addWidget(panneau_droit)
+        splitter_general.addWidget(panneau_droit)        
+        splitter_panneau_droite = QSplitter(Qt.Orientation.Vertical)
+        panneau_droit.layout().addWidget(splitter_panneau_droite)
 
         self.creer_groupe_graphiques()
-        panneau_droit.layout().addWidget(self.grp_graphs)
-        # TODO Ajouter splitter entre ces deux groupes de widgets graphiques
+        splitter_panneau_droite.addWidget(self.grp_graphs)
         self.creer_groupe_imu()
-        panneau_droit.layout().addWidget(self.grp_imu)
+        splitter_panneau_droite.addWidget(self.grp_imu)
 
         # Rafraichissement périodique des graphiques et des logs        
         self.timer = QTimer(self)
@@ -122,6 +121,36 @@ class EcranPrincipal(QFrame):
         self.grp_command.layout().addWidget(button, 0, 4)
         button.clicked.connect(self.confirmer_stop)
 
+
+    def creer_groupe_logs(self):
+        self.grp_logs = QGroupBox("Logs généraux")
+        self.grp_logs.setLayout(QVBoxLayout())
+        set_default_layout_params(self.grp_logs.layout())
+
+        self.tb_logs = QTextEdit ()
+        self.tb_logs.setReadOnly(True)        
+        self.tb_logs.setStyleSheet("background-color: rgb(0, 0, 0); color: rgb(255, 255, 255); ")
+        self.grp_logs.layout().addWidget(self.tb_logs)
+        self.tb_command = QLineEdit ()
+        self.grp_logs.layout().addWidget(self.tb_command)
+        self.tb_command.returnPressed.connect(self.nouvelles_commandes)
+
+
+    def creer_groupe_graphiques(self):
+        self.grp_graphs = QGroupBox("Graphiques IMU")
+        self.grp_graphs.setLayout(QVBoxLayout())
+        set_default_layout_params(self.grp_graphs.layout())
+
+        if settings.get_bool("graphs.debug"):
+            self.graphiques = graphiques.BaseGraphiquesIntegres(self.grp_graphs)
+        else:
+            self.graphiques = graphiques.GraphiquesIntegres(self.grp_graphs)
+        self.grp_graphs.layout().addWidget(self.graphiques)
+
+    
+
+    ###  FONCTIONS DE L'INTERFACE GRAPHIQUE  ###
+
     def demander_ip_port(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Connexion")
@@ -148,6 +177,43 @@ class EcranPrincipal(QFrame):
             self.ip = ip_input.text()
             self.port = port_input.text()
             self.executer_commande(f"wifi.broadcastUdpClient 0 {self.ip} {self.port}")
+
+    def creer_groupe_imu(self):
+        self.grp_imu = QGroupBox("IMU")
+        self.grp_imu.setLayout(QVBoxLayout())
+        set_default_layout_params(self.grp_imu.layout())
+       
+        layout_command = QGridLayout()
+        set_default_layout_params(layout_command)
+        self.grp_imu.layout().addLayout(layout_command)
+
+        button = QPushButton("Vider logs")
+        layout_command.addWidget(button, 0, 0)
+        button.clicked.connect(self.vider_logs_imu)
+
+        button = QPushButton("Vider et effacer")
+        layout_command.addWidget(button, 0, 1)
+        button.clicked.connect(self.imu_vider_et_effacer)
+
+        button = QPushButton("Calibrer")
+        layout_command.addWidget(button, 0, 2)        
+        button.clicked.connect(self.calibrer)
+
+        self.cb_imu_logs_defil = QCheckBox("Défilement auto")
+        self.cb_imu_logs_defil.setChecked(True)
+        layout_command.addWidget(self.cb_imu_logs_defil, 0, 3)
+
+        self.tb_imu_logs = QTextEdit ()
+        self.tb_imu_logs.setReadOnly(True)
+        self.tb_imu_logs.setStyleSheet("background-color: rgb(0, 0, 0); color: rgb(255, 255, 255);")
+        self.grp_imu.layout().addWidget(self.tb_imu_logs)
+
+    def charger_programme(self):
+        fileName = QFileDialog.getOpenFileName(self, "Charger programme de la fusée", "",
+                                               "Fichiers rfp (*.rfp)")
+        with open(fileName[0]) as f:
+            lines = f.read().splitlines()
+            self.executer_commandes(lines)
 
     def confirmer_lancement(self):
         dialog = QDialog(self)
@@ -193,70 +259,6 @@ class EcranPrincipal(QFrame):
             if dialog.exec():
                 self.password = password_input.text()
                 self.executer_commande(f"flightplan.stop {self.password}")
-
-
-    def creer_groupe_logs(self):
-        self.grp_logs = QGroupBox("Logs généraux")
-        self.grp_logs.setLayout(QVBoxLayout())
-        set_default_layout_params(self.grp_logs.layout())
-
-        self.tb_logs = QTextEdit ()
-        self.tb_logs.setReadOnly(True)        
-        self.tb_logs.setStyleSheet("background-color: rgb(0, 0, 0); color: rgb(255, 255, 255); ")
-        self.grp_logs.layout().addWidget(self.tb_logs)
-        self.tb_command = QLineEdit ()
-        self.grp_logs.layout().addWidget(self.tb_command)
-        self.tb_command.returnPressed.connect(self.nouvelles_commandes)
-
-
-    def creer_groupe_graphiques(self):
-        self.grp_graphs = QGroupBox("Graphiques IMU")
-        self.grp_graphs.setLayout(QVBoxLayout())
-        set_default_layout_params(self.grp_graphs.layout())
-
-        if settings.get_bool("graphs.debug"):
-            self.graphiques = graphiques.BaseGraphiquesIntegres(self.grp_graphs)
-        else:
-            self.graphiques = graphiques.GraphiquesIntegres(self.grp_graphs)
-        self.grp_graphs.layout().addWidget(self.graphiques)
-
-
-    def creer_groupe_imu(self):
-        self.grp_imu = QGroupBox("IMU")
-        self.grp_imu.setLayout(QVBoxLayout())
-        set_default_layout_params(self.grp_imu.layout())
-       
-        layout_command = QGridLayout()
-        set_default_layout_params(layout_command)
-        self.grp_imu.layout().addLayout(layout_command)
-
-        button = QPushButton("Vider logs")
-        layout_command.addWidget(button, 0, 0)
-        button.clicked.connect(self.vider_logs_imu)
-
-        button = QPushButton("Vider et effacer")
-        layout_command.addWidget(button, 0, 1)
-        button.clicked.connect(self.imu_vider_et_effacer)
-
-        button = QPushButton("Calibrer")
-        layout_command.addWidget(button, 0, 2)        
-        button.clicked.connect(self.calibrer)
-
-        self.cb_imu_logs_defil = QCheckBox("Défilement auto")
-        self.cb_imu_logs_defil.setChecked(True)
-        layout_command.addWidget(self.cb_imu_logs_defil, 0, 3)
-
-        self.tb_imu_logs = QTextEdit ()
-        self.tb_imu_logs.setReadOnly(True)
-        self.tb_imu_logs.setStyleSheet("background-color: rgb(0, 0, 0); color: rgb(255, 255, 255);")
-        self.grp_imu.layout().addWidget(self.tb_imu_logs)
-
-    def charger_programme(self):
-        fileName = QFileDialog.getOpenFileName(self, "Charger programme de la fusée", "",
-                                               "Fichiers rfp (*.rfp)")
-        with open(fileName[0]) as f:
-            lines = f.read().splitlines()
-            self.executer_commandes(lines)
 
     def maj(self):
         if self.actif:

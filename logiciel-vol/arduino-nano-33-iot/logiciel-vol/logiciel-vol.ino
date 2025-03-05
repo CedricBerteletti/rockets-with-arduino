@@ -75,7 +75,6 @@ void setup() {
     servos[i].init(i, servosBroches[i]);
   }
 
-  delay(1000);
   programmeVol.init(millis());
   dateFlushSuivant = programmeVol.dateCourante;
   dateLectureCommandeSuivante = programmeVol.dateCourante;

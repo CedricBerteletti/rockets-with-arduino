@@ -3,6 +3,5 @@
 *.obj
 *.FCStd1
 **/.venv/**
-logiciel-vol/arduino-nano-33-iot/logiciel-vol/secrets.h
 controle-sol/controle-sol.code-workspace
 logiciel-vol/arduino-nano-33-iot/logiciel-vol/secrets.h
