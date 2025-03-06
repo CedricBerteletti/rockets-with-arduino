@@ -64,7 +64,7 @@ class Interpreteur
     char cmdStrParam6[LONGUEUR_MAX_COMMANDE];
     int cmdIntParam1;
     int cmdIntParam2;
-    int cmdFloatParam1;
+    float cmdFloatParam1;
     PinMode cmdPinModeParam;
 };
 

@@ -33,8 +33,8 @@ inline constexpr int PIN_LED_DEBUG = 8;
 inline constexpr int TAILLE_BUFFER_DONNEES_INERTIELLES = 50;
 
 inline constexpr int NB_SERVOS = 4;
-inline constexpr int SERVO0_PIN = 7;
-inline constexpr int SERVO1_PIN = 6;
+inline constexpr int SERVO0_PIN = 18;
+inline constexpr int SERVO1_PIN = 19;
 inline constexpr int SERVO2_PIN = 20;
 inline constexpr int SERVO3_PIN = 21;
 
