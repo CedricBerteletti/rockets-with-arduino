@@ -26,8 +26,8 @@ class Connexion():
         if self.actif:
             self.fermer()
 
-        self.rocket_ip = rocket_ip;
-        self.rocket_port = rocket_port;
+        self.rocket_ip = rocket_ip
+        self.rocket_port = rocket_port
 
         self.socket = socket.socket(socket.AF_INET, # Internet
             socket.SOCK_DGRAM, socket.IPPROTO_UDP) # UDP

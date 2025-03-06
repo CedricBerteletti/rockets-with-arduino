@@ -88,12 +88,12 @@ class CentraleInertielle
     float offsetVAlpha = 0.0f; // Unité : °/s
     float offsetVBeta = 0.0f; // Unité : °/s
     float offsetVGamma = 0.0f; // Unité : °/s
-    float minAccX = 0.0f; // Unité : g
-    float minAccY = 0.0f; // Unité : g
-    float minAccZ = 0.0f; // Unité : g
-    float minVAlpha = 0.0f; // Unité : °/s
-    float minVBeta = 0.0f; // Unité : °/s
-    float minVGamma = 0.0f; // Unité : °/s
+    float minAccX = 0.1f; // Unité : g
+    float minAccY = 0.1f; // Unité : g
+    float minAccZ = 0.1f; // Unité : g
+    float minVAlpha = 1.0f; // Unité : °/s
+    float minVBeta = 1.0f; // Unité : °/s
+    float minVGamma = 1.0f; // Unité : °/s
 
     // Paramètre de la fonction de correction (asservissement de la trajectoire), de la forme a.err³ + b.err² + c.err + d
     float a = 0.0f;    

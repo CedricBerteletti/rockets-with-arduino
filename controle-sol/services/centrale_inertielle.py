@@ -76,6 +76,7 @@ class CentraleInertielle():
             logging.debug(f"Calcul du nouvel angle à deltat={temps_ecoule} s : a'={data.alpha} ; a={self.courant.alpha} ; va={data.valpha}")
             data.beta = self.integration(self.courant.beta, self.courant.vbeta, data.vbeta, temps_ecoule)
             data.gamma = self.integration(self.courant.gamma, self.courant.vgamma, data.vgamma, temps_ecoule)
+
             # TODO vitesses et positions
 
         # Mise à jour de la liste
@@ -126,6 +127,7 @@ class CentraleInertielle():
             self.offset_vbeta = 0.0
             self.offset_vgamma = 0.0
 
+        self.effacer_donnees()
         logging.info(f"CALIBRATION {self.offset_ax} ; {self.offset_ay} ; {self.offset_az} ; {self.offset_valpha} ; {self.offset_vbeta} ; {self.offset_vgamma}")
 
 

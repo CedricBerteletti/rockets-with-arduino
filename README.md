@@ -110,8 +110,20 @@ echo -n "WB 0 192.168.0.3 23900" > /dev/udp/192.168.0.3/23900
 
 Application Python permettant de configurer le vol de la fusée, de vérifier son statut, de lancer le compte à rebours final et d'acquérir et d'afficher les infos de vol.
 
-## Electronique
+## Électronique
 
 - Possibilité d'alimenter les servo-moteurs à une tension supérieure aux 5V de l'Arduino (par exemple avec les 7,4 V de la batterie), pour accélérer la vitesse de rotation.
+
+
+### Arduino Nano 33 IoT
+
+Ne pas utiliser les broches D10, D11, D12, D18 et D19 utilisées par défaut pour les interfaces SPI et I2C (sur laquelle est branchée notamment l'IMU).
+
+#### LSM6DS3 intégré
+
+The Arduino LSM6DS3 library allows us to use the Arduino Nano 33 IoT IMU module without having to go into complicated programming. The library takes care of the sensor initialization and sets its values as follows:
+- Accelerometer range is set at -4 |+4 g with -/+0.122 mg resolution.
+- Gyroscope range is set at -2000 | +2000 dps with +/-70 mdps resolution.
+- Output data rate is fixed at 104 Hz.
 
 

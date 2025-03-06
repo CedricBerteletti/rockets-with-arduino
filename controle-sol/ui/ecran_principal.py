@@ -30,8 +30,8 @@ class EcranPrincipal(QFrame):
         self.telemetrie = telemetrie
         self.centrale = centrale
         self.graphs_refresh_delay_ms = settings.get_int("graphs.refresh_delay_ms")
-        self.ip = settings.get("telemetry.arduino.ip")
-        self.port = settings.get("telemetry.arduino.port")
+        self.ip = settings.get("telemetry.ip")
+        self.port = settings.get("telemetry.port")
         self.password = ""
         self.init_ui()
 
@@ -298,6 +298,7 @@ class EcranPrincipal(QFrame):
 
     def maj_graph(self):
         self.graphiques.maj()
+        self.visualisation.maj_orientation(self.centrale.courant.alpha, self.centrale.courant.beta, self.centrale.courant.gamma)
 
     def stop(self):
         logging.debug("Fermeture de la fenêtre principale")
@@ -312,14 +313,18 @@ class EcranPrincipal(QFrame):
     def imu_vider_et_effacer(self):
         self.vider_logs_imu()
         self.graphiques.effacer()
+        self.centrale.effacer_donnees()
 
     def calibrer(self):
         self.centrale.calibrer()
+        self.imu_vider_et_effacer()
+        self.maj_graph()
 
     def nouvelles_commandes(self):
         commandes = self.tb_command.text().splitlines()
         self.tb_command.clear()
         self.executer_commandes(commandes)
+        self.visualisation.raz()
 
     def executer_commandes(self, commandes):
         for commande in commandes:
