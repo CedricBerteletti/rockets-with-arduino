@@ -11,6 +11,7 @@
 #define RST_PIN     9     // Configurable, see typical pin layout above
 #define SS_PIN      10    // Configurable, see typical pin layout above
 
+#define ROCKET_PIN 17     // Broche 0 laquelle est reliée le càble de signal de la fusée contrôlant la mise-à-feu
 #define BOUTON_PIN  4     // Broche à laquelle est relié le bouton de lancement
 #define COMMANDE_PIN 8    // Broche de commande du relai de mise à feu
 
@@ -35,8 +36,8 @@ void setup() {
   for (byte i = 0; i < 6; i++) {
     cleRfid.keyByte[i] = 0xFF;
   }
-
-  pinMode(BOUTON_PIN, INPUT_PULLUP); 
+  pinMode(ROCKET_PIN, INPUT_PULLUP);
+  pinMode(BOUTON_PIN, INPUT_PULLUP);
 
   pinMode(ROUGE_PIN, OUTPUT);
   pinMode(VERT_PIN, OUTPUT);
@@ -70,6 +71,10 @@ void loop() {
   intensiteRouge = 0;
   intensiteVert = 0;
   intensiteBleu = 0;
+
+  
+
+  Serial.println(analogRead(ROCKET_PIN));
 
   
   if(statut == STATUT_VERROUILLE) {
@@ -110,6 +115,11 @@ void loop() {
     Serial.println("Séquence finale.");
     statut = STATUT_COMPTE_A_REBOURS;
   }
+  else if (statut == STATUT_DEVERROUILLE && digitalRead(ROCKET_PIN) == HIGH) {
+    Serial.println("signal fusée:");
+    statut = STATUT_ALLUMAGE;
+  }
+  
   else if (statut == STATUT_COMPTE_A_REBOURS) {
 
     intensiteVert = 40;
@@ -150,7 +160,7 @@ void loop() {
     digitalWrite(COMMANDE_PIN, LOW);
     analogWrite(ROUGE_PIN, 0);
     analogWrite(VERT_PIN, 0);    
-    statut = STATUT_VERROUILLE;  
+    statut = STATUT_VERROUILLE;
   }
   
   delay(delai);
