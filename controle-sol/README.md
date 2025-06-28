@@ -3,8 +3,9 @@
 ## Description
 
 
-## Launching
+## Lancement
 
+### Windows
 Au besoin, créer le Python virtual environment and installer les différents packages.
 ```
 python.exe -m pip install --upgrade pip
@@ -25,6 +26,28 @@ Lancement
 ```
 python main.py
 ```
+
+### Linux
+Au besoin, créer le Python virtual environment and installer les différents packages.
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip3 install PyQt6
+pip3 install pyqtgraph
+pip3 install PyOpenGL
+pip3 install numpy-stl
+```
+
+Activer le Python virtual environment
+```
+source .venv/bin/activate
+```
+
+Lancement
+```
+python3 main.py
+```
+
 
 
 ## TODO
