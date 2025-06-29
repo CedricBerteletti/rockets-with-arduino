@@ -11,7 +11,7 @@
 #define RST_PIN     9     // Configurable, see typical pin layout above
 #define SS_PIN      10    // Configurable, see typical pin layout above
 
-#define ROCKET_PIN 17     // Broche 0 laquelle est reliée le càble de signal de la fusée contrôlant la mise-à-feu
+#define ROCKET_PIN 17     // Broche à laquelle est reliée le câble de signal de la fusée contrôlant la mise-à-feu
 #define BOUTON_PIN  4     // Broche à laquelle est relié le bouton de lancement
 #define COMMANDE_PIN 8    // Broche de commande du relai de mise à feu
 
@@ -36,7 +36,7 @@ void setup() {
   for (byte i = 0; i < 6; i++) {
     cleRfid.keyByte[i] = 0xFF;
   }
-  pinMode(ROCKET_PIN, INPUT_PULLUP);
+  pinMode(ROCKET_PIN, INPUT);
   pinMode(BOUTON_PIN, INPUT_PULLUP);
 
   pinMode(ROUGE_PIN, OUTPUT);
@@ -74,7 +74,7 @@ void loop() {
 
   
 
-  Serial.println(analogRead(ROCKET_PIN));
+  Serial.println(digitalRead(ROCKET_PIN));
 
   
   if(statut == STATUT_VERROUILLE) {

@@ -1,10 +1,10 @@
 # Script de configuration du plan de vol pour le lancememt de l'étage 2 seul (version 2b)
 
-# Allumage cabine
+# Paramétrage allumage cabine
 pin.setMode 2 OUTPUT
-# Allumage 1° étage
-pin.setMode 14 OUTPUT
-# Allumage caméra
+# Paramétrage allumage 1° étage (TODO ?)
+pin.setMode 6 OUTPUT
+# Paramétrage commande caméra
 pin.setMode 17 OUTPUT
 
 
