@@ -33,8 +33,8 @@ class ProgrammeVol
     void sauterVersEtape(int etape); // Aller directement à une étape/instruction spécifique
 
     int getEtapeCourante();
-    int getDureeEtape(int etape);
-    void setDureeEtape(int etape, int duree);
+    long getDureeEtape(int etape);
+    void setDureeEtape(int etape, long duree);
     char *getCommandeCourante();
 
   private:
@@ -43,7 +43,8 @@ class ProgrammeVol
     int etape = ETAPE_CONFIGURATION;
     long dateLancement = 0;
     long dateEtapeSuivante = -1;
-    int dureeEtape[NB_ETAPES];
+    long dureeEtape[NB_ETAPES];
+    long dureeCompteARebours; 
     
     void executerEtapeEtPreparerEtapeSuivante();
 };

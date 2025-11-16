@@ -64,18 +64,13 @@ int intensiteBleu;
 int delai = 1000;
 
 
-static const char CLE_AUTORISEE[] = "FE 4A 43 73";
+static const char CLE_AUTORISEE[] = "C0 CE 41 25";
 
 // But of course this is a more proper approach
 void loop() {
   intensiteRouge = 0;
   intensiteVert = 0;
   intensiteBleu = 0;
-
-  
-
-  Serial.println(digitalRead(ROCKET_PIN));
-
   
   if(statut == STATUT_VERROUILLE) {
     // VERIFICATION DE LA CLE RFID
@@ -111,12 +106,13 @@ void loop() {
       analogWrite(ROUGE_PIN, 0);
     }
   }
+
   else if(statut == STATUT_DEVERROUILLE && digitalRead(BOUTON_PIN) == LOW) {
-    Serial.println("Séquence finale.");
+    Serial.println("Séquence finale");
     statut = STATUT_COMPTE_A_REBOURS;
   }
   else if (statut == STATUT_DEVERROUILLE && digitalRead(ROCKET_PIN) == HIGH) {
-    Serial.println("signal fusée:");
+    Serial.println("signal fusée");
     statut = STATUT_ALLUMAGE;
   }
   
@@ -124,27 +120,38 @@ void loop() {
 
     intensiteVert = 40;
     intensiteRouge = 225;
-    for(int i = 10; i > 1; i -= 1)
+
+    bool annulation = false;
+    int delai = 10; // Compte à rebours en secondes
+    while (delai > 0 && !annulation)
     {
-      Serial.println(i);
+      Serial.println(delai);
       analogWrite(ROUGE_PIN, intensiteRouge);
       analogWrite(VERT_PIN, intensiteVert);
       delay(500);
       analogWrite(ROUGE_PIN, 0);
       analogWrite(VERT_PIN, 0);
       delay(500);
+
+      annulation = digitalRead(BOUTON_PIN) == LOW;
+      delai--;
     }
     
-    intensiteVert = 0;
-    intensiteRouge = 255;
-    Serial.println(1);
-    analogWrite(ROUGE_PIN, intensiteRouge);
-    analogWrite(VERT_PIN, intensiteVert);
-    delay(800);
-    analogWrite(ROUGE_PIN, 0);
-    analogWrite(VERT_PIN, 0);
-    delay(200);
-    statut = STATUT_ALLUMAGE;
+    if(annulation) {
+      Serial.println("Annulation du lancement !");
+      statut = STATUT_VERROUILLE;
+    }
+    else {
+      intensiteVert = 0;
+      intensiteRouge = 255;
+      analogWrite(ROUGE_PIN, intensiteRouge);
+      analogWrite(VERT_PIN, intensiteVert);
+      delay(800);
+      analogWrite(ROUGE_PIN, 0);
+      analogWrite(VERT_PIN, 0);
+      delay(200);
+      statut = STATUT_ALLUMAGE;
+    }
   }
   else if (statut == STATUT_ALLUMAGE) {    
     Serial.println("Décollage !");

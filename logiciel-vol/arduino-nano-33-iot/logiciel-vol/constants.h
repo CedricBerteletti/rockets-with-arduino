@@ -41,6 +41,6 @@ inline constexpr int SERVO3_PIN = 21;
 // Nombre d'étapes/instructions du programme de vol
 inline constexpr int NB_ETAPES = 50;
 inline constexpr int ETAPE_CONFIGURATION = -1;
-inline constexpr int ETAPE_DECOMPTE_FINAL = 0;
+inline constexpr int ETAPE_DECOMPTE_FINAL = 10;
 
 #endif

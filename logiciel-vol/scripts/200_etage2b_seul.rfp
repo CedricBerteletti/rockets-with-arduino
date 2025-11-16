@@ -1,20 +1,39 @@
 # Script de configuration du plan de vol pour le lancememt de l'étage 2 seul (version 2b)
 
+
+### Configurations hors séquence autonome
+
 # Paramétrage allumage cabine
 pin.setMode 2 OUTPUT
-# Paramétrage allumage 1° étage (TODO ?)
-pin.setMode 6 OUTPUT
+# Paramétrage allumage 1° étage
+pin.setMode 14 OUTPUT
 # Paramétrage commande caméra
 pin.setMode 17 OUTPUT
 
 
 
-flightplan.configureStep 0 10000 logger.log DECOMPTE FINAL {{DATE}}
+### Configuration de la séquence autonome
 
-flightplan.configureStep 1 0 pin.fire 14    # Allumage des étages avec les pins 14 à 17
-flightplan.configureStep 2 5000 rocket.stage
-flightplan.configureStep 3 0 rocket.stage
-flightplan.configureStep 4 0 logger.deactivateLogFlush
-flightplan.configureStep 5 0 logger.log FIN DE MISSION
+# Les 10 premières étapes sont réservées pour des dernières initialisations juste avant le lancement
+flightplan.configureStep 0 1000 logger.log INIT 0
+flightplan.configureStep 1 1000 logger.log INIT 1
+flightplan.configureStep 2 1000 logger.log INIT 2
+flightplan.configureStep 3 1000 logger.log INIT 3
+flightplan.configureStep 4 1000 logger.log INIT 4
+flightplan.configureStep 5 1000 logger.log INIT 5
+flightplan.configureStep 6 1000 logger.log INIT 6
+flightplan.configureStep 7 1000 logger.log INIT 7
+flightplan.configureStep 8 1000 logger.log INIT 8
+flightplan.configureStep 9 1000 logger.log INIT 9
 
-flightplan.configureStep 6 -1 logger.deactivateLogRocketStatus
+# Début du compte à rebours 
+flightplan.configureStep 10 10000 logger.log DECOMPTE FINAL {{DATE}}
+
+flightplan.configureStep 11 0 pin.fire 14    # Allumage des étages avec les pins 14 à 16
+flightplan.configureStep 12 5000 rocket.stage
+flightplan.configureStep 13 0 rocket.stage
+flightplan.configureStep 14 0 logger.log FIN DE MISSION
+
+
+
+
