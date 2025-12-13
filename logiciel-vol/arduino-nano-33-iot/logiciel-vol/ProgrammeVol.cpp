@@ -54,19 +54,18 @@ bool ProgrammeVol::evaluerEtapeSuivante() {
 void ProgrammeVol::etapeSuivante() {
   etape = etape + 1;
   if(etape > ETAPE_CONFIGURATION) {
+    if(etape == 0) {
+      // Initialisation de la dateEtapeSuivante à la date courante
+      dateEtapeSuivante = millis();
+    }
     if(etape == ETAPE_DECOMPTE_FINAL) {
       // Étapes d'initialisation jusqu'au décompte final ! La fusée est en auto à partir de maintenant
       // (ie, transition d'état selon ce qui a été précédemment paramétré)
       dateLancement = millis();
-      dureeCompteARebours = 0;
-      for (int i = ETAPE_CONFIGURATION+1; i <= ETAPE_DECOMPTE_FINAL; i++ ) {
-        dureeCompteARebours = dureeCompteARebours + dureeEtape[i];
-      }
+      dureeCompteARebours =getDureeEtape(etape);
 
       // On commence à afficher les logs sur les 
       loggingStatutFusee = true;
-      // Initialisation de la dateEtapeSuivante à la date courante
-      dateEtapeSuivante = dateLancement;
     }
 
     itoa(etape, strLog, 10);
@@ -90,7 +89,7 @@ void ProgrammeVol::sauterVersEtape(int e) {
 void ProgrammeVol::executerEtapeEtPreparerEtapeSuivante() {
   if(dureeEtape[etape] != -1) {
     // La condition de passage à l'étape suivante est une durée
-    dateEtapeSuivante = dateEtapeSuivante + dureeEtape[etape];
+    dateEtapeSuivante = dateEtapeSuivante + getDureeEtape(etape);
   }
   else {
     // La condition de passage à l'étape suivante n'est pas une durée
@@ -101,7 +100,7 @@ void ProgrammeVol::executerEtapeEtPreparerEtapeSuivante() {
 void ProgrammeVol::logStatutFusee() {
   if(etape > ETAPE_CONFIGURATION) {
     // t = 0s commence lorsque l'on arrive à l'instruction/étape ETAPE_DECOMPTE_FINAL
-    int dateEnSeconde = dateCourante - dateLancement - dureeCompteARebours/1000;
+    int dateEnSeconde = (dateCourante - dateLancement - dureeCompteARebours)/1000;
     sprintf(strLog, "t=%is | Étape %i | Étage %i", dateEnSeconde, etape, etageCourant);
   }
   else {
