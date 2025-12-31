@@ -8,17 +8,19 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-#define RST_PIN     9     // Configurable, see typical pin layout above
-#define SS_PIN      10    // Configurable, see typical pin layout above
+#define RST_PIN       9     // Configurable, see typical pin layout above
+#define SS_PIN        10    // Configurable, see typical pin layout above
 
-#define ROCKET_PIN 17     // Broche à laquelle est reliée le câble de signal de la fusée contrôlant la mise-à-feu
-#define BOUTON_PIN  4     // Broche à laquelle est relié le bouton de lancement
-#define COMMANDE_PIN 8    // Broche de commande du relai de mise à feu
+#define SEUIL_BOUTON  255
+#define ROCKET_PIN    20    // Broche à laquelle est reliée le câble de signal de la fusée contrôlant la mise-à-feu
+#define BOUTON_PIN    21    // Broche à laquelle est relié le bouton de lancement
+
+#define COMMANDE_PIN  2     // Broche de commande du relai de mise à feu
 
 // Broches pour la LED RVB
-#define ROUGE_PIN 5
-#define VERT_PIN 6
-#define BLEU_PIN 7
+#define ROUGE_PIN     16
+#define VERT_PIN      17
+#define BLEU_PIN      19
 
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Création de l'instance pour la gestion de la clé RFID
@@ -37,14 +39,14 @@ void setup() {
     cleRfid.keyByte[i] = 0xFF;
   }
   pinMode(ROCKET_PIN, INPUT);
-  pinMode(BOUTON_PIN, INPUT_PULLUP);
+  pinMode(BOUTON_PIN, INPUT);
 
   pinMode(ROUGE_PIN, OUTPUT);
   pinMode(VERT_PIN, OUTPUT);
   pinMode(BLEU_PIN, OUTPUT);
-  digitalWrite(ROUGE_PIN, LOW);
-  digitalWrite(VERT_PIN, LOW);
-  digitalWrite(BLEU_PIN, LOW);
+  analogWrite(ROUGE_PIN, 0);
+  analogWrite(VERT_PIN, 0);
+  analogWrite(BLEU_PIN, 255);
 
   pinMode(COMMANDE_PIN, OUTPUT);
 
@@ -73,6 +75,11 @@ void loop() {
   intensiteBleu = 0;
   
   if(statut == STATUT_VERROUILLE) {
+    intensiteBleu = 255;
+    analogWrite(ROUGE_PIN, intensiteRouge);
+    analogWrite(VERT_PIN, intensiteVert);
+    analogWrite(BLEU_PIN, intensiteBleu);
+
     // VERIFICATION DE LA CLE RFID
     // Look for new cards, and select one if present
     if ( ! mfrc522.PICC_IsNewCardPresent() || ! mfrc522.PICC_ReadCardSerial() ) {
@@ -86,12 +93,19 @@ void loop() {
       statut = STATUT_DEVERROUILLE;
 
       intensiteVert = 255;
+      intensiteBleu = 0;
+      
+      analogWrite(ROUGE_PIN, intensiteRouge);
       analogWrite(VERT_PIN, intensiteVert);
+      analogWrite(BLEU_PIN, intensiteBleu);
       delai = 100;
     }
     else {    
       Serial.println("ALERTE ! Accès non autorisé !");
-      
+            
+      intensiteBleu = 0;
+      analogWrite(VERT_PIN, intensiteVert);
+      analogWrite(BLEU_PIN, intensiteBleu);
       intensiteRouge = 255;
       analogWrite(ROUGE_PIN, intensiteRouge);
       delay(200);
@@ -107,17 +121,18 @@ void loop() {
     }
   }
 
-  else if(statut == STATUT_DEVERROUILLE && digitalRead(BOUTON_PIN) == LOW) {
+  else if(statut == STATUT_DEVERROUILLE && analogRead(BOUTON_PIN) >= SEUIL_BOUTON) {
     Serial.println("Séquence finale");
     statut = STATUT_COMPTE_A_REBOURS;
   }
-  else if (statut == STATUT_DEVERROUILLE && digitalRead(ROCKET_PIN) == HIGH) {
+  else if (statut == STATUT_DEVERROUILLE && analogRead(ROCKET_PIN) >= SEUIL_BOUTON) {
     Serial.println("signal fusée");
     statut = STATUT_ALLUMAGE;
   }
   
   else if (statut == STATUT_COMPTE_A_REBOURS) {
 
+    intensiteVert = 0;
     intensiteVert = 40;
     intensiteRouge = 225;
 
@@ -128,12 +143,13 @@ void loop() {
       Serial.println(delai);
       analogWrite(ROUGE_PIN, intensiteRouge);
       analogWrite(VERT_PIN, intensiteVert);
+      analogWrite(BLEU_PIN, intensiteBleu);
       delay(500);
       analogWrite(ROUGE_PIN, 0);
       analogWrite(VERT_PIN, 0);
       delay(500);
 
-      annulation = digitalRead(BOUTON_PIN) == LOW;
+      annulation = analogRead(BOUTON_PIN) >= SEUIL_BOUTON;
       delai--;
     }
     
@@ -146,6 +162,7 @@ void loop() {
       intensiteRouge = 255;
       analogWrite(ROUGE_PIN, intensiteRouge);
       analogWrite(VERT_PIN, intensiteVert);
+      analogWrite(BLEU_PIN, intensiteBleu);
       delay(800);
       analogWrite(ROUGE_PIN, 0);
       analogWrite(VERT_PIN, 0);
@@ -160,13 +177,15 @@ void loop() {
     intensiteRouge = 255;
     analogWrite(ROUGE_PIN, intensiteRouge);
     analogWrite(VERT_PIN, intensiteVert);
+    analogWrite(BLEU_PIN, intensiteBleu);
     digitalWrite(COMMANDE_PIN, HIGH);
     
     delay(2000);
     
     digitalWrite(COMMANDE_PIN, LOW);
     analogWrite(ROUGE_PIN, 0);
-    analogWrite(VERT_PIN, 0);    
+    analogWrite(VERT_PIN, 0);
+    analogWrite(BLEU_PIN, 0);
     statut = STATUT_VERROUILLE;
   }
   
