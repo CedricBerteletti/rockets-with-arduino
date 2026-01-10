@@ -59,11 +59,15 @@ const int STATUT_COMPTE_A_REBOURS = 2;
 const int STATUT_ALLUMAGE = 3;
 int statut = STATUT_VERROUILLE;
 
+// Durées en ms
+const int DUREE_ALLUMAGE = 4000;
+const int DELAI_LECTURE = 100;
+
+const int NB_SECONDES_COMPTE_A_REBOURS_MANUEL = 10;
+
 int intensiteRouge;
 int intensiteVert;
 int intensiteBleu;
-
-int delai = 1000;
 
 
 static const char CLE_AUTORISEE[] = "C0 CE 41 25";
@@ -98,7 +102,6 @@ void loop() {
       analogWrite(ROUGE_PIN, intensiteRouge);
       analogWrite(VERT_PIN, intensiteVert);
       analogWrite(BLEU_PIN, intensiteBleu);
-      delai = 100;
     }
     else {    
       Serial.println("ALERTE ! Accès non autorisé !");
@@ -137,7 +140,7 @@ void loop() {
     intensiteRouge = 225;
 
     bool annulation = false;
-    int delai = 10; // Compte à rebours en secondes
+    int delai = NB_SECONDES_COMPTE_A_REBOURS_MANUEL; // Compte à rebours en secondes
     while (delai > 0 && !annulation)
     {
       Serial.println(delai);
@@ -180,7 +183,7 @@ void loop() {
     analogWrite(BLEU_PIN, intensiteBleu);
     digitalWrite(COMMANDE_PIN, HIGH);
     
-    delay(2000);
+    delay(DUREE_ALLUMAGE);
     
     digitalWrite(COMMANDE_PIN, LOW);
     analogWrite(ROUGE_PIN, 0);
@@ -189,7 +192,7 @@ void loop() {
     statut = STATUT_VERROUILLE;
   }
   
-  delay(delai);
+  delay(DELAI_LECTURE);
 }
 
 boolean verificationCle() {
