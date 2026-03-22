@@ -26,3 +26,35 @@ Diamètre trou pour vis M3 : 3,0 mm
 - 55 cm : 200 - 300 g
 - 45 cm : 100 - 200 g
 - 35 cm : 50 - 100 g
+
+# Fusée étage 2 seul
+
+## Base
+
+Hauteur : 185 mm
+Masse sans moteur : 180 g
+Centre de gavrité (depuis bas) : 80 mm
+
+## Corps
+
+Hauteur : 585 mm
+Masse : 146 g
+Centre de gavrité (depuis bas) : 315 mm
+
+## Base + Corps
+
+Hauteur : 770 mm
+Masse sans moteur : 326 g
+Centre de gavrité (depuis bas) : 275 mm
+
+
+## Coiffe
+
+Hauteur : 210 mm
+Masse sans batterie : 228 g
+Centre de gavrité (depuis bas) : 65 mm
+Masse batterie Black Lithium 45 C 7,4V 300mAh : 16 g
+
+## Caméra
+
+Environ 1 Go pour 4 min d'enregistrement
